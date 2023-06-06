@@ -1,0 +1,30 @@
+{
+  "name": "autoservice",
+  "private": true,
+  "scripts": {
+    "start": "cross-env MONGO_URL=mongodb://localhost:27017/autoservice meteor run --port 80",
+    "test": "meteor test --once --driver-package meteortesting:mocha",
+    "test-app": "TEST_WATCH=1 meteor test --full-app --driver-package meteortesting:mocha",
+    "visualize": "meteor --production --extra-packages bundle-visualizer"
+  },
+  "dependencies": {
+    "@babel/runtime": "^7.17.9",
+    "deepmerge": "^4.3.1",
+    "meteor-node-stubs": "^1.2.1",
+    "simpl-schema": "^3.4.1",
+    "validator": "^13.9.0",
+    "vue": "^3.3.4",
+    "vue-i18n": "^9.2.2",
+    "vue-router": "^4.2.1"
+  },
+  "meteor": {
+    "mainModule": {
+      "client": "client/main.js",
+      "server": "server/main.js"
+    },
+    "testModule": "tests/main.js"
+  },
+  "devDependencies": {
+    "cross-env": "^7.0.3"
+  }
+}

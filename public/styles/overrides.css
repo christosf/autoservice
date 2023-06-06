@@ -1,0 +1,25 @@
+@media (max-width: 599.98px) {
+    .q-layout-padding {
+        padding: 6px
+    }
+
+    .q-table__top {
+        padding: 6px 8px;
+    }
+}
+
+@media (min-width: 600px) and (max-width:1439.98px) {
+    .q-layout-padding {
+        padding: 12px
+    }
+}
+
+@media (min-width: 1440px) {
+    .q-layout-padding {
+        padding: 12px
+    }
+}
+
+.q-dialog__inner--minimized {
+    padding: 12px;
+}
