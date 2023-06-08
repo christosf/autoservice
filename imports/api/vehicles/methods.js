@@ -18,6 +18,8 @@ Meteor.methods({
                 type: String,
                 optional: true
             },
+            tags: Array,
+            'tags.$': String,
             bodyType: {
                 type: String,
                 optional: true
@@ -45,17 +47,101 @@ Meteor.methods({
         }).validate(params)
         
         const vehicle = { ...params }
-
-        vehicle.addedById = this.userId
         vehicle.code = 'V' + Meteor.call('counters.increaseVehiclesCounter')
+        vehicle.makeModel = `${vehicle.make} ${vehicle.model}`
 
         try {
-            const vehicleId = Vehicles.insert(vehicle)
-            return { added: true, vehicleId, code: vehicle.code }
+            return { added: true, _id: Vehicles.insert(vehicle), code: vehicle.code }
         } catch(error) {
             Meteor.call('counters.decreaseVehiclesCounter')
             throw error
         }
+    },
+    'vehicles.update'(params) {
+        if (Meteor.isClient) return
+
+        new SimpleSchema({
+            _id: String,
+            ownerId: String,
+            make: String,
+            model: String,
+            regNumber: {
+                type: String,
+                optional: true
+            },
+            chassisNumber: {
+                type: String,
+                optional: true
+            },
+            tags: Array,
+            'tags.$': String,
+            bodyType: {
+                type: String,
+                optional: true
+            },
+            fuelType: {
+                type: String,
+                optional: true
+            },
+            engine: {
+                type: String,
+                optional: true
+            },
+            gearbox: {
+                type: String,
+                optional: true
+            },
+            drivetrain: {
+                type: String,
+                optional: true
+            },
+            modelYear: {
+                type: String,
+                optional: true
+            }
+        }).validate(params)
+
+        const { _id } = params
+        const vehicle = { ...params }
+        delete vehicle._id
+
+        vehicle.makeModel = `${vehicle.make} ${vehicle.model}`
+        
+        return { updated: Vehicles.update(_id, { $set: vehicle }) === 1 }
+    },
+    'vehicles.delete'(params) {
+        if (Meteor.isClient) return
+
+        new SimpleSchema({
+            _id: String
+        }).validate(params)
+
+        const { _id } = params
+
+        // TODO: Do not allow if vehicles has jobcards.
+        return { deleted: Vehicles.remove(_id) === 1 }
+    },
+    'vehicles.deactivate'(params) {
+        if (Meteor.isClient) return
+
+        new SimpleSchema({
+            _id: String
+        }).validate(params)
+
+        const { _id } = params
+
+        return { deactivated: Vehicles.update(_id, { $set: { active: false }}) === 1 }
+    },
+    'vehicles.activate'(params) {
+        if (Meteor.isClient) return
+
+        new SimpleSchema({
+            _id: String
+        }).validate(params)
+
+        const { _id } = params
+
+        return { activated: Vehicles.update(_id, { $set: { active: true }}) === 1 }
     },
     'vehicles.fieldValueExists'(params) {
         if (Meteor.isClient) return
@@ -83,20 +169,6 @@ Meteor.methods({
             field: String,
             filter: String
         }).validate(params)
-
-        /*
-        // In case the results need to be limited, use this method (needs refinement)
-        const results = []
-        Vehicles.rawCollection().aggregate([
-            { $match: { make: { $regex: filter, $options: 'i' }}},
-            { '$group': { '_id': '$make' }},
-            { '$limit': 8 }
-        ]).toArray().then(res => {
-            res.forEach(item => {
-                results.push(item._id)
-            })
-            console.log(results)
-        })*/
 
         const { field } = params
         const filter = params.filter.replace(/([()[{*+.$^\\|?])/g, '\\$1').toUpperCase()

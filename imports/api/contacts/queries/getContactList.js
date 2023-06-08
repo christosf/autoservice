@@ -19,7 +19,8 @@ export default Contacts.createQuery('getContactList', {
             { code: { $regex: params.filter, $options : 'i' }},
             { name: { $regex: params.filter, $options : 'i' }},
             { mobilePhone: { $regex: params.filter, $options : 'i' }},
-            { landlinePhone: { $regex: params.filter, $options : 'i' }}
+            { landlinePhone: { $regex: params.filter, $options : 'i' }},
+            { tags: { $regex: params.filter, $options : 'i' }}
         ]
 
         options.sort[params.sortBy] = params.descending ? 1 : -1
@@ -30,6 +31,7 @@ export default Contacts.createQuery('getContactList', {
     type: 1,
     mobilePhone: 1,
     landlinePhone: 1,
+    tags: 1,
     vehiclesCount: 1,
     active: 1,
     updatedAt: 1

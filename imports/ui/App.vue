@@ -2,7 +2,7 @@
     <q-layout view='hHh LpR lFr' class='bg-grey-2'>
         <q-header reveal elevated class='bg-black text-white'>
             <q-toolbar>
-                <q-toolbar-title>
+                <q-toolbar-title class='gt-sm'>
                     <router-link
                         :to='{ name: "IndexPage" }'
                         class='text-white'
@@ -11,6 +11,15 @@
                         AutoService
                     </router-link>
                 </q-toolbar-title>
+                <q-btn
+                    @click='leftSidebarOpen = !leftSidebarOpen'
+                    :icon='leftSidebarOpen ? "close" : "menu"'
+                    class='lt-md'
+                    color='primary'
+                    padding='xs'
+                    round
+                    flat
+                />
                 <q-space />
                 <div v-if='userId' class='q-gutter-sm'>
                     <q-btn-dropdown
@@ -29,6 +38,11 @@
                             <q-item clickable @click='addVehicleDialogRef.open()'>
                                 <q-item-section>
                                     <q-item-label>{{ $t('vehicles.one') }}</q-item-label>
+                                </q-item-section>
+                            </q-item>
+                            <q-item clickable @click='addJobcardDialogRef.open()'>
+                                <q-item-section>
+                                    <q-item-label>{{ $t('jobcards.one') }}</q-item-label>
                                 </q-item-section>
                             </q-item>
                         </q-list>
@@ -50,15 +64,16 @@
                         flat
                     />
                 </div>
-                
             </q-toolbar>
         </q-header>
 
         <q-drawer
-            v-model='leftSidebar'
+            v-model='leftSidebarVisible'
+            @click='leftSidebarOpen = false'
             :width='$q.screen.lt.md ? 200 : 250'
-            side='left'
+            :overlay='leftSidebarOpen'
             behavior='desktop'
+            side='left'
             bordered
         >
             <router-view name='leftSidebar' v-slot='{ Component }'>
@@ -69,7 +84,7 @@
         </q-drawer>
 
         <q-drawer
-            v-model='rightSidebar'
+            v-model='rightSidebarVisible'
             :width='$q.screen.lt.md ? 200 : 250'
             side='right'
             behavior='desktop'
@@ -99,6 +114,7 @@
         -->
         <add-contact-dialog ref='addContactDialogRef' />
         <add-vehicle-dialog ref='addVehicleDialogRef' />
+        <add-jobcard-dialog ref='addJobcardDialogRef' />
     </q-layout>
 </template>
 
@@ -110,11 +126,13 @@ import { useQuasar } from './quasar'
 import { useUsers } from './users/composables'
 import AddContactDialog from './contacts/components/AddContactDialog.vue'
 import AddVehicleDialog from './vehicles/components/AddVehicleDialog.vue'
+import AddJobcardDialog from './jobcards/components/AddJobcardDialog.vue'
 
 export default {
     components: {
         AddContactDialog,
-        AddVehicleDialog
+        AddVehicleDialog,
+        AddJobcardDialog
     },
     setup() {
         const $q = useQuasar()
@@ -125,8 +143,11 @@ export default {
 
         const addContactDialogRef = ref(null)
         const addVehicleDialogRef = ref(null)
+        const addJobcardDialogRef = ref(null)
+
+        const leftSidebarOpen = ref(false)
         
-        const rightSidebar = computed(() => {
+        const rightSidebarVisible = computed(() => {
             let sidebar = false
             if (route.matched.length > 0) {
                 route.matched.forEach(match => {
@@ -139,7 +160,7 @@ export default {
             return $q.screen.gt.sm && sidebar
         })
         
-        const leftSidebar = computed(() => {
+        const leftSidebarVisible = computed(() => {
             let sidebar = false
             if (route.matched.length > 0) {
                 route.matched.forEach(match => {
@@ -149,7 +170,7 @@ export default {
                     } 
                 })
             }
-            return $q.screen.gt.sm && sidebar
+            return ($q.screen.gt.sm && sidebar) || leftSidebarOpen.value
         })
 
         const logoutFn = () => {
@@ -166,13 +187,16 @@ export default {
 
         provide('addContactDialogRef', addContactDialogRef)
         provide('addVehicleDialogRef', addVehicleDialogRef)
+        provide('addJobcardDialogRef', addJobcardDialogRef)
 
         return {
             userId,
             addContactDialogRef,
             addVehicleDialogRef,
-            leftSidebar,
-            rightSidebar,
+            addJobcardDialogRef,
+            leftSidebarOpen,
+            leftSidebarVisible,
+            rightSidebarVisible,
             logoutFn
         }
     }

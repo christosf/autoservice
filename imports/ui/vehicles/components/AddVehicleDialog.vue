@@ -3,10 +3,11 @@
         v-model='dialogOpen'
         @hide='resetForm'
         :maximized='$q.platform.is.mobile'
+        id='add-vehicle-dialog'
         no-backdrop-dismiss
     >
-        <q-card class='full-width' style='max-width: 800px;'>
-            <q-card-section class='q-py-sm'>
+        <q-card>
+            <q-card-section class='q-pa-sm'>
                 <q-toolbar>
                     <div class='text-h6'>{{ $t('vehicles.add') }}</div>
                     <q-space />
@@ -28,24 +29,25 @@
                         flat
                     >
                         <q-step
+                            name='basicDetails'
                             @transition='basicDetailsFormRef.focus()'
-                            :name='1'
                             :title='$t("core.basic_details")'
-                            :error='steps.step1.hasError'
+                            :error='steps.basicDetails.hasError'
                             icon='directions_car'
                         >
                             <q-form
                                 @submit='submitForm("basicDetails")'
-                                @validation-error='atValidationError(1)'
+                                @validation-error='validationError("basicDetails")'
                                 ref='basicDetailsFormRef'
                                 class='q-gutter-md'
                             >
                                 <q-select
                                     v-model='form.owner'
-                                    @update:model-value='resetFormValidation(1, basicDetailsFormRef)'
+                                    @update:model-value='resetFormValidation("basicDetails", basicDetailsFormRef)'
                                     @filter='filterContacts'
                                     :rules='rules.owner'
                                     :options='contactsOptionList'
+                                    :autofocus='$q.platform.is.desktop'
                                     lazy-rules='ondemand'
                                     input-class='text-uppercase'
                                     class='q-mt-none'
@@ -54,7 +56,6 @@
                                     use-input
                                     bottom-slots
                                     label-slot
-                                    autofocus
                                     outlined
                                 >
                                     <template #prepend>
@@ -73,7 +74,7 @@
                                                     <span class='text-weight-medium'>{{ opt.name }}</span>
                                                     <q-chip size='xs' icon='tag'>{{ opt.code }}</q-chip>
                                                 </q-item-label>
-                                                <q-item-label v-if='opt.type === "company"' caption>
+                                                <q-item-label v-if='isCompany(opt.type)' caption>
                                                     {{ opt.landlinePhone }}
                                                     <template v-if='opt.mobilePhone'>/ {{ opt.mobilePhone }}</template>
                                                 </q-item-label>
@@ -92,7 +93,7 @@
                                     v-model='form.make'
                                     @filter='(value, update) => filterDistinctFieldValuesNoInitial(value, update, "make")'
                                     @input-value='value => addNewValue(value, "make")'
-                                    @update:model-value='resetFormValidation(1, basicDetailsFormRef)'
+                                    @update:model-value='resetFormValidation("basicDetails", basicDetailsFormRef)'
                                     :rules='rules.make'
                                     :options='makesOptionList'
                                     lazy-rules='ondemand'
@@ -122,7 +123,7 @@
                                     v-model='form.model'
                                     @filter='(value, update) => filterDistinctFieldValuesNoInitial(value, update, "model")'
                                     @input-value='value => addNewValue(value, "model")'
-                                    @update:model-value='resetFormValidation(1, basicDetailsFormRef)'
+                                    @update:model-value='resetFormValidation("basicDetails", basicDetailsFormRef)'
                                     :rules='rules.model'
                                     :options='modelsOptionList'
                                     lazy-rules='ondemand'
@@ -150,7 +151,7 @@
                                 </q-select>
                                 <q-input
                                     v-model='form.regNumber'
-                                    @update:model-value='resetFormValidation(1, basicDetailsFormRef)'
+                                    @update:model-value='resetFormValidation("basicDetails", basicDetailsFormRef)'
                                     :label='$t("vehicles.reg_number")'
                                     :rules='rules.regNumber'
                                     lazy-rules='ondemand'
@@ -165,10 +166,10 @@
                                 </q-input>
                                 <q-input
                                     v-model='form.chassisNumber'
-                                    @update:model-value='resetFormValidation(1, basicDetailsFormRef)'
+                                    @update:model-value='resetFormValidation("basicDetails", basicDetailsFormRef)'
                                     :label='$t("vehicles.chassis_number")'
                                     :rules='rules.chassisNumber'
-                                    :error='steps.step1.chassisError'
+                                    :error='steps.basicDetails.chassisError'
                                     lazy-rules='ondemand'
                                     input-class='text-uppercase'
                                     maxlength='17'
@@ -183,12 +184,13 @@
                                     <q-btn
                                         type='submit'
                                         :label='$t("core.add")'
+                                        :loading='formSubmitted'
                                         color='primary'
                                         icon='add'
                                         no-caps
                                     />
                                     <q-btn
-                                        @click='steps.current = 2'
+                                        @click='steps.current = "extraDetails"'
                                         :label='$t("core.extra_details")'
                                         color='blue-grey-10'
                                         icon='chevron_right'
@@ -199,19 +201,46 @@
                             </q-form>
                         </q-step>
                         <q-step
+                            name='extraDetails'
                             @transition='extraDetailsFormRef.focus()'
-                            :name='2'
                             :title='$t("core.extra_details")'
-                            :error='steps.step2.hasError'
+                            :error='steps.extraDetails.hasError'
                             icon='settings'
                         >
                             <q-form
                                 @submit='submitForm("extraDetails")'
-                                @validation-error='atValidationError(2)'
+                                @validation-error='validationError("extraDetails")'
+                                :autofocus='$q.platform.is.desktop'
                                 ref='extraDetailsFormRef'
                             >
                                 <div class='row q-col-gutter-md q-mb-md'>
                                     <div class='col q-pt-none'>
+                                        <q-select
+                                            v-model='form.tags'
+                                            @filter='(value, update) => filterDistinctFieldValues(value, update, "tags")'
+                                            @new-value='addNewTag'
+                                            @update:model-value='resetFormValidation("extraDetails", extraDetailsFormRef)'
+                                            :label='$t("core.tags")'
+                                            :options='tagsOptionList'
+                                            input-class='text-uppercase'
+                                            class='q-pt-none'
+                                            multiple
+                                            use-chips
+                                            use-input
+                                            fill-input
+                                            hide-dropdown-icon
+                                            options-dense
+                                            bottom-slots
+                                            outlined
+                                        >
+                                            <template #prepend>
+                                                <q-icon name='sell' />
+                                            </template>
+                                        </q-select>
+                                    </div>
+                                </div>
+                                <div class='row q-col-gutter-md q-mb-md'>
+                                    <div class='col-xs-12 col-sm-6'>
                                         <q-select
                                             v-model='form.bodyType'
                                             @filter='(value, update) => filterDistinctFieldValues(value, update, "bodyType")'
@@ -227,7 +256,6 @@
                                             hide-selected
                                             options-dense
                                             bottom-slots
-                                            autofocus
                                             outlined
                                         >
                                             <template #prepend>
@@ -235,7 +263,7 @@
                                             </template>
                                         </q-select>
                                     </div>
-                                    <div class='col q-pt-none'>
+                                    <div class='col-xs-12 col-sm-6'>
                                         <q-select
                                             v-model='form.fuelType'
                                             @filter='(value, update) => filterDistinctFieldValues(value, update, "fuelType")'
@@ -260,13 +288,13 @@
                                     </div>
                                 </div>
                                 <div class='row q-col-gutter-md q-mb-md'>
-                                    <div class='col'>
+                                    <div class='col-xs-12 col-sm-6'>
                                         <q-select
-                                            v-model='form.engine'
-                                            @filter='(value, update) => filterDistinctFieldValues(value, update, "engine")'
-                                            @input-value='value => addNewValue(value, "engine")'
-                                            :label='$t("vehicles.engine")'
-                                            :options='enginesOptionList'
+                                            v-model='form.drivetrain'
+                                            @filter='(value, update) => filterDistinctFieldValues(value, update, "drivetrain")'
+                                            @input-value='value => addNewValue(value, "drivetrain")'
+                                            :label='$t("vehicles.drivetrain")'
+                                            :options='drivetrainsOptionList'
                                             input-class='text-uppercase'
                                             input-debounce='400'
                                             maxlength='50'
@@ -279,11 +307,11 @@
                                             outlined
                                         >
                                             <template #prepend>
-                                                <q-icon name='cyclone' />
+                                                <q-icon name='support' />
                                             </template>
                                         </q-select>
                                     </div>
-                                    <div class='col'>
+                                    <div class='col-xs-12 col-sm-6'>
                                         <q-select
                                             v-model='form.gearbox'
                                             @filter='(value, update) => filterDistinctFieldValues(value, update, "gearbox")'
@@ -308,13 +336,13 @@
                                     </div>
                                 </div>
                                 <div class='row q-col-gutter-md q-mb-md'>
-                                    <div class='col'>
+                                    <div class='col-xs-12 col-sm-6'>
                                         <q-select
-                                            v-model='form.drivetrain'
-                                            @filter='(value, update) => filterDistinctFieldValues(value, update, "drivetrain")'
-                                            @input-value='value => addNewValue(value, "drivetrain")'
-                                            :label='$t("vehicles.drivetrain")'
-                                            :options='drivetrainsOptionList'
+                                            v-model='form.engine'
+                                            @filter='(value, update) => filterDistinctFieldValuesNoInitial(value, update, "engine")'
+                                            @input-value='value => addNewValue(value, "engine")'
+                                            :label='$t("vehicles.engine")'
+                                            :options='enginesOptionList'
                                             input-class='text-uppercase'
                                             input-debounce='400'
                                             maxlength='50'
@@ -327,11 +355,11 @@
                                             outlined
                                         >
                                             <template #prepend>
-                                                <q-icon name='support' />
+                                                <q-icon name='cyclone' />
                                             </template>
                                         </q-select>
                                     </div>
-                                    <div class='col'>
+                                    <div class='col-xs-12 col-sm-6'>
                                         <q-input
                                             v-model='form.modelYear'
                                             :label='$t("vehicles.model_year")'
@@ -348,7 +376,7 @@
                                 </div>
                                 <div class='q-gutter-sm q-mt-sm'>
                                     <q-btn
-                                        @click='steps.current = 1'
+                                        @click='steps.current = "basicDetails"'
                                         color='blue-grey-10'
                                         icon='chevron_left'
                                         outline
@@ -356,6 +384,7 @@
                                     <q-btn
                                         type='submit'
                                         :label='$t("core.add")'
+                                        :loading='formSubmitted'
                                         color='primary'
                                         icon='add'
                                         no-caps
@@ -403,30 +432,36 @@ import { ref, reactive, toRaw } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useQuasar } from '../../quasar'
 import { useContactsApi } from '../../contacts/composables'
-import { useVehicles } from '../../vehicles/composables'
+import { useVehiclesApi } from '../../vehicles/composables'
 
 export default {
     setup() {
         const $q = useQuasar()
         const { t: $t } = useI18n()
 
-        const { filterContacts: filterContactsFn } = useContactsApi()
+        const {
+            ContactTypesEnum,
+            filterContacts: filterContactsFn
+        } = useContactsApi()
+
         const {
             fieldValueExists,
             getDistinctFieldValues,
             addVehicle,
-        } = useVehicles()
+        } = useVehiclesApi()
 
         const stepperRef = ref(null)
         const basicDetailsFormRef = ref(null)
         const extraDetailsFormRef = ref(null)
 
         const dialogOpen = ref(false)
+        const formSubmitted = ref(false)
         const vehicleAdded = ref(false)
 
         const contactsOptionList = ref([])
         const makesOptionList = ref([])
         const modelsOptionList = ref([])
+        const tagsOptionList = ref([])
         const bodyTypesOptionList = ref([])
         const fuelTypesOptionList = ref([])
         const enginesOptionList = ref([])
@@ -434,12 +469,12 @@ export default {
         const drivetrainsOptionList = ref([])
 
         const steps = reactive({
-            current: 1,
-            step1: {
+            current: 'basicDetails',
+            basicDetails: {
                 hasError: false,
                 chassisError: false
             },
-            step2: {
+            extraDetails: {
                 hasError: false
             }
         })
@@ -450,6 +485,7 @@ export default {
             model: '',
             regNumber: '',
             chassisNumber: '',
+            tags: [],
             bodyType: '',
             fuelType: '',
             engine: '',
@@ -471,7 +507,7 @@ export default {
             regNumber: [
                 val => {
                     if (!val && !form.chassisNumber) {
-                        steps.step1.chassisError = true
+                        steps.basicDetails.chassisError = true
                         return $t('vehicles.reg_or_chassis_required')
                     }
                     return true
@@ -500,6 +536,10 @@ export default {
             dialogOpen.value = false
         }
 
+        const isCompany = type => {
+            return type === ContactTypesEnum.COMPANY
+        }
+
         const submitForm = async(type) => {
             let basicDetailsFormVal = true
             let extraDetailsFormVal = true
@@ -512,23 +552,27 @@ export default {
             }
 
             if (basicDetailsFormVal && extraDetailsFormVal) {
+                formSubmitted.value = true
                 const vehicle = structuredClone(toRaw(form))
                 
+                // Get only the _id of the owner.
                 vehicle.ownerId = vehicle.owner._id
                 delete vehicle.owner
                 
                 addVehicle(vehicle).then(response => {
                     vehicleAdded.value = response
                     if (form.regNumber) {
-                        vehicleAdded.value.label = `${form.make} ${form.model} (${form.regNumber})`.toUpperCase()
+                        vehicleAdded.value.label = `${form.regNumber} - ${form.make} ${form.model}`.toUpperCase()
                     } else {
-                        vehicleAdded.value.label = `${form.make} ${form.model} (${form.chassisNumber})`.toUpperCase()
+                        vehicleAdded.value.label = `${form.make} ${form.model} - ${form.chassisNumber}`.toUpperCase()
                     }
+                    formSubmitted.value = false
                 }).catch(error => {
                     $q.notify({
                         type: 'negative',
                         message: $t('core.error_occured')
                     })
+                    formSubmitted.value = false
                     console.log(error)
                 })
             }
@@ -542,6 +586,7 @@ export default {
             form.model = ''
             form.regNumber = ''
             form.chassisNumber = ''
+            form.tags.splice(0)
             form.bodyType = ''
             form.fuelType = ''
             form.engine = ''
@@ -549,24 +594,24 @@ export default {
             form.drivetrain = ''
             form.modelYear = ''
 
-            steps.current = 1
-            steps.step1.hasError = false
-            steps.step1.chassisError = false
-            steps.step2.hasError = false
+            steps.current = 'basicDetails'
+            steps.basicDetails.hasError = false
+            steps.basicDetails.chassisError = false
+            steps.extraDetails.hasError = false
         }
 
         const resetFormValidation = (step, formRef) => {
-            steps['step' + step].hasError = false
+            steps[step].hasError = false
             formRef.resetValidation()
 
-            if (step === 1) {
-                steps.step1.chassisError = false
+            if (step === 'basicDetails') {
+                steps.basicDetails.chassisError = false
             }
         }
 
-        const atValidationError = step => {
+        const validationError = step => {
             steps.current = step
-            steps['step' + step].hasError = true
+            steps[step].hasError = true
         }
 
         const filterContacts = (filter, update) => {
@@ -592,6 +637,7 @@ export default {
                     switch(field) {
                         case 'make': makesOptionList.value = []; break
                         case 'model': modelsOptionList.value = []; break
+                        case 'engine': enginesOptionList.value = []; break
                     }
                 })
                 return
@@ -601,6 +647,7 @@ export default {
                     switch(field) {
                         case 'make': makesOptionList.value = response; break
                         case 'model': modelsOptionList.value = response; break
+                        case 'engine': enginesOptionList.value = response; break
                     }
                 })
             })
@@ -610,9 +657,9 @@ export default {
             getDistinctFieldValues({ filter, field }).then(response => {
                 update(() => {
                     switch(field) {
+                        case 'tags': tagsOptionList.value = response; break
                         case 'bodyType': bodyTypesOptionList.value = response; break
                         case 'fuelType': fuelTypesOptionList.value = response; break
-                        case 'engine': enginesOptionList.value = response; break
                         case 'gearbox': gearboxesOptionList.value = response; break
                         case 'drivetrain': drivetrainsOptionList.value = response; break
                     }
@@ -622,15 +669,19 @@ export default {
 
         const addNewValue = (value, field) => form[field] = value
 
+        const addNewTag = (value, done) => done(value.toUpperCase(), 'add-unique')
+
         return {
             stepperRef,
             basicDetailsFormRef,
             extraDetailsFormRef,
             dialogOpen,
+            formSubmitted,
             vehicleAdded,
             contactsOptionList,
             makesOptionList,
             modelsOptionList,
+            tagsOptionList,
             bodyTypesOptionList,
             fuelTypesOptionList,
             enginesOptionList,
@@ -641,15 +692,25 @@ export default {
             rules,
             open,
             close,
+            isCompany,
             submitForm,
             resetForm,
             resetFormValidation,
-            atValidationError,
+            validationError,
             filterContacts,
             filterDistinctFieldValuesNoInitial,
             filterDistinctFieldValues,
-            addNewValue
+            addNewValue,
+            addNewTag
         }
     }
 }
 </script>
+
+<style>
+#add-vehicle-dialog .q-card {
+    width: 100%;
+    max-width: 800px;
+}
+
+</style>

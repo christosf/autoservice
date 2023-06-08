@@ -4,12 +4,14 @@ import core from '../../ui/core/translations'
 import users from '../../ui/users/translations'
 import contacts from '../../ui/contacts/translations'
 import vehicles from '../../ui/vehicles/translations'
+import jobcards from '../../ui/jobcards/translations'
 
 const messages = merge.all([
     core,
     users,
     contacts,
-    vehicles
+    vehicles,
+    jobcards
 ])
 
 export default createI18n({

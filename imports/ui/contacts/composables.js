@@ -11,6 +11,7 @@ export function useContactsApi() {
     const deactivateContact = params => Meteor.callAsync('contacts.deactivate', params)
     const contactExists = params => Meteor.callAsync('contacts.contactExists', params)
     const filterContacts = params => Meteor.callAsync('contacts.filterContacts', params)
+    const getDistinctFieldValues = params => Meteor.callAsync('contacts.getDistinctFieldValues', params)
     
     return {
         ContactTypesEnum,
@@ -24,7 +25,8 @@ export function useContactsApi() {
         activateContact,
         deactivateContact,
         contactExists,
-        filterContacts
+        filterContacts,
+        getDistinctFieldValues
     }
 }
 

@@ -56,12 +56,12 @@
                                     @update:model-value='resetFormValidation("basicDetails", basicDetailsFormRef)'
                                     ref='nameFieldRef'
                                     :rules='rules.name'
+                                    :autofocus='$q.platform.is.desktop'
                                     lazy-rules='ondemand'
                                     input-class='text-uppercase'
                                     maxlength='60'
                                     bottom-slots
                                     label-slot
-                                    autofocus
                                     outlined
                                 >
                                     <template #prepend>
@@ -165,9 +165,9 @@
                             <q-form
                                 @submit='submitForm("addresses")'
                                 @validation-error='validationError("addresses")'
+                                :autofocus='$q.platform.is.desktop'
                                 ref='addressesFormRef'
                                 class='q-gutter-md'
-                                autofocus
                             >
                                 <q-table
                                     :columns='addressesFieldColumns'
@@ -293,17 +293,38 @@
                             <q-form
                                 @submit='submitForm("extraDetails")'
                                 @validation-error='validationError("extraDetails")'
+                                :autofocus='$q.platform.is.desktop'
                                 ref='extraDetailsFormRef'
                                 class='q-gutter-md'
-                                autofocus
                             >
+                                <q-select
+                                    v-model='form.tags'
+                                    @filter='filterTags'
+                                    @new-value='addNewTag'
+                                    @update:model-value='resetFormValidation("extraDetails", extraDetailsFormRef)'
+                                    :label='$t("core.tags")'
+                                    :options='tagsOptionList'
+                                    input-class='text-uppercase'
+                                    class='q-mt-none'
+                                    multiple
+                                    use-chips
+                                    use-input
+                                    fill-input
+                                    hide-dropdown-icon
+                                    options-dense
+                                    bottom-slots
+                                    outlined
+                                >
+                                    <template #prepend>
+                                        <q-icon name='sell' />
+                                    </template>
+                                </q-select>
                                 <q-input
                                     v-model='form.email'
                                     @update:model-value='resetFormValidation("extraDetails", extraDetailsFormRef)'
                                     :rules='rules.email'
                                     :label='$t("contacts.email")'
                                     lazy-rules='ondemand'
-                                    class='q-mt-none'
                                     bottom-slots
                                     outlined
                                 >
@@ -399,10 +420,12 @@ export default {
     setup() {
         const $q = useQuasar()
         const { t: $t } = useI18n()
+
         const {
             ContactTypesEnum, 
             AddressTypesEnum,
-            contactExists, 
+            getDistinctFieldValues,
+            contactExists,
             addContact
         } = useContactsApi()
 
@@ -417,9 +440,11 @@ export default {
         const extraDetailsFormRef = ref(null)
         const nameFieldRef = ref(null)
 
-        const dialogOpen = ref(true)
+        const dialogOpen = ref(false)
         const formSubmitted = ref(false)
         const contactAdded = ref(null)
+
+        const tagsOptionList = ref([])
 
         const steps = reactive({
             current: 'basicDetails',
@@ -442,6 +467,7 @@ export default {
             mobilePhone: '',
             landlinePhone: '',
             addresses: [{ street: '', city: '', postalCode: '', type: '' }],
+            tags: [],
             email: '',
             website: '',
             vatNumber: ''
@@ -544,6 +570,7 @@ export default {
             form.landlinePhone = ''
             form.addresses.splice(0)
             form.addresses.push({ street: '', city: '', postalCode: '', type: '' })
+            form.tags.splice(0)
             form.email = ''
             form.website = ''
             form.vatNumber = ''
@@ -570,6 +597,14 @@ export default {
             steps.current = step
             steps[step].hasError = true
         }
+
+        const filterTags = (filter, update) => {
+            getDistinctFieldValues({ filter, field: 'tags' }).then(response => {
+                update(() => tagsOptionList.value = response)
+            })
+        }
+
+        const addNewTag = (value, done) => done(value.toUpperCase(), 'add-unique')
 
         watch(form.addresses, () => {
             const lastRow = form.addresses[form.addresses.length - 1]
@@ -657,6 +692,7 @@ export default {
             dialogOpen,
             formSubmitted,
             contactAdded,
+            tagsOptionList,
             steps,
             form,
             rules,
@@ -667,7 +703,9 @@ export default {
             submitForm,
             resetForm,
             resetFormValidation,
-            validationError
+            validationError,
+            filterTags,
+            addNewTag
         }
     }
 }

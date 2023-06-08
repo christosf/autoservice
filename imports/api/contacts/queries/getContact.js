@@ -15,6 +15,7 @@ export default Contacts.createQuery('getContact', {
     mobilePhone: 1,
     landlinePhone: 1,
     addresses: 1,
+    tags: 1,
     email: 1,
     website: 1,
     vatNumber: 1,
@@ -28,6 +29,9 @@ export default Contacts.createQuery('getContact', {
         username: 1
     },
     vehicles: {
+        $filters: {
+            active: true
+        },
         code: 1,
         make: 1,
         model: 1,

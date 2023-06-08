@@ -62,6 +62,13 @@
                     {{ props.col.label ? $t(props.col.label) : '' }}
                 </q-th>
             </template>
+            <template #body-cell='props'>
+                <q-td :props='props'>
+                    <router-link :to='{ name: "ViewContact", params: { code: props.row.code }}' class='text-black'>
+                        {{ props.value }}
+                    </router-link>
+                </q-td>
+            </template>
             <template #body-cell-type='props'>
                 <q-td :props='props' :class='{"dense": $q.screen.lt.sm}'>
                     <router-link :to='{ name: "ViewContact", params: { code: props.row.code }}'>
@@ -71,13 +78,6 @@
                         <q-icon v-else name='person' color='primary' size='22px'>
                             <q-tooltip anchor='top middle' self='bottom middle'>{{ $t('contacts.individual') }}</q-tooltip>
                         </q-icon>
-                    </router-link>
-                </q-td>
-            </template>
-            <template #body-cell='props'>
-                <q-td :props='props'>
-                    <router-link :to='{ name: "ViewContact", params: { code: props.row.code }}' class='text-black'>
-                        {{ props.value }}
                     </router-link>
                 </q-td>
             </template>
@@ -203,15 +203,6 @@ export default {
                 classes: 'contact-type',
             },
             {
-                name: 'code',
-                label: 'core.code',
-                field: 'code',
-                required: true,
-                sortable: true,
-                align: 'left',
-                classes: 'contact-code'
-            },
-            {
                 name: 'name',
                 label: 'contacts.name',
                 field: 'name',
@@ -248,6 +239,15 @@ export default {
                 sortable: true,
                 align: 'left',
                 classes: 'contact-date'
+            },
+            {
+                name: 'code',
+                label: 'core.code',
+                field: 'code',
+                required: true,
+                sortable: true,
+                align: 'left',
+                classes: 'contact-code'
             },
             {
                 name: 'operations',

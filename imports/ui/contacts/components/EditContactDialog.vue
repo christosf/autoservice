@@ -9,7 +9,7 @@
         <q-card>
             <q-card-section class='q-pa-sm'>
                 <q-toolbar>
-                    <div class='text-h6'>{{ $t('contacts.edit') }}</div>
+                    <div class='text-h6'>{{ title }}</div>
                     <q-space />
                     <q-btn icon='close' flat round dense v-close-popup />
                 </q-toolbar>
@@ -54,12 +54,12 @@
                                 @update:model-value='resetFormValidation("basicDetails", basicDetailsFormRef)'
                                 ref='nameFieldRef'
                                 :rules='rules.name'
+                                :autofocus='$q.platform.is.desktop'
                                 lazy-rules='ondemand'
                                 input-class='text-uppercase'
                                 maxlength='60'
                                 bottom-slots
                                 label-slot
-                                autofocus
                                 outlined
                             >
                                 <template #prepend>
@@ -163,9 +163,9 @@
                         <q-form
                             @submit='submitForm("addresses")'
                             @validation-error='validationError("addresses")'
+                            :autofocus='$q.platform.is.desktop'
                             ref='addressesFormRef'
                             class='q-gutter-md'
-                            autofocus
                         >
                             <q-table
                                 :columns='addressesFieldColumns'
@@ -291,17 +291,38 @@
                         <q-form
                             @submit='submitForm("extraDetails")'
                             @validation-error='validationError("extraDetails")'
+                            :autofocus='$q.platform.is.desktop'
                             ref='extraDetailsFormRef'
                             class='q-gutter-md'
-                            autofocus
                         >
+                            <q-select
+                                v-model='form.tags'
+                                @filter='filterTags'
+                                @new-value='addNewTag'
+                                @update:model-value='resetFormValidation("extraDetails", extraDetailsFormRef)'
+                                :label='$t("core.tags")'
+                                :options='tagsOptionList'
+                                input-class='text-uppercase'
+                                class='q-mt-none'
+                                multiple
+                                use-chips
+                                use-input
+                                fill-input
+                                hide-dropdown-icon
+                                options-dense
+                                bottom-slots
+                                outlined
+                            >
+                                <template #prepend>
+                                    <q-icon name='sell' />
+                                </template>
+                            </q-select>
                             <q-input
                                 v-model='form.email'
                                 @update:model-value='resetFormValidation("extraDetails", extraDetailsFormRef)'
                                 :rules='rules.email'
                                 :label='$t("contacts.email")'
                                 lazy-rules='ondemand'
-                                class='q-mt-none'
                                 bottom-slots
                                 outlined
                             >
@@ -372,6 +393,7 @@ export default {
             AddressTypesEnum,
             ContactTypesEnum,
             getContactEditableFields,
+            getDistinctFieldValues,
             contactExists,
             updateContact
         } = useContactsApi()
@@ -388,9 +410,12 @@ export default {
         const nameFieldRef = ref(null)
 
         const dialogOpen = ref(false)
+        const title = ref($t('contacts.edit'))
         const formSubmitted = ref(false)
         const contactId = ref(null)
         const contactCode = ref(null)
+
+        const tagsOptionList = ref([])
 
         const steps = reactive({
             current: 'basicDetails',
@@ -413,6 +438,7 @@ export default {
             mobilePhone: '',
             landlinePhone: '',
             addresses: [{ street: '', city: '', postalCode: '', type: '' }],
+            tags: [],
             email: '',
             website: '',
             vatNumber: ''
@@ -494,10 +520,10 @@ export default {
             if (basicDetailsFormVal && addressesFormVal && extraDetailsFormVal) {
                 formSubmitted.value = true
                 const contact = structuredClone(toRaw(form))
+                contact._id = contactId.value
 
                 // Always remove last table row because it is empty.
                 contact.addresses.pop()
-                contact._id = contactId.value
                 
                 updateContact(contact).then(response => {
                     const { updated } = response
@@ -536,6 +562,7 @@ export default {
             form.landlinePhone = ''
             form.addresses.splice(0)
             form.addresses.push({ street: '', city: '', postalCode: '', type: '' })
+            form.tags.splice(0)
             form.email = ''
             form.website = ''
             form.vatNumber = ''
@@ -563,6 +590,14 @@ export default {
             steps[step].hasError = true
         }
 
+        const filterTags = (filter, update) => {
+            getDistinctFieldValues({ filter, field: 'tags' }).then(response => {
+                update(() => tagsOptionList.value = response)
+            })
+        }
+
+        const addNewTag = (value, done) => done(value.toUpperCase(), 'add-unique')
+
         const fetchUser = () => {
             const query = getContactEditableFields.clone({ id: contactId.value })
             query.fetchOne((error, contact) => {
@@ -581,6 +616,7 @@ export default {
                         }
                     }
                 })
+                title.value = `${$t('core.edit')}: ${contactCode.value} - ${contact.name}`
             })
         }
 
@@ -668,9 +704,10 @@ export default {
             addressesFieldColumns,
             addressTypeOptionList,
             dialogOpen,
+            title,
             formSubmitted,
+            tagsOptionList,
             steps,
-            contactCode,
             form,
             rules,
             isCompany,
@@ -680,7 +717,9 @@ export default {
             submitForm,
             resetForm,
             resetFormValidation,
-            validationError
+            validationError,
+            filterTags,
+            addNewTag
         }
     }
 }

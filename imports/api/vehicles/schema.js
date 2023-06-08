@@ -5,6 +5,25 @@ export default new SimpleSchema({
         type: String,
         denyUpdate: true
     },
+    ownerId: String,
+    make: {
+        type: String,
+        max: 50,
+        autoValue() {
+            return this.isSet ? this.value.toUpperCase() : this.unset()
+        }
+    },
+    model: {
+        type: String,
+        max: 50,
+        autoValue() {
+            return this.isSet ? this.value.toUpperCase() : this.unset()
+        }
+    },
+    makeModel: {
+        type: String,
+        max: 100
+    },
     regNumber: {
         type: String,
         min: 4,
@@ -29,31 +48,8 @@ export default new SimpleSchema({
             return this.field('regNumber').isSet
         }
     },
-    make: {
-        type: String,
-        max: 50,
-        autoValue() {
-            return this.isSet ? this.value.toUpperCase() : this.unset()
-        }
-    },
-    model: {
-        type: String,
-        max: 50,
-        autoValue() {
-            return this.isSet ? this.value.toUpperCase() : this.unset()
-        }
-    },
-    makeModel: {
-        type: String,
-        max: 100,
-        autoValue() {
-            return `${this.field('make').value} ${this.field('model').value}`
-        }
-    },
-    ownerId: {
-        type: String,
-        optional: true
-    },
+    tags: Array,
+    'tags.$': String,
     bodyType: {
         type: String,
         max: 50,
@@ -97,14 +93,31 @@ export default new SimpleSchema({
     modelYear: {
         type: String,
         max: 4,
-        regEx: /^[0-9]*$/,
+        regEx: /^[0-9]{4}$/,
         optional: true
+    },
+    notes: {
+        type: String,
+        max: 1000,
+        optional: true,
     },
     active: {
         type: Boolean,
         defaultValue: true
     },
-    addedById: String,
+    addedById: {
+        type: String,
+        denyUpdate: true,
+        autoValue() {
+            if (this.isInsert) {
+                return this.userId
+            } else if (this.isUpsert) {
+                return { $setOnInsert: this.userId }
+            } else {
+                this.unset()
+            }
+        }
+    },
     createdAt: {
         type: Date,
         denyUpdate: true,
@@ -120,8 +133,6 @@ export default new SimpleSchema({
     },
     updatedAt: {
         type: Date,
-        denyInsert: true,
-        optional: true,
         autoValue() {
             return new Date()
         }

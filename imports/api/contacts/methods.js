@@ -24,6 +24,8 @@ Meteor.methods({
             'addresses.$.city': String,
             'addresses.$.postalCode': String,
             'addresses.$.type': String,
+            tags: Array,
+            'tags.$': String,
             email: {
                 type: String,
                 optional: true
@@ -69,6 +71,8 @@ Meteor.methods({
             'addresses.$.city': String,
             'addresses.$.postalCode': String,
             'addresses.$.type': String,
+            tags: Array,
+            'tags.$': String,
             email: {
                 type: String,
                 optional: true
@@ -88,6 +92,24 @@ Meteor.methods({
         delete contact._id
         
         return { updated: Contacts.update(_id, { $set: contact }) === 1 }
+    },
+    'contacts.delete'(params) {
+        if (Meteor.isClient) return
+
+        new SimpleSchema({
+            _id: String
+        }).validate(params)
+
+        const { _id } = params
+
+        const linkedVehicles = Contacts.getLink(_id, 'vehicles')
+        const vehiclesCount = linkedVehicles.find({}, { fields: { _id: 1 }}).count()
+
+        if (vehiclesCount > 0) {
+            throw new Meteor.Error('vehicles-associated')
+        }
+
+        return { deleted: Contacts.remove(_id) === 1 }
     },
     'contacts.deactivate'(params) {
         if (Meteor.isClient) return
@@ -110,24 +132,6 @@ Meteor.methods({
         const { _id } = params
 
         return { activated: Contacts.update(_id, { $set: { active: true }}) === 1 }
-    },
-    'contacts.delete'(params) {
-        if (Meteor.isClient) return
-
-        new SimpleSchema({
-            _id: String
-        }).validate(params)
-
-        const { _id } = params
-
-        const linkedVehicles = Contacts.getLink(_id, 'vehicles')
-        const vehiclesCount = linkedVehicles.find({}, { fields: { _id: 1 }}).count()
-
-        if (vehiclesCount > 0) {
-            throw new Meteor.Error('vehicles-associated')
-        }
-
-        return { deleted: Contacts.remove(_id) === 1 }
     },
     'contacts.contactExists'(params) {
         if (Meteor.isClient) return
@@ -183,5 +187,21 @@ Meteor.methods({
             },
             limit: 8
         }).fetch()
+    },
+    'contacts.getDistinctFieldValues'(params) {
+        if (Meteor.isClient) return
+
+        new SimpleSchema({
+            field: String,
+            filter: String
+        }).validate(params)
+
+        const { field } = params
+        const filter = params.filter.replace(/([()[{*+.$^\\|?])/g, '\\$1').toUpperCase()
+        const query = {}
+
+        query[field] = { $regex: filter, $options: 'i' }
+
+        return Contacts.rawCollection().distinct(field, query)
     }
 })

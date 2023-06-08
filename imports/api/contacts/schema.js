@@ -68,6 +68,11 @@ export default new SimpleSchema({
         type: String,
         allowedValues: Object.values(AddressTypesEnum)
     },
+    tags: Array,
+    'tags.$': {
+        type: String,
+        max: 40
+    },
     email: {
         type: String,
         max: 100,

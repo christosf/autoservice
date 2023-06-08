@@ -15,7 +15,8 @@ export default Vehicles.createQuery('getVehicleList', {
             { code: { $regex: params.filter, $options : 'i' }},
             { makeModel: { $regex: params.filter, $options : 'i' }},
             { regNumber: { $regex: params.filter, $options : 'i' }},
-            { chassisNumber: { $regex: params.filter, $options : 'i' }}
+            { chassisNumber: { $regex: params.filter, $options : 'i' }},
+            { tags: { $regex: params.filter, $options : 'i' }}
         ]
 
         options.sort[params.sortBy] = params.descending ? 1 : -1
@@ -27,9 +28,11 @@ export default Vehicles.createQuery('getVehicleList', {
     makeModel: 1,
     regNumber: 1,
     chassisNumber: 1,
+    tags: 1,
     owner: {
         code: 1,
         name: 1
     },
-    active: 1
+    active: 1,
+    updatedAt: 1
 })
