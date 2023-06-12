@@ -126,7 +126,7 @@ import { useQuasar } from './quasar'
 import { useUsers } from './users/composables'
 import AddContactDialog from './contacts/components/AddContactDialog.vue'
 import AddVehicleDialog from './vehicles/components/AddVehicleDialog.vue'
-import AddJobcardDialog from './jobcards/components/AddJobcardDialog.vue'
+import AddJobcardDialog from './job-cards/components/AddJobcardDialog.vue'
 
 export default {
     components: {

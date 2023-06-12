@@ -252,7 +252,8 @@ export default {
             {
                 name: 'operations',
                 required: true,
-                align: 'right'
+                align: 'right',
+                classes: 'contact-operations'
             }
         ]
 
@@ -462,11 +463,15 @@ export default {
 }
 
 #contacts-table .contact-phone {
-    width: 110px;
+    width: 120px;
 }
 
 #contacts-table .contact-date {
     width: 150px;
+}
+
+#contacts-table .contact-operations {
+    width: 90px;
 }
 
 #contacts-table th:last-child,

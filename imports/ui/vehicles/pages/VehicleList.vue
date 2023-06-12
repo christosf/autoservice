@@ -191,7 +191,8 @@ export default {
                 label: 'vehicles.reg_number_short',
                 field: 'regNumber',
                 sortable: true,
-                align: 'left'
+                align: 'left',
+                classes: 'vehicle-reg-number'
             },
             {
                 name: 'make',
@@ -232,7 +233,8 @@ export default {
             },
             {
                 name: 'operations',
-                align: 'right'
+                align: 'right',
+                classes: 'vehicle-operations'
             }
         ]
 
@@ -414,8 +416,20 @@ export default {
     padding-left: 0;
 }
 
+#vehicles-table .vehicle-reg-number {
+    width: 130px;
+}
+
 #vehicles-table .vehicle-code {
     width: 50px;
+}
+
+#vehicles-table .vehicle-date {
+    width: 150px;
+}
+
+#vehicles-table .vehicle-operations {
+    width: 90px;
 }
 
 #vehicles-table th:last-child,

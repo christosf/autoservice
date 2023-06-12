@@ -17,3 +17,7 @@ if (Counters.find({ name: CounterNamesEnum.CONTACTS }).count() === 0) {
 if (Counters.find({ name: CounterNamesEnum.VEHICLES }).count() === 0) {
     Counters.insert({ name: CounterNamesEnum.VEHICLES })
 }
+
+if (Counters.find({ name: CounterNamesEnum.SERVICES }).count() === 0) {
+    Counters.insert({ name: CounterNamesEnum.SERVICES })
+}
