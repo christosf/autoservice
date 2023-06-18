@@ -40,9 +40,14 @@
                                     <q-item-label>{{ $t('vehicles.one') }}</q-item-label>
                                 </q-item-section>
                             </q-item>
-                            <q-item clickable @click='addJobcardDialogRef.open()'>
+                            <q-item clickable @click='addJobCardDialogRef.open()'>
                                 <q-item-section>
                                     <q-item-label>{{ $t('jobcards.one') }}</q-item-label>
+                                </q-item-section>
+                            </q-item>
+                            <q-item clickable @click='addServiceDialogRef.open()'>
+                                <q-item-section>
+                                    <q-item-label>{{ $t('services.one') }}</q-item-label>
                                 </q-item-section>
                             </q-item>
                         </q-list>
@@ -114,7 +119,8 @@
         -->
         <add-contact-dialog ref='addContactDialogRef' />
         <add-vehicle-dialog ref='addVehicleDialogRef' />
-        <add-jobcard-dialog ref='addJobcardDialogRef' />
+        <add-job-card-dialog ref='addJobCardDialogRef' />
+        <add-service-dialog ref='addServiceDialogRef' />
     </q-layout>
 </template>
 
@@ -126,13 +132,15 @@ import { useQuasar } from './quasar'
 import { useUsers } from './users/composables'
 import AddContactDialog from './contacts/components/AddContactDialog.vue'
 import AddVehicleDialog from './vehicles/components/AddVehicleDialog.vue'
-import AddJobcardDialog from './job-cards/components/AddJobcardDialog.vue'
+import AddJobCardDialog from './job-cards/components/AddJobCardDialog.vue'
+import AddServiceDialog from './services/components/AddServiceDialog.vue'
 
 export default {
     components: {
         AddContactDialog,
         AddVehicleDialog,
-        AddJobcardDialog
+        AddJobCardDialog,
+        AddServiceDialog
     },
     setup() {
         const $q = useQuasar()
@@ -143,7 +151,8 @@ export default {
 
         const addContactDialogRef = ref(null)
         const addVehicleDialogRef = ref(null)
-        const addJobcardDialogRef = ref(null)
+        const addJobCardDialogRef = ref(null)
+        const addServiceDialogRef = ref(null)
 
         const leftSidebarOpen = ref(false)
         
@@ -187,13 +196,15 @@ export default {
 
         provide('addContactDialogRef', addContactDialogRef)
         provide('addVehicleDialogRef', addVehicleDialogRef)
-        provide('addJobcardDialogRef', addJobcardDialogRef)
+        provide('addJobCardDialogRef', addJobCardDialogRef)
+        provide('addServiceDialogRef', addServiceDialogRef)
 
         return {
             userId,
             addContactDialogRef,
             addVehicleDialogRef,
-            addJobcardDialogRef,
+            addJobCardDialogRef,
+            addServiceDialogRef,
             leftSidebarOpen,
             leftSidebarVisible,
             rightSidebarVisible,

@@ -3,10 +3,10 @@ import { Users, Contacts, Vehicles } from '../database'
 Users.addLinks({
     contactsAdded: {
         collection: Contacts,
-        inversedBy: 'addedBy'
+        inversedBy: 'createdBy'
     },
     vehiclesAdded: {
         collection: Vehicles,
-        inversedBy: 'addedBy'
+        inversedBy: 'createdBy'
     }
 })

@@ -6,7 +6,7 @@ export default {
             active: 'Active',
             add_new: 'Add new',
             add: 'Add contact',
-            added_what_next: 'The contact <strong>"{name}"</strong> was added successfully! What do you want to do next?',
+            added_what_next: 'The contact <strong>{contact}</strong> was added successfully! What do you want to do next?',
             address_city: 'City',
             address_postal_code_short: 'Postal code',
             address_postal_code: 'Postal code',

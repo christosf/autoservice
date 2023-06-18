@@ -25,7 +25,7 @@ export default Contacts.createQuery('getContact', {
     active: 1,
     createdAt: 1,
     updatedAt: 1,
-    addedBy: {
+    createdBy: {
         username: 1
     },
     vehicles: {

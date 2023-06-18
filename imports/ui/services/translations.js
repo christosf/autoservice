@@ -1,0 +1,60 @@
+export default {
+    en: {
+        services: {
+            activate_successful: 'The service has been activated successfully!',
+            activate: 'Activate service',
+            add_new: 'Add new',
+            add: 'Add service',
+            added_what_next: 'The service <strong>{service}</strong> was added successfully! What do you want to do next?',
+            all: 'All',
+            already_exists: 'There is already a service with this name.',
+            deactivate_prompt_msg: 'Are you sure that you want to deactivate this service?',
+            deactivate_successful: 'This service has been deactivated successfully!',
+            deactivate: 'Deactivate service',
+            deactivated: 'Deactivated',
+            delete_prompt_msg: 'Are you sure that you want to permanently delete this service?',
+            delete_successful: 'The service has been deleted successfully!',
+            delete: 'Permanent delete service',
+            description: 'Labour services you offer to your clients.',
+            edit: 'Edit service',
+            man_hours: 'Man-hours',
+            many: 'Services',
+            name_example: 'e.g. Oil change',
+            name: 'Service name',
+            no_vat: 'Exempt from VAT',
+            one: 'Service',
+            rate_per_hour: 'Rate per hour',
+            update_successful: 'The service was updated successfully!',
+            view: 'View service'
+        }
+    },
+    el: {
+        services: {
+            activate_successful: 'Η υπηρεσία έχει ενεργοποιηθεί επιτυχώς!',
+            activate: 'Ενεργοποίηση υπηρεσίας',
+            add_new: 'Προσθήκη νέας',
+            add: 'Προσθήκη υπηρεσίας',
+            added_what_next: 'Η υπηρεσία <strong>{service}</strong> έχει προστεθέι επιτυχώς! Τι θέλετε να κάνετε τώρα;',
+            all: 'Όλες',
+            already_exists: 'Υπάρχει ήδη μια υπηρεσία με αυτό το όνομα.',
+            deactivate_prompt_msg: 'Είστε σίγουροι ότι θέλετε να απενεργοποιήσετε αυτή την υπηρεσία;',
+            deactivate_successful: 'Η υπηρεσία έχει απενεργοποιηθεί επιτυχώς!',
+            deactivate: 'Απενεργοποίηση υπηρεσίας',
+            deactivated: 'Απενεργοποιημένες',
+            delete_prompt_msg: 'Είστε σίγουροι ότι θέλετε να διαγράψετε οριστικά αυτή την υπηρεσία;',
+            delete_successful: 'Η υπηρεσία έχει διαγραφεί επιτυχώς!',
+            delete: 'Οριστική διαγραφή υπηρεσίας',
+            description: 'Εργατικές υπηρεσίες τις οποίες προσφέρετε στους πελάτες σας.',
+            edit: 'Επεξεργασία υπηρεσίας',
+            man_hours: 'Εργατοώρες',
+            many: 'Υπηρεσίες',
+            name_example: 'π.χ. Αλλαγή λαδιού',
+            name: 'Όνομα υπηρεσίας',
+            no_vat: 'Απαλλαγή από το ΦΠΑ',
+            one: 'Υπηρεσία',
+            rate_per_hour: 'Χρέωση ανά ώρα',
+            update_successful: 'Η υπηρεσία ενημερώθηκε επιτυχώς!',
+            view: 'Προβολή υπηρεσίας'
+        }
+    }
+}

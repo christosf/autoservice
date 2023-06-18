@@ -48,7 +48,7 @@ Meteor.methods({
         
         const vehicle = { ...params }
         vehicle.code = 'V' + Meteor.call('counters.increaseVehiclesCounter')
-        vehicle.makeModel = `${vehicle.make} ${vehicle.model}`
+        vehicle.makeModel = `${vehicle.make} ${vehicle.model}`.toUpperCase()
 
         try {
             return { added: true, _id: Vehicles.insert(vehicle), code: vehicle.code }
@@ -105,7 +105,7 @@ Meteor.methods({
         const vehicle = { ...params }
         delete vehicle._id
 
-        vehicle.makeModel = `${vehicle.make} ${vehicle.model}`
+        vehicle.makeModel = `${vehicle.make} ${vehicle.model}`.toUpperCase()
         
         return { updated: Vehicles.update(_id, { $set: vehicle }) === 1 }
     },
@@ -162,7 +162,7 @@ Meteor.methods({
 
         return !!Vehicles.findOne(query, { fields: { _id: 1 }})
     },
-    'vehicles.getDistinctFieldValues'(params) {
+    async 'vehicles.getDistinctFieldValues'(params) {
         if (Meteor.isClient) return
 
         new SimpleSchema({
@@ -176,6 +176,8 @@ Meteor.methods({
 
         query[field] = { $regex: filter, $options: 'i' }
 
-        return Vehicles.rawCollection().distinct(field, query)
+        const response = await Vehicles.rawCollection().distinct(field, query)
+
+        return response.filter(item => new RegExp(filter).test(item))
     }
 })

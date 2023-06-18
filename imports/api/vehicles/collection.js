@@ -35,6 +35,8 @@ if (Meteor.isServer) {
     Vehicles.createIndex({ model: 1 }, { name: 'modelIndex' })
 
     Vehicles.createIndex({ makeModel: 1 }, { name: 'makeModelIndex' })
+
+    Vehicles.createIndex({ updatedAt: 1 }, { name: 'updatedAtIndex' })
 }
 
 export default Vehicles

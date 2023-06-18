@@ -25,3 +25,10 @@ a {
 .fade-enter, .fade-leave-to {
     opacity: 0;
 }
+
+.add-relation-item {
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+}
+.add-relation-item:last-child {
+    border-bottom: none;
+}

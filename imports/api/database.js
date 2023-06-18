@@ -8,6 +8,7 @@ import Services from './services/collection'
 import './counters/methods'
 import './contacts/methods'
 import './vehicles/methods'
+import './services/methods'
 import './settings/methods'
 
 import './users/links'

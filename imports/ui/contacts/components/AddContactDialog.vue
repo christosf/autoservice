@@ -54,10 +54,10 @@
                                 <q-input
                                     v-model='form.name'
                                     @update:model-value='resetFormValidation("basicDetails", basicDetailsFormRef)'
-                                    ref='nameFieldRef'
                                     :rules='rules.name'
                                     :autofocus='$q.platform.is.desktop'
                                     lazy-rules='ondemand'
+                                    ref='nameFieldRef'
                                     input-class='text-uppercase'
                                     maxlength='60'
                                     bottom-slots
@@ -68,16 +68,17 @@
                                         <q-icon name='badge' />
                                     </template>
                                     <template #label>
-                                        <span>
-                                            {{ $t(`contacts.${isCompany ? 'company_name' : 'full_name'}`) }}
-                                        </span>
-                                        <span class='text-red-8 q-pl-xs'>*</span>
-                                    </template>
+                                    <span>
+                                        {{ $t(`contacts.${isCompany ? 'company_name' : 'full_name'}`) }}
+                                    </span>
+                                    <span class='text-red-8 q-pl-xs'>*</span>
+                                </template>
                                 </q-input>
                                 <q-input
                                     v-show='isIndividual'
                                     v-model='form.mobilePhone'
                                     @update:model-value='resetFormValidation("basicDetails", basicDetailsFormRef)'
+                                    @keydown='filterPhoneInput'
                                     :error='steps.basicDetails.mobileError'
                                     :rules='rules.mobilePhone'
                                     lazy-rules='ondemand'
@@ -100,6 +101,7 @@
                                 <q-input
                                     v-model='form.landlinePhone'
                                     @update:model-value='resetFormValidation("basicDetails", basicDetailsFormRef)'
+                                    @keydown='filterPhoneInput'
                                     :error='steps.basicDetails.landlineError'
                                     :rules='rules.landlinePhone'
                                     lazy-rules='ondemand'
@@ -123,6 +125,7 @@
                                     v-show='isCompany'
                                     v-model='form.mobilePhone'
                                     @update:model-value='resetFormValidation("basicDetails", basicDetailsFormRef)'
+                                    @keydown='filterPhoneInput'
                                     :label='$t("contacts.mobile_phone")'
                                     :rules='rules.mobilePhone'
                                     lazy-rules='ondemand'
@@ -410,7 +413,7 @@
 </template>
 
 <script>
-import { ref, reactive, computed, toRaw, watch } from 'vue'
+import { ref, reactive, computed, toRaw, watch, watchEffect } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { isURL, isEmail } from 'validator'
 import { useQuasar } from '../../quasar'
@@ -604,7 +607,19 @@ export default {
             })
         }
 
+        const filterPhoneInput = event => {
+            const allowedKeys = ['Backspace', 'Enter', 'Tab']
+
+            if (isNaN(event.key) && !allowedKeys.includes(event.key)) {
+                event.preventDefault()
+            }
+        }
+
         const addNewTag = (value, done) => done(value.toUpperCase(), 'add-unique')
+
+        watchEffect(() => {
+            tagsOptionList.value = tagsOptionList.value.filter(tag => !form.tags.includes(tag))
+        })
 
         watch(form.addresses, () => {
             const lastRow = form.addresses[form.addresses.length - 1]
@@ -704,6 +719,7 @@ export default {
             resetForm,
             resetFormValidation,
             validationError,
+            filterPhoneInput,
             filterTags,
             addNewTag
         }

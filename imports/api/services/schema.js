@@ -8,31 +8,41 @@ export default new SimpleSchema({
     name: {
         type: String,
         min: 3,
-        max: 50,
+        max: 60,
         autoValue() {
             return this.isSet ? this.value.toUpperCase() : this.unset()
         }
     },
     description: {
         type: String,
-        max: 500,
+        max: 300,
         optional: true,
         autoValue() {
             return this.isSet ? this.value.toUpperCase() : this.unset()
         }
     },
-    hours: Number,
-    ratePerHour: Number,
+    hours: {
+        type: Number,
+        defaultValue: 0
+    },
+    ratePerHour: {
+        type: Number,
+        defaultValue: 0
+    },
     tags: Array,
     'tags.$': {
         type: String,
         max: 40
     },
+    noVat: {
+        type: Boolean,
+        defaultValue: false
+    },
     active: {
         type: Boolean,
         defaultValue: true
     },
-    addedById: {
+    createdById: {
         type: String,
         denyUpdate: true,
         autoValue() {

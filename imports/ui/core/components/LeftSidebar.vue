@@ -32,20 +32,20 @@
                 {{ $t('jobcards.many' )}}
             </q-item-section>
         </q-item>
-        <q-item :to='{ name: "ServiceList" }'>
-            <q-item-section avatar>
-                <q-icon name='design_services' />
-            </q-item-section>
-            <q-item-section>
-                {{ $t('core.services' )}}
-            </q-item-section>
-        </q-item>
         <q-item :to='{ name: "PartList" }'>
             <q-item-section avatar>
                 <q-icon name='category' />
             </q-item-section>
             <q-item-section>
                 {{ $t('core.parts' )}}
+            </q-item-section>
+        </q-item>
+        <q-item :to='{ name: "ServiceList" }'>
+            <q-item-section avatar>
+                <q-icon name='design_services' />
+            </q-item-section>
+            <q-item-section>
+                {{ $t('services.many' )}}
             </q-item-section>
         </q-item>
         <q-item :to='{ name: "InvoiceList" }'>

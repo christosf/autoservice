@@ -188,7 +188,7 @@ Meteor.methods({
             limit: 8
         }).fetch()
     },
-    'contacts.getDistinctFieldValues'(params) {
+    async 'contacts.getDistinctFieldValues'(params) {
         if (Meteor.isClient) return
 
         new SimpleSchema({
@@ -202,6 +202,8 @@ Meteor.methods({
 
         query[field] = { $regex: filter, $options: 'i' }
 
-        return Contacts.rawCollection().distinct(field, query)
+        const response = await Contacts.rawCollection().distinct(field, query)
+
+        return response.filter(item => new RegExp(filter).test(item))
     }
 })

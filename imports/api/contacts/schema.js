@@ -117,7 +117,7 @@ export default new SimpleSchema({
         type: Boolean,
         defaultValue: true
     },
-    addedById: {
+    createdById: {
         type: String,
         denyUpdate: true,
         autoValue() {

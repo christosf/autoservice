@@ -397,7 +397,7 @@
 </template>
 
 <script>
-import { ref, reactive, toRaw } from 'vue'
+import { ref, reactive, toRaw, watchEffect } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useQuasar } from '../../quasar'
 import { useContactsApi } from '../../contacts/composables'
@@ -677,6 +677,10 @@ export default {
                     : `${$t('core.edit')}: ${vehicleCode.value} - ${vehicle.make} ${vehicle.model}`
             })
         }
+
+        watchEffect(() => {
+            tagsOptionList.value = tagsOptionList.value.filter(tag => !form.tags.includes(tag))
+        })
 
         return {
             stepperRef,

@@ -11,4 +11,18 @@ Services.deny({
     remove: () => true
 })
 
+if (Meteor.isServer) {
+    Services.createIndex({ code: 1 }, {
+        name: 'codeIndex',
+        unique: true
+    })
+
+    Services.createIndex({ name: 1 }, {
+        name: 'nameIndex',
+        unique: true
+    })
+
+    Services.createIndex({ updatedAt: 1 }, { name: 'updatedAtIndex' })
+}
+
 export default Services

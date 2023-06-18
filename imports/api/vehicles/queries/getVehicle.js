@@ -32,7 +32,7 @@ export default Vehicles.createQuery('getVehicle', {
         mobilePhone: 1,
         landlinePhone: 1
     },
-    addedBy: {
+    createdBy: {
         username: 1
     }
 })

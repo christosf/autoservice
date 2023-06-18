@@ -30,5 +30,19 @@ Meteor.methods({
         }, { $inc: { counter: -1 }})
         
         return res.value.counter
+    },
+    async 'counters.increaseServicesCounter'() {
+        const res = await Counters.rawCollection().findOneAndUpdate({
+            name: CounterNamesEnum.SERVICES
+        }, { $inc: { counter: 1 }})
+        
+        return res.value.counter
+    },
+    async 'counters.decreaseServicesCounter'() {
+        const res = await Counters.rawCollection().findOneAndUpdate({
+            name: CounterNamesEnum.SERVICES
+        }, { $inc: { counter: -1 }})
+        
+        return res.value.counter
     }
 })

@@ -7,7 +7,7 @@
             :columns='columns'
             :loading='loading'
             :filter='filter'
-            :rows-per-page-options='[1,15,30,50,100]'
+            :rows-per-page-options='[15,30,50,100]'
             row-key='_id'
             id='vehicles-table'
             binary-state-sort
@@ -15,12 +15,12 @@
             flat
         >
             <template #top-left>
-                <div class='text-h6 q-pr-md'>{{ $t('vehicles.many') }}</div>
+                <div class='text-h6'>{{ $t('vehicles.many') }}</div>
             </template>
             <template #top-right>
                 <div class='row q-gutter-sm'>
                     <q-btn-dropdown
-                        :label='$t(`vehicles.${customFilter}`)'
+                        :label='$t(`vehicles.${statusFilter}`)'
                         :padding='$q.screen.lt.sm ? "sm" : "sm md"'
                         color='primary'
                         auto-close
@@ -29,9 +29,9 @@
                     >
                         <q-list :dense='$q.platform.is.desktop' separator>
                             <q-item
-                                v-for='item in customFilterItems'
+                                v-for='item in statusFilterItems'
                                 @click='$router.push({ name: "VehicleList", query: { view: item }})'
-                                :active='customFilter === item'
+                                :active='statusFilter === item'
                                 clickable
                             >
                                 <q-item-section>
@@ -45,6 +45,7 @@
                         :placeholder='$t("core.search_td")'
                         :autofocus='$q.platform.is.desktop'
                         input-class='text-uppercase'
+                        ref='filterRef'
                         class='search-vehicles'
                         debounce='400'
                         borderless
@@ -80,6 +81,20 @@
                     <router-link :to='{ name: "ViewContact", params: { code: props.row.owner.code }}' class='text-black'>
                         {{ props.value }}
                     </router-link>
+                </q-td>
+            </template>
+            <template #body-cell-tags='props'>
+                <q-td :props='props'>
+                    <q-chip
+                        v-for='tag in props.value'
+                        @click='addTagFilter(tag)'
+                        :label='tag'
+                        class='q-ml-none'
+                        style='font-size: 12px;'
+                        clickable
+                        square
+                    />
+                    {{ props.value.length === 0 ? '-' : '' }}
                 </q-td>
             </template>
             <template #body-cell-operations='props'>
@@ -139,7 +154,7 @@
 
 <script>
 import { Tracker } from 'meteor/tracker'
-import { ref, watch } from 'vue'
+import { ref, watch, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useQuasar, useMeta, date } from '../../quasar'
@@ -165,12 +180,13 @@ export default {
 
         const vueReactiveDependencies = new Tracker.Dependency
         const editVehicleDialogRef = ref(null)
+        const filterRef = ref(null)
 
         const loading = ref(true)
         const vehicles = ref([])
         const filter = ref('')
-        const customFilter = ref('all')
-        const customFilterItems = ['all', 'deactivated']
+        const statusFilter = ref('all')
+        const statusFilterItems = ['all', 'deactivated']
 
         const pagination = ref({
             sortBy: 'updatedAt',
@@ -215,6 +231,12 @@ export default {
                 align: 'left'
             },
             {
+                name: 'tags',
+                label: 'core.tags',
+                field: 'tags',
+                align: 'left'
+            },
+            {
                 name: 'updatedAt',
                 label: 'core.updated_at_short',
                 field: 'updatedAt',
@@ -241,6 +263,15 @@ export default {
         const updateVehicleList = props => {
             pagination.value = props.pagination
             vueReactiveDependencies.changed()
+        }
+
+        const addTagFilter = tag => {
+            filter.value = tag
+            if ($q.platform.is.desktop) {
+                nextTick(() => {
+                    filterRef.value.select()
+                })
+            }
         }
 
         const activateVehicle = vehicleId => {
@@ -335,7 +366,7 @@ export default {
             })
         }
 
-        watch(customFilter, () => vueReactiveDependencies.changed())
+        watch(statusFilter, () => vueReactiveDependencies.changed())
 
         watch(route, () => {
             if (route.query.view === 'all') {
@@ -343,9 +374,9 @@ export default {
             }
 
             if (['deactivated'].includes(route.query.view)) {
-                customFilter.value = route.query.view
+                statusFilter.value = route.query.view
             } else {
-                customFilter.value = 'all'
+                statusFilter.value = 'all'
             }
         }, { immediate: true })
         
@@ -355,7 +386,7 @@ export default {
 
             const query = getVehicleList.clone({
                 filter: filter.value,
-                customFilter: customFilter.value,
+                statusFilter: statusFilter.value,
                 sortBy: pagination.value.sortBy,
                 descending: pagination.value.descending,
                 limit: pagination.value.rowsPerPage,
@@ -383,14 +414,16 @@ export default {
 
         return {
             editVehicleDialogRef,
+            filterRef,
             loading,
             vehicles,
             filter,
-            customFilter,
-            customFilterItems,
+            statusFilter,
+            statusFilterItems,
             pagination,
             columns,
             updateVehicleList,
+            addTagFilter,
             activateVehicle,
             deactivateVehicle,
             deleteVehicle
@@ -429,7 +462,9 @@ export default {
 }
 
 #vehicles-table .vehicle-operations {
-    width: 90px;
+    width: 70px;
+    padding-left: 6px;
+    padding-right: 10px;
 }
 
 #vehicles-table th:last-child,

@@ -35,6 +35,8 @@ if (Meteor.isServer) {
     Contacts.createIndex({ mobilePhone: 1 }, { name: 'mobilePhoneIndex', sparse: true })
     
     Contacts.createIndex({ landlinePhone: 1 }, { name: 'landlinePhoneIndex', sparse: true })
+
+    Contacts.createIndex({ updatedAt: 1 }, { name: 'updatedAtIndex' })
 }
 
 export default Contacts

@@ -14,7 +14,7 @@ export default Contacts.createQuery('getContactExport', {
     vatNumber: 1,
     notes: 1,
     active: 1,
-    addedBy: {
+    createdBy: {
         _id: 1,
         username: 1
     },

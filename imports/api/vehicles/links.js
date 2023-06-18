@@ -1,10 +1,10 @@
 import { Vehicles, Users, Contacts } from '../database'
 
 Vehicles.addLinks({
-    addedBy: {
+    createdBy: {
         collection: Users,
         type: 'one',
-        field: 'addedById'
+        field: 'createdById'
     },
     owner: {
         collection: Contacts,

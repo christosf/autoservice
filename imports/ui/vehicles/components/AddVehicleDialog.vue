@@ -68,7 +68,7 @@
                                         <span class='text-red-8 q-pl-xs'>*</span>
                                     </template>
                                     <template v-slot:option='{ itemProps, opt }'>
-                                        <q-item v-bind='itemProps'>
+                                        <q-item v-bind='itemProps' class='add-relation-item'>
                                             <q-item-section>
                                                 <q-item-label>
                                                     <span class='text-weight-medium'>{{ opt.name }}</span>
@@ -400,14 +400,14 @@
                                 :to='{ name: "ViewVehicle", params: { code: vehicleAdded.code }}'
                                 :label='$t("vehicles.view")'
                                 color='primary'
-                                icon='person'
+                                icon='directions_car'
                                 no-caps
                             />
                             <q-btn
                                 @click='resetForm'
                                 :label='$t("vehicles.add_new")'
                                 color='primary'
-                                icon='person_add'
+                                icon='add'
                                 outline
                                 no-caps
                             />
@@ -428,7 +428,7 @@
 </template>
 
 <script>
-import { ref, reactive, toRaw } from 'vue'
+import { ref, reactive, toRaw, watchEffect } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useQuasar } from '../../quasar'
 import { useContactsApi } from '../../contacts/composables'
@@ -670,6 +670,10 @@ export default {
         const addNewValue = (value, field) => form[field] = value
 
         const addNewTag = (value, done) => done(value.toUpperCase(), 'add-unique')
+
+        watchEffect(() => {
+            tagsOptionList.value = tagsOptionList.value.filter(tag => !form.tags.includes(tag))
+        })
 
         return {
             stepperRef,

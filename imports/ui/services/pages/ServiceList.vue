@@ -2,26 +2,25 @@
     <q-page padding>
         <q-table
             v-model:pagination='pagination'
-            @request='updateContactList'
-            :rows='contacts'
+            @request='updateServiceList'
+            :rows='services'
             :columns='columns'
             :loading='loading'
             :filter='filter'
-            :visible-columns='visibleColumns'
             :rows-per-page-options='[15,30,50,100]'
             row-key='_id'
-            id='contacts-table'
+            id='services-table'
             binary-state-sort
             bordered
             flat
         >
             <template #top-left>
-                <div class='text-h6'>{{ $t('contacts.many') }}</div>
+                <div class='text-h6'>{{ $t('services.many') }}</div>
             </template>
             <template #top-right>
                 <div class='row q-gutter-sm'>
                     <q-btn-dropdown
-                        :label='$t(`contacts.${customFilter}`)'
+                        :label='$t(`services.${statusFilter}`)'
                         :padding='$q.screen.lt.sm ? "sm" : "sm md"'
                         color='primary'
                         auto-close
@@ -30,13 +29,13 @@
                     >
                         <q-list :dense='$q.platform.is.desktop' separator>
                             <q-item
-                                v-for='item in customFilterItems'
-                                @click='$router.push({ name: "ContactList", query: { view: item }})'
-                                :active='customFilter === item'
+                                v-for='item in statusFilterItems'
+                                @click='$router.push({ name: "ServiceList", query: { view: item }})'
+                                :active='statusFilter === item'
                                 clickable
                             >
                                 <q-item-section>
-                                    <q-item-label>{{ $t(`contacts.${item}`) }}</q-item-label>
+                                    <q-item-label>{{ $t(`services.${item}`) }}</q-item-label>
                                 </q-item-section>
                             </q-item>
                         </q-list>
@@ -46,8 +45,8 @@
                         :placeholder='$t("core.search_td")'
                         :autofocus='$q.platform.is.desktop'
                         input-class='text-uppercase'
-                        class='search-contacts'
                         ref='filterRef'
+                        class='search-services'
                         debounce='400'
                         borderless
                         dense
@@ -65,35 +64,23 @@
             </template>
             <template #body-cell='props'>
                 <q-td :props='props'>
-                    <router-link :to='{ name: "ViewContact", params: { code: props.row.code }}' class='text-black'>
-                        {{ props.value }}
-                    </router-link>
+                    {{ props.value || props.value >= 0 ? props.value : '-' }}
                 </q-td>
             </template>
             <template #body-cell-type='props'>
                 <q-td :props='props' :class='{"dense": $q.screen.lt.sm}'>
-                    <router-link :to='{ name: "ViewContact", params: { code: props.row.code }}'>
-                        <q-icon v-if='isCompany(props.value)' name='domain' color='primary' size='22px'>
-                            <q-tooltip anchor='top middle' self='bottom middle'>{{ $t('contacts.company') }}</q-tooltip>
-                        </q-icon>
-                        <q-icon v-else name='person' color='primary' size='22px'>
-                            <q-tooltip anchor='top middle' self='bottom middle'>{{ $t('contacts.individual') }}</q-tooltip>
-                        </q-icon>
-                    </router-link>
+                    <q-icon name='design_services' color='primary' size='22px' />
                 </q-td>
             </template>
-            <template #body-cell-primaryPhone='props'>
-                <q-td :props='props'>
-                    <a :href='`tel:${getPhone("primary", props.row)}`' class='text-black'>
-                        {{ getPhone('primary', props.row) }}
-                    </a>
+            <template #body-cell-name='props'>
+                <q-td :props='props' :class='{"dense": $q.screen.lt.sm}'>
+                    <span>{{ props.value }}</span>
+                    <q-tooltip v-if='props.row.description'>{{ props.row.description }}</q-tooltip>
                 </q-td>
             </template>
-            <template #body-cell-secondaryPhone='props'>
+            <template #body-cell-ratePerHour='props'>
                 <q-td :props='props'>
-                    <a :href='`tel:${getPhone("secondary", props.row)}`' class='text-black'>
-                        {{ getPhone('secondary', props.row) }}
-                    </a>
+                    {{ props.value >= 0 ? '&euro; ' + props.value : '-' }}
                 </q-td>
             </template>
             <template #body-cell-tags='props'>
@@ -110,12 +97,17 @@
                     {{ props.value.length === 0 ? '-' : '' }}
                 </q-td>
             </template>
+            <template #body-cell-noVat='props'>
+                <q-td :props='props'>
+                    {{ props.value ? $t('core.no') : $t('core.yes') }}
+                </q-td>
+            </template>
             <template #body-cell-operations='props'>
                 <q-td :props='props'>
                     <div class='q-gutter-sm'>
                         <template v-if='props.row.active'>
                             <q-btn
-                                @click='editContactDialogRef.open(props.row._id, props.row.code)'
+                                @click='editServiceDialogRef.open(props.row._id, props.row.code)'
                                 icon='edit'
                                 color='secondary'
                                 size='sm'
@@ -125,7 +117,7 @@
                                 <q-tooltip anchor='top middle' self='bottom middle'>{{ $t('core.edit') }}</q-tooltip>
                             </q-btn>
                             <q-btn
-                                @click='deactivateContact(props.row._id)'
+                                @click='deactivateService(props.row._id)'
                                 icon='visibility_off'
                                 color='negative'
                                 size='sm'
@@ -137,7 +129,7 @@
                         </template>
                         <template v-else>
                             <q-btn
-                                @click='activateContact(props.row._id)'
+                                @click='activateService(props.row._id)'
                                 icon='visibility'
                                 color='positive'
                                 size='sm'
@@ -147,7 +139,7 @@
                                 <q-tooltip anchor='top middle' self='bottom middle'>{{ $t('core.activate') }}</q-tooltip>
                             </q-btn>
                             <q-btn
-                                @click='deleteContact(props.row._id)'
+                                @click='deleteService(props.row._id)'
                                 icon='delete'
                                 color='negative'
                                 size='sm'
@@ -161,22 +153,22 @@
                 </q-td>
             </template>
         </q-table>
-        <edit-contact-dialog ref='editContactDialogRef' />
+        <edit-service-dialog ref='editServiceDialogRef' />
     </q-page>
 </template>
 
 <script>
 import { Tracker } from 'meteor/tracker'
-import { ref, watch, nextTick } from 'vue'
+import { nextTick, ref, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useQuasar, useMeta, date } from '../../quasar'
-import { useContactsApi } from '../composables'
-import EditContactDialog from '../components/EditContactDialog.vue'
+import { useServicesApi } from '../composables'
+import EditServiceDialog from '../components/EditServiceDialog.vue'
 
 export default {
     components: {
-        EditContactDialog
+        EditServiceDialog
     },
     setup() {
         const router = useRouter()
@@ -185,23 +177,21 @@ export default {
         const { t: $t } = useI18n()
         const { formatDate } = date
         const {
-            ContactTypesEnum,
-            getContactList,
-            activateContact: activateContactFn,
-            deactivateContact: deactivateContactFn,
-            deleteContact: deleteContactFn
-        } = useContactsApi()
-        
+            getServiceList,
+            deleteService: deleteServiceFn,
+            activateService: activateServiceFn,
+            deactivateService: deactivateServiceFn
+        } = useServicesApi()
+
         const vueReactiveDependencies = new Tracker.Dependency
-        const editContactDialogRef = ref(null)
+        const editServiceDialogRef = ref(null)
         const filterRef = ref(null)
-                
+
         const loading = ref(true)
-        const contacts = ref([])
-        const visibleColumns = ref([])
+        const services = ref([])
         const filter = ref('')
-        const customFilter = ref('all')
-        const customFilterItems = ['all', 'customers', 'suppliers', 'deactivated']
+        const statusFilter = ref('all')
+        const statusFilterItems = ['all', 'deactivated']
 
         const pagination = ref({
             sortBy: 'updatedAt',
@@ -214,86 +204,66 @@ export default {
         const columns = [
             {
                 name: 'type',
-                field: 'type',
-                required: true,
-                classes: 'contact-type',
+                classes: 'service-type'
             },
             {
                 name: 'name',
-                label: 'contacts.name',
+                label: 'core.name',
                 field: 'name',
-                required: true,
                 sortable: true,
                 align: 'left'
             },
             {
-                name: 'primaryPhone',
-                label: 'contacts.phone',
-                required: true,
-                align: 'left',
-                classes: 'contact-phone'
+                name: 'ratePerHour',
+                label: 'services.rate_per_hour',
+                field: 'ratePerHour',
+                align: 'center'
             },
             {
-                name: 'secondaryPhone',
-                required: true,
-                align: 'left',
-                classes: 'contact-phone'
-            },
-            {
-                name: 'vehiclesCount',
-                label: 'vehicles.many',
-                field: 'vehiclesCount',
-                sortable: true,
+                name: 'hours',
+                label: 'services.man_hours',
+                field: 'hours',
                 align: 'center'
             },
             {
                 name: 'tags',
                 label: 'core.tags',
                 field: 'tags',
-                required: true,
                 align: 'left'
+            },
+            {
+                name: 'noVat',
+                label: 'core.vat',
+                field: 'noVat',
+                align: 'center'
             },
             {
                 name: 'updatedAt',
                 label: 'core.updated_at_short',
                 field: 'updatedAt',
                 format: val => formatDate(val, 'DD.MM.YYYY HH:mm'),
-                required: true,
                 sortable: true,
                 align: 'left',
-                classes: 'contact-date'
+                classes: 'service-date'
             },
             {
                 name: 'code',
                 label: 'core.code',
                 field: 'code',
-                required: true,
                 sortable: true,
                 align: 'left',
-                classes: 'contact-code'
+                classes: 'service-code'
             },
             {
                 name: 'operations',
-                required: true,
                 align: 'right',
-                classes: 'contact-operations'
+                classes: 'service-operations'
             }
         ]
 
-        const updateContactList = props => {
+        const updateServiceList = props => {
             pagination.value = props.pagination
             vueReactiveDependencies.changed()
-        }
-
-        const isCompany = type => type === ContactTypesEnum.COMPANY
-
-        const getPhone = (phoneType, contact) => {
-            const { type, mobilePhone, landlinePhone } = contact
-
-            if (phoneType === 'primary') {
-                return isCompany(type) ? landlinePhone : mobilePhone
-            }
-            return isCompany(type) ? mobilePhone : landlinePhone
         }
 
         const addTagFilter = tag => {
@@ -305,14 +275,14 @@ export default {
             }
         }
 
-        const activateContact = contactId => {
-            activateContactFn({ _id: contactId }).then(response => {
+        const activateService = serviceId => {
+            activateServiceFn({ _id: serviceId }).then(response => {
                 const { activated } = response
 
                 if (activated) {
                     $q.notify({
                         type: 'positive',
-                        message: $t('contacts.activate_successful')
+                        message: $t('services.activate_successful')
                     })
                 }
             }).catch(error => {
@@ -320,10 +290,10 @@ export default {
             })
         }
 
-        const deactivateContact = contactId => {
+        const deactivateService = serviceId => {
             $q.dialog({
-                title: $t('contacts.deactivate'),
-                message: $t('contacts.deactivate_prompt_msg'),
+                title: $t('services.deactivate'),
+                message: $t('services.deactivate_prompt_msg'),
                 cancel: true,
                 persistent: true,
                 ok: {
@@ -339,13 +309,13 @@ export default {
                     noCaps: true
                 }
             }).onOk(() => {
-                deactivateContactFn({ _id: contactId }).then(response => {
+                deactivateServiceFn({ _id: serviceId }).then(response => {
                     const { deactivated } = response
 
                     if (deactivated) {
                         $q.notify({
                             type: 'positive',
-                            message: $t('contacts.deactivate_successful')
+                            message: $t('services.deactivate_successful')
                         })
                     }
                 }).catch(error => {
@@ -354,10 +324,10 @@ export default {
             })
         }
 
-        const deleteContact = contactId => {
+        const deleteService = serviceId => {
             $q.dialog({
-                title: $t('contacts.delete'),
-                message: $t('contacts.delete_prompt_msg'),
+                title: $t('services.delete'),
+                message: $t('services.delete_prompt_msg'),
                 cancel: true,
                 persistent: true,
                 ok: {
@@ -373,50 +343,32 @@ export default {
                     noCaps: true
                 }
             }).onOk(() => {
-                deleteContactFn({ _id: contactId }).then(response => {
+                deleteServiceFn({ _id: serviceId }).then(response => {
                     const { deleted } = response
 
                     if (deleted) {
                         $q.notify({
                             type: 'positive',
-                            message: $t('contacts.delete_successful')
+                            message: $t('services.delete_successful')
                         })
                     }
                 }).catch(error => {
-                    if (error.error === 'vehicles-associated') {
-                        $q.notify({
-                            type: 'negative',
-                            message: $t('contacts.error_associated_vehicles')
-                        })
-                    } else {
-                        console.log(error)
-                    }
+                    console.log(error)
                 })
             })
         }
 
-        watch(customFilter, () => {
-            if (customFilter.value === 'customers') {
-                visibleColumns.value = ['vehiclesCount']
-            } else {
-                visibleColumns.value = []
-
-                if (pagination.value.sortBy === 'vehiclesCount') {
-                    pagination.value.sortBy = 'updatedAt'
-                }
-            }
-            vueReactiveDependencies.changed()
-        })
+        watch(statusFilter, () => vueReactiveDependencies.changed())
 
         watch(route, () => {
             if (route.query.view === 'all') {
-                router.replace({ name: 'ContactList' })
+                router.replace({ name: 'ServiceList' })
             }
 
-            if (['customers', 'suppliers', 'deactivated'].includes(route.query.view)) {
-                customFilter.value = route.query.view
+            if (['deactivated'].includes(route.query.view)) {
+                statusFilter.value = route.query.view
             } else {
-                customFilter.value = 'all'
+                statusFilter.value = 'all'
             }
         }, { immediate: true })
 
@@ -424,9 +376,9 @@ export default {
             vueReactiveDependencies.depend()
             loading.value = true
 
-            const query = getContactList.clone({
+            const query = getServiceList.clone({
                 filter: filter.value,
-                customFilter: customFilter.value,
+                statusFilter: statusFilter.value,
                 sortBy: pagination.value.sortBy,
                 descending: pagination.value.descending,
                 limit: pagination.value.rowsPerPage,
@@ -442,75 +394,73 @@ export default {
                     }
                     pagination.value.rowsNumber = response
                 })
-                contacts.value = query.fetch()
+
+                services.value = query.fetch()
                 loading.value = false
             }
         })
 
         useMeta({
-            title: $t('contacts.many')
+            title: $t('services.many')
         })
 
         return {
-            editContactDialogRef,
+            editServiceDialogRef,
             filterRef,
             loading,
-            contacts,
-            visibleColumns,
+            services,
             filter,
-            customFilter,
-            customFilterItems,
+            statusFilter,
+            statusFilterItems,
             pagination,
             columns,
-            updateContactList,
-            isCompany,
-            getPhone,
+            updateServiceList,
             addTagFilter,
-            activateContact,
-            deactivateContact,
-            deleteContact
+            activateService,
+            deactivateService,
+            deleteService
         }
     }
 }
 </script>
 
 <style>
-#contacts-table tbody td {
+#services-table tbody td {
     font-size: 14px;
 }
 
-#contacts-table .search-contacts {
+#services-table .search-services {
     width: 120px;
 }
 
-#contacts-table .contact-type {
+#services-table .service-type {
     width: 22px;
 }
-#contacts-table .contact-type.dense {
+#services-table .service-type.dense {
     padding-right: 0;
     padding-left: 0;
 }
 
-#contacts-table .contact-code {
+#services-table .service-reg-number {
+    width: 130px;
+}
+
+#services-table .service-code {
     width: 50px;
 }
 
-#contacts-table .contact-phone {
-    width: 120px;
-}
-
-#contacts-table .contact-date {
+#services-table .service-date {
     width: 150px;
 }
 
-#contacts-table .contact-operations {
+#services-table .service-operations {
     width: 70px;
     padding-left: 6px;
     padding-right: 10px;
 }
 
-#contacts-table th:last-child,
-#contacts-table td:last-child {
+#services-table th:last-child,
+#services-table td:last-child {
     background-color: #ffffff;
     position: sticky;
     right: 0;

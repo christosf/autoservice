@@ -5,6 +5,7 @@ import settings from '../../ui/settings/translations'
 import users from '../../ui/users/translations'
 import contacts from '../../ui/contacts/translations'
 import vehicles from '../../ui/vehicles/translations'
+import services from '../../ui/services/translations'
 import jobcards from '../../ui/job-cards/translations'
 
 const messages = merge.all([
@@ -13,6 +14,7 @@ const messages = merge.all([
     users,
     contacts,
     vehicles,
+    services,
     jobcards
 ])
 
