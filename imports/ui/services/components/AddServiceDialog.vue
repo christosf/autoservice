@@ -151,13 +151,6 @@
                         <div v-html='$t("services.added_what_next", { service: form.name.toUpperCase() })' class='text-subtitle1' />
                         <div class='q-mt-lg q-gutter-sm'>
                             <q-btn
-                                :to='{ name: "ViewService", params: { code: serviceAdded.code }}'
-                                :label='$t("services.view")'
-                                color='primary'
-                                icon='design_services'
-                                no-caps
-                            />
-                            <q-btn
                                 @click='resetForm'
                                 :label='$t("services.add_new")'
                                 color='primary'

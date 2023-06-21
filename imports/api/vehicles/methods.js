@@ -1,12 +1,13 @@
 import { Meteor } from 'meteor/meteor'
 import SimpleSchema from 'simpl-schema'
 import { Vehicles } from '../database'
+import { CounterNamesEnum } from '../counters/enums'
 
 Meteor.methods({
     'vehicles.insert'(params) {
         if (Meteor.isClient) return
 
-        new SimpleSchema({
+        const schema = new SimpleSchema({
             ownerId: String,
             make: String,
             model: String,
@@ -44,23 +45,24 @@ Meteor.methods({
                 type: String,
                 optional: true
             }
-        }).validate(params)
+        })
+        schema.validate(schema.clean(params))
         
         const vehicle = { ...params }
-        vehicle.code = 'V' + Meteor.call('counters.increaseVehiclesCounter')
+        vehicle.code = 'V' + Meteor.call('counters.increaseCounter', { name: CounterNamesEnum.VEHICLES })
         vehicle.makeModel = `${vehicle.make} ${vehicle.model}`.toUpperCase()
 
         try {
             return { added: true, _id: Vehicles.insert(vehicle), code: vehicle.code }
         } catch(error) {
-            Meteor.call('counters.decreaseVehiclesCounter')
+            Meteor.call('counters.decreaseCounter', { name: CounterNamesEnum.VEHICLES })
             throw error
         }
     },
     'vehicles.update'(params) {
         if (Meteor.isClient) return
 
-        new SimpleSchema({
+        const schema = new SimpleSchema({
             _id: String,
             ownerId: String,
             make: String,
@@ -99,7 +101,8 @@ Meteor.methods({
                 type: String,
                 optional: true
             }
-        }).validate(params)
+        })
+        schema.validate(schema.clean(params))
 
         const { _id } = params
         const vehicle = { ...params }
@@ -112,9 +115,10 @@ Meteor.methods({
     'vehicles.delete'(params) {
         if (Meteor.isClient) return
 
-        new SimpleSchema({
+        const schema = new SimpleSchema({
             _id: String
-        }).validate(params)
+        })
+        schema.validate(schema.clean(params))
 
         const { _id } = params
 
@@ -124,9 +128,10 @@ Meteor.methods({
     'vehicles.deactivate'(params) {
         if (Meteor.isClient) return
 
-        new SimpleSchema({
+        const schema = new SimpleSchema({
             _id: String
-        }).validate(params)
+        })
+        schema.validate(schema.clean(params))
 
         const { _id } = params
 
@@ -135,9 +140,10 @@ Meteor.methods({
     'vehicles.activate'(params) {
         if (Meteor.isClient) return
 
-        new SimpleSchema({
+        const schema = new SimpleSchema({
             _id: String
-        }).validate(params)
+        })
+        schema.validate(schema.clean(params))
 
         const { _id } = params
 
@@ -146,14 +152,18 @@ Meteor.methods({
     'vehicles.fieldValueExists'(params) {
         if (Meteor.isClient) return
 
-        new SimpleSchema({
+        const schema = new SimpleSchema({
             field: String,
-            value: String,
+            value: {
+                type: String,
+                defaultValue: ''
+            },
             excludeId: {
                 type: String,
                 optional: true
             }
-        }).validate(params)
+        })
+        schema.validate(schema.clean(params))
 
         const { field, value, excludeId } = params
 
@@ -165,10 +175,14 @@ Meteor.methods({
     async 'vehicles.getDistinctFieldValues'(params) {
         if (Meteor.isClient) return
 
-        new SimpleSchema({
+        const schema = new SimpleSchema({
             field: String,
-            filter: String
-        }).validate(params)
+            filter: {
+                type: String,
+                defaultValue: ''
+            }
+        })
+        schema.validate(schema.clean(params))
 
         const { field } = params
         const filter = params.filter.replace(/([()[{*+.$^\\|?])/g, '\\$1').toUpperCase()

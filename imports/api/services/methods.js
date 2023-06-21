@@ -1,12 +1,13 @@
 import { Meteor } from 'meteor/meteor'
 import SimpleSchema from 'simpl-schema'
 import { Services } from '../database'
+import { CounterNamesEnum } from '../counters/enums'
 
 Meteor.methods({
     'services.insert'(params) {
         if (Meteor.isClient) return
 
-        new SimpleSchema({
+        const schema = new SimpleSchema({
             name: String,
             ratePerHour: {
                 type: Number,
@@ -23,22 +24,23 @@ Meteor.methods({
             tags: Array,
             'tags.$': String,
             noVat: Boolean
-        }).validate(params)
+        })
+        schema.validate(schema.clean(params))
         
         const service = { ...params }
-        service.code = 'S' + Meteor.call('counters.increaseServicesCounter')
+        service.code = 'S' + Meteor.call('counters.increaseCounter', { name: CounterNamesEnum.SERVICES })
 
         try {
             return { added: true, _id: Services.insert(service), code: service.code }
         } catch(error) {
-            Meteor.call('counters.decreaseServicesCounter')
+            Meteor.call('counters.decreaseCounter', { name: CounterNamesEnum.SERVICES })
             throw error
         }
     },
     'services.update'(params) {
         if (Meteor.isClient) return
 
-        new SimpleSchema({
+        const schema = new SimpleSchema({
             _id: String,
             name: String,
             ratePerHour: {
@@ -56,7 +58,8 @@ Meteor.methods({
             tags: Array,
             'tags.$': String,
             noVat: Boolean
-        }).validate(params)
+        })
+        schema.validate(schema.clean(params))
 
         const { _id } = params
         const service = { ...params }
@@ -67,9 +70,10 @@ Meteor.methods({
     'services.delete'(params) {
         if (Meteor.isClient) return
 
-        new SimpleSchema({
+        const schema = new SimpleSchema({
             _id: String
-        }).validate(params)
+        })
+        schema.validate(schema.clean(params))
 
         const { _id } = params
 
@@ -78,9 +82,10 @@ Meteor.methods({
     'services.deactivate'(params) {
         if (Meteor.isClient) return
 
-        new SimpleSchema({
+        const schema = new SimpleSchema({
             _id: String
-        }).validate(params)
+        })
+        schema.validate(schema.clean(params))
 
         const { _id } = params
 
@@ -89,9 +94,10 @@ Meteor.methods({
     'services.activate'(params) {
         if (Meteor.isClient) return
 
-        new SimpleSchema({
+        const schema = new SimpleSchema({
             _id: String
-        }).validate(params)
+        })
+        schema.validate(schema.clean(params))
 
         const { _id } = params
 
@@ -100,13 +106,14 @@ Meteor.methods({
     'services.serviceExists'(params) {
         if (Meteor.isClient) return
 
-        new SimpleSchema({
+        const schema = new SimpleSchema({
             name: String,
             excludeId: {
                 type: String,
                 optional: true
             }
-        }).validate(params)
+        })
+        schema.validate(schema.clean(params))
 
         const { name, excludeId } = params
         
@@ -123,10 +130,14 @@ Meteor.methods({
     async 'services.getDistinctFieldValues'(params) {
         if (Meteor.isClient) return
 
-        new SimpleSchema({
+        const schema = new SimpleSchema({
             field: String,
-            filter: String
-        }).validate(params)
+            filter: {
+                type: String,
+                defaultValue: ''
+            }
+        })
+        schema.validate(schema.clean(params))
 
         const { field } = params
         const filter = params.filter.replace(/([()[{*+.$^\\|?])/g, '\\$1').toUpperCase()

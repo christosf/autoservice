@@ -74,8 +74,10 @@
             </template>
             <template #body-cell-name='props'>
                 <q-td :props='props' :class='{"dense": $q.screen.lt.sm}'>
-                    <span>{{ props.value }}</span>
-                    <q-tooltip v-if='props.row.description'>{{ props.row.description }}</q-tooltip>
+                    <span>
+                        {{ props.value }}
+                        <q-tooltip v-if='props.row.description'>{{ props.row.description }}</q-tooltip>
+                    </span>
                 </q-td>
             </template>
             <template #body-cell-ratePerHour='props'>
@@ -361,14 +363,14 @@ export default {
         watch(statusFilter, () => vueReactiveDependencies.changed())
 
         watch(route, () => {
-            if (route.query.view === 'all') {
-                router.replace({ name: 'ServiceList' })
-            }
-
-            if (['deactivated'].includes(route.query.view)) {
-                statusFilter.value = route.query.view
-            } else {
-                statusFilter.value = 'all'
+            if (route.name === 'ServiceList') {
+                const availableViews = ['deactivated']
+                if (route.query.view && availableViews.includes(route.query.view)) {
+                    statusFilter.value = route.query.view
+                } else {
+                    statusFilter.value = 'all'
+                    router.replace({ name: 'ServiceList' })
+                }
             }
         }, { immediate: true })
 

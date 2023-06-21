@@ -1,47 +1,29 @@
 import { Meteor } from 'meteor/meteor'
 import { Counters } from '../database'
-import { CounterNamesEnum } from './enums'
+import SimpleSchema from 'simpl-schema'
 
 Meteor.methods({
-    async 'counters.increaseContactsCounter'() {
-        const res = await Counters.rawCollection().findOneAndUpdate({
-            name: CounterNamesEnum.CONTACTS
-        }, { $inc: { counter: 1 }})
+    async 'counters.increaseCounter'(params) {
+        const schema = new SimpleSchema({
+            name: String
+        })
+        schema.validate(schema.clean(params))
+
+        const { name } = params
+
+        const res = await Counters.rawCollection().findOneAndUpdate({ name }, { $inc: { counter: 1 }})
         
         return res.value.counter
     },
-    async 'counters.decreaseContactsCounter'() {
-        const res = await Counters.rawCollection().findOneAndUpdate({
-            name: CounterNamesEnum.CONTACTS
-        }, { $inc: { counter: -1 }})
-        
-        return res.value.counter
-    },
-    async 'counters.increaseVehiclesCounter'() {
-        const res = await Counters.rawCollection().findOneAndUpdate({
-            name: CounterNamesEnum.VEHICLES
-        }, { $inc: { counter: 1 }})
-        
-        return res.value.counter
-    },
-    async 'counters.decreaseVehiclesCounter'() {
-        const res = await Counters.rawCollection().findOneAndUpdate({
-            name: CounterNamesEnum.VEHICLES
-        }, { $inc: { counter: -1 }})
-        
-        return res.value.counter
-    },
-    async 'counters.increaseServicesCounter'() {
-        const res = await Counters.rawCollection().findOneAndUpdate({
-            name: CounterNamesEnum.SERVICES
-        }, { $inc: { counter: 1 }})
-        
-        return res.value.counter
-    },
-    async 'counters.decreaseServicesCounter'() {
-        const res = await Counters.rawCollection().findOneAndUpdate({
-            name: CounterNamesEnum.SERVICES
-        }, { $inc: { counter: -1 }})
+    async 'counters.decreaseCounter'(params) {
+        const schema = new SimpleSchema({
+            name: String
+        })
+        schema.validate(schema.clean(params))
+
+        const { name } = params
+
+        const res = await Counters.rawCollection().findOneAndUpdate({ name }, { $inc: { counter: -1 }})
         
         return res.value.counter
     }

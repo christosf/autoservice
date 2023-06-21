@@ -7,7 +7,7 @@ export default Vehicles.createQuery('getVehicleList', {
         params.filter = params.filter.replace(/([()[{*+.$^\\|?])/g, '\\$1').toUpperCase()
 
         filters.active = true
-        if (params.customFilter === 'deactivated') {
+        if (params.statusFilter === 'deactivated') {
             filters.active = false
         }
 

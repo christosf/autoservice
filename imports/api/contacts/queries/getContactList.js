@@ -7,11 +7,11 @@ export default Contacts.createQuery('getContactList', {
         params.filter = params.filter.replace(/([()[{*+.$^\\|?])/g, '\\$1').toUpperCase()
 
         filters.active = true
-        if (params.customFilter === 'deactivated') {
+        if (params.statusFilter === 'deactivated') {
             filters.active = false
-        } else if (params.customFilter === 'customers') {
+        } else if (params.statusFilter === 'customers') {
             filters.vehiclesCount = { $gt: 0 }
-        } else if (params.customFilter === 'suppliers') {
+        } else if (params.statusFilter === 'suppliers') {
             // TODO: Filter contacts if they have PartSupplies.
         }
 

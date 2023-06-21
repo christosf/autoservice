@@ -1,7 +1,8 @@
 const CounterNamesEnum = {
     CONTACTS: 'contacts',
     VEHICLES: 'vehicles',
-    SERVICES: 'services'
+    SERVICES: 'services',
+    PARTS: 'parts'
 }
 
 Object.freeze(CounterNamesEnum)

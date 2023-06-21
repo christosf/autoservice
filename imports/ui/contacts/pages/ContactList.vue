@@ -21,7 +21,7 @@
             <template #top-right>
                 <div class='row q-gutter-sm'>
                     <q-btn-dropdown
-                        :label='$t(`contacts.${customFilter}`)'
+                        :label='$t(`contacts.${statusFilter}`)'
                         :padding='$q.screen.lt.sm ? "sm" : "sm md"'
                         color='primary'
                         auto-close
@@ -30,9 +30,9 @@
                     >
                         <q-list :dense='$q.platform.is.desktop' separator>
                             <q-item
-                                v-for='item in customFilterItems'
+                                v-for='item in statusFilterItems'
                                 @click='$router.push({ name: "ContactList", query: { view: item }})'
-                                :active='customFilter === item'
+                                :active='statusFilter === item'
                                 clickable
                             >
                                 <q-item-section>
@@ -200,8 +200,8 @@ export default {
         const contacts = ref([])
         const visibleColumns = ref([])
         const filter = ref('')
-        const customFilter = ref('all')
-        const customFilterItems = ['all', 'customers', 'suppliers', 'deactivated']
+        const statusFilter = ref('all')
+        const statusFilterItems = ['all', 'customers', 'suppliers', 'deactivated']
 
         const pagination = ref({
             sortBy: 'updatedAt',
@@ -395,8 +395,8 @@ export default {
             })
         }
 
-        watch(customFilter, () => {
-            if (customFilter.value === 'customers') {
+        watch(statusFilter, () => {
+            if (statusFilter.value === 'customers') {
                 visibleColumns.value = ['vehiclesCount']
             } else {
                 visibleColumns.value = []
@@ -409,14 +409,14 @@ export default {
         })
 
         watch(route, () => {
-            if (route.query.view === 'all') {
-                router.replace({ name: 'ContactList' })
-            }
-
-            if (['customers', 'suppliers', 'deactivated'].includes(route.query.view)) {
-                customFilter.value = route.query.view
-            } else {
-                customFilter.value = 'all'
+            if (route.name === 'ContactList') {
+                const availableViews = ['customers', 'suppliers', 'deactivated']
+                if (route.query.view && availableViews.includes(route.query.view)) {
+                    statusFilter.value = route.query.view
+                } else {
+                    statusFilter.value = 'all'
+                    router.replace({ name: 'ContactList' })
+                }
             }
         }, { immediate: true })
 
@@ -426,7 +426,7 @@ export default {
 
             const query = getContactList.clone({
                 filter: filter.value,
-                customFilter: customFilter.value,
+                statusFilter: statusFilter.value,
                 sortBy: pagination.value.sortBy,
                 descending: pagination.value.descending,
                 limit: pagination.value.rowsPerPage,
@@ -458,8 +458,8 @@ export default {
             contacts,
             visibleColumns,
             filter,
-            customFilter,
-            customFilterItems,
+            statusFilter,
+            statusFilterItems,
             pagination,
             columns,
             updateContactList,

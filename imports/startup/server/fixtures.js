@@ -21,3 +21,7 @@ if (Counters.find({ name: CounterNamesEnum.VEHICLES }).count() === 0) {
 if (Counters.find({ name: CounterNamesEnum.SERVICES }).count() === 0) {
     Counters.insert({ name: CounterNamesEnum.SERVICES })
 }
+
+if (Counters.find({ name: CounterNamesEnum.PARTS }).count() === 0) {
+    Counters.insert({ name: CounterNamesEnum.PARTS })
+}

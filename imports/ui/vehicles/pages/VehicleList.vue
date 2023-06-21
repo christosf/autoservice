@@ -369,14 +369,14 @@ export default {
         watch(statusFilter, () => vueReactiveDependencies.changed())
 
         watch(route, () => {
-            if (route.query.view === 'all') {
-                router.replace({ name: 'VehicleList' })
-            }
-
-            if (['deactivated'].includes(route.query.view)) {
-                statusFilter.value = route.query.view
-            } else {
-                statusFilter.value = 'all'
+            if (route.name === 'VehicleList') {
+                const availableViews = ['deactivated']
+                if (route.query.view && availableViews.includes(route.query.view)) {
+                    statusFilter.value = route.query.view
+                } else {
+                    statusFilter.value = 'all'
+                    router.replace({ name: 'VehicleList' })
+                }
             }
         }, { immediate: true })
         

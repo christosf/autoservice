@@ -102,7 +102,7 @@ export default new SimpleSchema({
     },
     notes: {
         type: String,
-        max: 1000,
+        max: 2000,
         optional: true,
     },
     balance: {
