@@ -89,7 +89,7 @@ Meteor.methods({
 
         const { _id } = params
 
-        return { deactivated: Services.update(_id, { $set: { active: false }}) === 1 }
+        return { deactivated: Services.update(_id, { $set: { isActive: false }}) === 1 }
     },
     'services.activate'(params) {
         if (Meteor.isClient) return
@@ -101,7 +101,7 @@ Meteor.methods({
 
         const { _id } = params
 
-        return { activated: Services.update(_id, { $set: { active: true }}) === 1 }
+        return { activated: Services.update(_id, { $set: { isActive: true }}) === 1 }
     },
     'services.serviceExists'(params) {
         if (Meteor.isClient) return

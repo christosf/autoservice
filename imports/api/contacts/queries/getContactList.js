@@ -6,9 +6,9 @@ export default Contacts.createQuery('getContactList', {
 
         params.filter = params.filter.replace(/([()[{*+.$^\\|?])/g, '\\$1').toUpperCase()
 
-        filters.active = true
+        filters.isActive = true
         if (params.statusFilter === 'deactivated') {
-            filters.active = false
+            filters.isActive = false
         } else if (params.statusFilter === 'customers') {
             filters.vehiclesCount = { $gt: 0 }
         } else if (params.statusFilter === 'suppliers') {
@@ -33,6 +33,6 @@ export default Contacts.createQuery('getContactList', {
     landlinePhone: 1,
     tags: 1,
     vehiclesCount: 1,
-    active: 1,
+    isActive: 1,
     updatedAt: 1
 })

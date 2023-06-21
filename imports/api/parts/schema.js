@@ -60,7 +60,7 @@ export default new SimpleSchema({
         type: String,
         max: 40
     },
-    active: {
+    isActive: {
         type: Boolean,
         defaultValue: true
     },

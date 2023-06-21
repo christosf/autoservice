@@ -100,7 +100,7 @@
             <template #body-cell-operations='props'>
                 <q-td :props='props'>
                     <div class='q-gutter-sm'>
-                        <template v-if='props.row.active'>
+                        <template v-if='props.row.isActive'>
                             <q-btn
                                 @click='editVehicleDialogRef.open(props.row._id, props.row.code)'
                                 icon='edit'

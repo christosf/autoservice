@@ -350,8 +350,9 @@
                                 </q-input>
                                 <q-input
                                     v-if='isCompany'
-                                    v-model='form.vatNumber'
+                                    v-model='form.taxIdNumber'
                                     :label='$t("contacts.vat_number")'
+                                    maxlength='20'
                                     bottom-slots
                                     outlined
                                 >
@@ -473,7 +474,7 @@ export default {
             tags: [],
             email: '',
             website: '',
-            vatNumber: ''
+            taxIdNumber: ''
         })
 
         const isCompany = computed(() => form.type === ContactTypesEnum.COMPANY)
@@ -576,7 +577,7 @@ export default {
             form.tags.splice(0)
             form.email = ''
             form.website = ''
-            form.vatNumber = ''
+            form.taxIdNumber = ''
 
             steps.current = 'basicDetails'
             steps.basicDetails.hasError = false

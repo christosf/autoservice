@@ -135,7 +135,7 @@ Meteor.methods({
 
         const { _id } = params
 
-        return { deactivated: Vehicles.update(_id, { $set: { active: false }}) === 1 }
+        return { deactivated: Vehicles.update(_id, { $set: { isActive: false }}) === 1 }
     },
     'vehicles.activate'(params) {
         if (Meteor.isClient) return
@@ -147,7 +147,7 @@ Meteor.methods({
 
         const { _id } = params
 
-        return { activated: Vehicles.update(_id, { $set: { active: true }}) === 1 }
+        return { activated: Vehicles.update(_id, { $set: { isActive: true }}) === 1 }
     },
     'vehicles.fieldValueExists'(params) {
         if (Meteor.isClient) return

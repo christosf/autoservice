@@ -12,5 +12,5 @@ export default Contacts.createQuery('getContactEditableFields', {
     tags: 1,
     email: 1,
     website: 1,
-    vatNumber: 1
+    taxIdNumber: 1
 })

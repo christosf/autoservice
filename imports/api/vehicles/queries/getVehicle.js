@@ -23,7 +23,7 @@ export default Vehicles.createQuery('getVehicle', {
     drivetrain: 1,
     modelYear: 1,
     notes: 1,
-    active: 1,
+    isActive: 1,
     createdAt: 1,
     updatedAt: 1,
     owner: {

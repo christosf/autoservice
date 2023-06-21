@@ -6,9 +6,9 @@ export default Services.createQuery('getServiceList', {
 
         params.filter = params.filter.replace(/([()[{*+.$^\\|?])/g, '\\$1').toUpperCase()
 
-        filters.active = true
+        filters.isActive = true
         if (params.statusFilter === 'deactivated') {
-            filters.active = false
+            filters.isActive = false
         }
 
         filters.$or = [
@@ -27,6 +27,6 @@ export default Services.createQuery('getServiceList', {
     hours: 1,
     tags: 1,
     noVat: 1,
-    active: 1,
+    isActive: 1,
     updatedAt: 1
 })

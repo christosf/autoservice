@@ -12,6 +12,7 @@
     "deepmerge": "^4.3.1",
     "meteor-node-stubs": "^1.2.1",
     "papaparse": "^5.4.1",
+    "queue": "^7.0.0",
     "simpl-schema": "^3.4.1",
     "validator": "^13.9.0",
     "vue": "^3.3.4",

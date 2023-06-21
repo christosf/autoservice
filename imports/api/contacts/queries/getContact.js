@@ -18,11 +18,11 @@ export default Contacts.createQuery('getContact', {
     tags: 1,
     email: 1,
     website: 1,
-    vatNumber: 1,
+    taxIdNumber: 1,
     notes: 1,
     balance: 1,
     vehiclesCount: 1,
-    active: 1,
+    isActive: 1,
     createdAt: 1,
     updatedAt: 1,
     createdBy: {
@@ -30,7 +30,7 @@ export default Contacts.createQuery('getContact', {
     },
     vehicles: {
         $filters: {
-            active: true
+            isActive: true
         },
         code: 1,
         make: 1,

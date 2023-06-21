@@ -38,7 +38,7 @@ export default new SimpleSchema({
         type: Boolean,
         defaultValue: false
     },
-    active: {
+    isActive: {
         type: Boolean,
         defaultValue: true
     },

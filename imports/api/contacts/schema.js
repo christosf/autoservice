@@ -95,9 +95,9 @@ export default new SimpleSchema({
             return 'invalid_url'
         }
     },
-    vatNumber: {
+    taxIdNumber: {
         type: String,
-        max: 30,
+        max: 20,
         optional: true
     },
     notes: {
@@ -105,15 +105,11 @@ export default new SimpleSchema({
         max: 2000,
         optional: true,
     },
-    balance: {
-        type: Number,
-        defaultValue: 0
-    },
     vehiclesCount: {
         type: Number,
         defaultValue: 0
     },
-    active: {
+    isActive: {
         type: Boolean,
         defaultValue: true
     },

@@ -6,9 +6,9 @@ export default Vehicles.createQuery('getVehicleList', {
 
         params.filter = params.filter.replace(/([()[{*+.$^\\|?])/g, '\\$1').toUpperCase()
 
-        filters.active = true
+        filters.isActive = true
         if (params.statusFilter === 'deactivated') {
-            filters.active = false
+            filters.isActive = false
         }
 
         filters.$or = [
@@ -33,6 +33,6 @@ export default Vehicles.createQuery('getVehicleList', {
         code: 1,
         name: 1
     },
-    active: 1,
+    isActive: 1,
     updatedAt: 1
 })

@@ -101,7 +101,7 @@ export default new SimpleSchema({
         max: 1000,
         optional: true,
     },
-    active: {
+    isActive: {
         type: Boolean,
         defaultValue: true
     },

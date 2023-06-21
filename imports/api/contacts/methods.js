@@ -6,42 +6,12 @@ import { CounterNamesEnum } from '../counters/enums'
 
 Meteor.methods({
     'contacts.insert'(params) {
+        /*
+            No validation is needed here because no editing of params is done in this method.
+            Params are validated by the attached schema on the collection.
+        */
         if (Meteor.isClient) return
 
-        const schema = new SimpleSchema({
-            type: String,
-            name: String,
-            mobilePhone: {
-                type: String,
-                optional: true
-            },
-            landlinePhone: {
-                type: String,
-                optional: true
-            },
-            addresses: Array,
-            'addresses.$': Object,
-            'addresses.$.street': String,
-            'addresses.$.city': String,
-            'addresses.$.postalCode': String,
-            'addresses.$.type': String,
-            tags: Array,
-            'tags.$': String,
-            email: {
-                type: String,
-                optional: true
-            },
-            website: {
-                type: String,
-                optional: true
-            },
-            vatNumber: {
-                type: String,
-                optional: true
-            }
-        })
-        schema.validate(schema.clean(params))
-        
         const contact = { ...params }
         contact.code = 'C' + Meteor.call('counters.increaseCounter', { name: CounterNamesEnum.CONTACTS })
 
@@ -83,7 +53,7 @@ Meteor.methods({
                 type: String,
                 optional: true
             },
-            vatNumber: {
+            taxIdNumber: {
                 type: String,
                 optional: true
             }
@@ -125,7 +95,7 @@ Meteor.methods({
 
         const { _id } = params
 
-        return { deactivated: Contacts.update(_id, { $set: { active: false }}) === 1 }
+        return { deactivated: Contacts.update(_id, { $set: { isActive: false }}) === 1 }
     },
     'contacts.activate'(params) {
         if (Meteor.isClient) return
@@ -137,7 +107,7 @@ Meteor.methods({
 
         const { _id } = params
 
-        return { activated: Contacts.update(_id, { $set: { active: true }}) === 1 }
+        return { activated: Contacts.update(_id, { $set: { isActive: true }}) === 1 }
     },
     'contacts.updateNotes'(params) {
         if (Meteor.isClient) return
@@ -197,7 +167,7 @@ Meteor.methods({
         const filter = params.filter.replace(/([()[{*+.$^\\|?])/g, '\\$1').toUpperCase()
 
         return Contacts.find({
-            active: true,
+            isActive: true,
             $or: [
                 { code: { $regex: filter, $options: 'i' }},
                 { name: { $regex: filter, $options: 'i' }},
