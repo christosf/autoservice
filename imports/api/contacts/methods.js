@@ -1,70 +1,55 @@
 import { Meteor } from 'meteor/meteor'
 import SimpleSchema from 'simpl-schema'
 import { Contacts } from '../database'
+import { ContactsQueue } from './collection'
 import { ContactTypesEnum } from './enums'
 import { CounterNamesEnum } from '../counters/enums'
 
 Meteor.methods({
-    'contacts.insert'(params) {
+    async 'contacts.insert'(params) {
         /*
             No validation is needed here because no editing of params is done in this method.
             Params are validated by the attached schema on the collection.
         */
         if (Meteor.isClient) return
 
-        const contact = { ...params }
-        contact.code = 'C' + Meteor.call('counters.increaseCounter', { name: CounterNamesEnum.CONTACTS })
-
-        try {
-            return { added: true, _id: Contacts.insert(contact), code: contact.code }
-        } catch(error) {
-            Meteor.call('counters.decreaseCounter', { name: CounterNamesEnum.CONTACTS })
-            throw error
-        }
+        return await ContactsQueue.add(() => {
+            const contact = { ...params }
+            contact.code = 'C' + Meteor.call('counters.increaseCounter', { name: CounterNamesEnum.CONTACTS })
+    
+            try {
+                return { added: true, _id: Contacts.insert(contact), code: contact.code }
+            } catch(error) {
+                Meteor.call('counters.decreaseCounter', { name: CounterNamesEnum.CONTACTS })
+                throw error
+            }
+        }).promise
     },
     'contacts.update'(params) {
         if (Meteor.isClient) return
 
         const schema = new SimpleSchema({
             _id: String,
-            type: String,
-            name: String,
-            mobilePhone: {
-                type: String,
-                optional: true
-            },
-            landlinePhone: {
-                type: String,
-                optional: true
-            },
-            addresses: Array,
-            'addresses.$': Object,
-            'addresses.$.street': String,
-            'addresses.$.city': String,
-            'addresses.$.postalCode': String,
-            'addresses.$.type': String,
-            tags: Array,
-            'tags.$': String,
-            email: {
-                type: String,
-                optional: true
-            },
-            website: {
-                type: String,
-                optional: true
-            },
-            taxIdNumber: {
-                type: String,
-                optional: true
+            contact: {
+                type: Object,
+                blackbox: true
             }
         })
         schema.validate(schema.clean(params))
         
-        const { _id } = params
-        const contact = { ...params }
-        delete contact._id
+        const { _id, contact } = params
+
+        const fieldsToSet = {}
+        const fieldsToUnset = {}
+        Object.keys(contact).forEach(field => {
+            if (contact[field] === '') {
+                fieldsToUnset[field] = ''
+            } else {
+                fieldsToSet[field] = contact[field]
+            }
+        })
         
-        return { updated: Contacts.update(_id, { $set: contact }) === 1 }
+        return { updated: Contacts.update(_id, { $set: fieldsToSet, $unset: fieldsToUnset }) === 1 }
     },
     'contacts.delete'(params) {
         if (Meteor.isClient) return

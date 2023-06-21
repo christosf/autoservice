@@ -524,12 +524,11 @@ export default {
             if (basicDetailsFormVal && addressesFormVal && extraDetailsFormVal) {
                 formSubmitted.value = true
                 const contact = structuredClone(toRaw(form))
-                contact._id = contactId.value
 
                 // Always remove last table row because it is empty.
                 contact.addresses.pop()
                 
-                updateContact(contact).then(response => {
+                updateContact({ _id: contactId.value, contact }).then(response => {
                     const { updated } = response
 
                     if (updated) {

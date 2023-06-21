@@ -1,8 +1,10 @@
 import { Meteor } from 'meteor/meteor'
 import { Mongo } from 'meteor/mongo'
+import { Queue } from 'queue-system'
 import schema from './schema'
 
 const Contacts = new Mongo.Collection('contacts')
+const ContactsQueue = new Queue()
 
 Contacts.attachSchema(schema)
 
@@ -39,4 +41,4 @@ if (Meteor.isServer) {
     Contacts.createIndex({ updatedAt: 1 }, { name: 'updatedAtIndex' })
 }
 
-export default Contacts
+export { Contacts as default, ContactsQueue }
