@@ -95,7 +95,7 @@
                         </div>
                     </q-tab-panel>
                     <q-tab-panel name='history'>
-                        Feature not available yet.
+                        <q-table :rows='contact.history' flat bordered />
                     </q-tab-panel>
                 </q-tab-panels>
             </template>
@@ -201,10 +201,7 @@ export default {
                     return
                 }
 
-                if (contact.value.notes) {
-                    notes.value = contact.value.notes
-                }
-
+                notes.value = contact.value.notes ? contact.value.notes : ''
                 title.value = `${contact.value.name} (${$t('contacts.one')})`
                 loading.value = false
             }

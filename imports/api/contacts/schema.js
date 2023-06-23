@@ -3,10 +3,6 @@ import { isURL, isEmail } from 'validator'
 import { AddressTypesEnum, ContactTypesEnum } from './enums'
 
 export default new SimpleSchema({
-    code: {
-        type: String,
-        denyUpdate: true
-    },
     type: {
         type: String,
         allowedValues: Object.values(ContactTypesEnum),
@@ -68,11 +64,6 @@ export default new SimpleSchema({
         type: String,
         allowedValues: Object.values(AddressTypesEnum)
     },
-    tags: Array,
-    'tags.$': {
-        type: String,
-        max: 40
-    },
     email: {
         type: String,
         max: 100,
@@ -108,41 +99,5 @@ export default new SimpleSchema({
     vehiclesCount: {
         type: Number,
         defaultValue: 0
-    },
-    isActive: {
-        type: Boolean,
-        defaultValue: true
-    },
-    createdById: {
-        type: String,
-        denyUpdate: true,
-        autoValue() {
-            if (this.isInsert) {
-                return this.userId
-            } else if (this.isUpsert) {
-                return { $setOnInsert: this.userId }
-            } else {
-                this.unset()
-            }
-        }
-    },
-    createdAt: {
-        type: Date,
-        denyUpdate: true,
-        autoValue() {
-            if (this.isInsert) {
-                return new Date()
-            } else if (this.isUpsert) {
-                return { $setOnInsert: new Date() }
-            } else {
-                this.unset()
-            }
-        }
-    },
-    updatedAt: {
-        type: Date,
-        autoValue() {
-            return new Date()
-        }
     }
 })

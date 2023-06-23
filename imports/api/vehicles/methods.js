@@ -5,8 +5,6 @@ import { CounterNamesEnum } from '../counters/enums'
 
 Meteor.methods({
     'vehicles.insert'(params) {
-        if (Meteor.isClient) return
-
         const schema = new SimpleSchema({
             ownerId: String,
             make: String,
@@ -60,8 +58,6 @@ Meteor.methods({
         }
     },
     'vehicles.update'(params) {
-        if (Meteor.isClient) return
-
         const schema = new SimpleSchema({
             _id: String,
             ownerId: String,
@@ -113,8 +109,6 @@ Meteor.methods({
         return { updated: Vehicles.update(_id, { $set: vehicle }) === 1 }
     },
     'vehicles.delete'(params) {
-        if (Meteor.isClient) return
-
         const schema = new SimpleSchema({
             _id: String
         })
@@ -126,8 +120,6 @@ Meteor.methods({
         return { deleted: Vehicles.remove(_id) === 1 }
     },
     'vehicles.deactivate'(params) {
-        if (Meteor.isClient) return
-
         const schema = new SimpleSchema({
             _id: String
         })
@@ -138,8 +130,6 @@ Meteor.methods({
         return { deactivated: Vehicles.update(_id, { $set: { isActive: false }}) === 1 }
     },
     'vehicles.activate'(params) {
-        if (Meteor.isClient) return
-
         const schema = new SimpleSchema({
             _id: String
         })
@@ -150,8 +140,6 @@ Meteor.methods({
         return { activated: Vehicles.update(_id, { $set: { isActive: true }}) === 1 }
     },
     'vehicles.fieldValueExists'(params) {
-        if (Meteor.isClient) return
-
         const schema = new SimpleSchema({
             field: String,
             value: {
@@ -173,8 +161,6 @@ Meteor.methods({
         return !!Vehicles.findOne(query, { fields: { _id: 1 }})
     },
     async 'vehicles.getDistinctFieldValues'(params) {
-        if (Meteor.isClient) return
-
         const schema = new SimpleSchema({
             field: String,
             filter: {

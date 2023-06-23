@@ -25,6 +25,7 @@ export default Contacts.createQuery('getContact', {
     isActive: 1,
     createdAt: 1,
     updatedAt: 1,
+    history: 1,
     createdBy: {
         username: 1
     },

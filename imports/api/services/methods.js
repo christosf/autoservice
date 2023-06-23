@@ -5,8 +5,6 @@ import { CounterNamesEnum } from '../counters/enums'
 
 Meteor.methods({
     'services.insert'(params) {
-        if (Meteor.isClient) return
-
         const schema = new SimpleSchema({
             name: String,
             ratePerHour: {
@@ -38,8 +36,6 @@ Meteor.methods({
         }
     },
     'services.update'(params) {
-        if (Meteor.isClient) return
-
         const schema = new SimpleSchema({
             _id: String,
             name: String,
@@ -68,8 +64,6 @@ Meteor.methods({
         return { updated: Services.update(_id, { $set: service }) === 1 }
     },
     'services.delete'(params) {
-        if (Meteor.isClient) return
-
         const schema = new SimpleSchema({
             _id: String
         })
@@ -80,8 +74,6 @@ Meteor.methods({
         return { deleted: Services.remove(_id) === 1 }
     },
     'services.deactivate'(params) {
-        if (Meteor.isClient) return
-
         const schema = new SimpleSchema({
             _id: String
         })
@@ -92,8 +84,6 @@ Meteor.methods({
         return { deactivated: Services.update(_id, { $set: { isActive: false }}) === 1 }
     },
     'services.activate'(params) {
-        if (Meteor.isClient) return
-
         const schema = new SimpleSchema({
             _id: String
         })
@@ -104,8 +94,6 @@ Meteor.methods({
         return { activated: Services.update(_id, { $set: { isActive: true }}) === 1 }
     },
     'services.serviceExists'(params) {
-        if (Meteor.isClient) return
-
         const schema = new SimpleSchema({
             name: String,
             excludeId: {
@@ -128,8 +116,6 @@ Meteor.methods({
         return !!Services.findOne(query, { fields: { _id: 1 }})
     },
     async 'services.getDistinctFieldValues'(params) {
-        if (Meteor.isClient) return
-
         const schema = new SimpleSchema({
             field: String,
             filter: {

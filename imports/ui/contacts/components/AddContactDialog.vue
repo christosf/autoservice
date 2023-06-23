@@ -78,7 +78,7 @@
                                     v-show='isIndividual'
                                     v-model='form.mobilePhone'
                                     @update:model-value='resetFormValidation("basicDetails", basicDetailsFormRef)'
-                                    @keydown='filterPhoneInput'
+                                    @keydown='allowOnlyDigits'
                                     :error='steps.basicDetails.mobileError'
                                     :rules='rules.mobilePhone'
                                     lazy-rules='ondemand'
@@ -101,7 +101,7 @@
                                 <q-input
                                     v-model='form.landlinePhone'
                                     @update:model-value='resetFormValidation("basicDetails", basicDetailsFormRef)'
-                                    @keydown='filterPhoneInput'
+                                    @keydown='allowOnlyDigits'
                                     :error='steps.basicDetails.landlineError'
                                     :rules='rules.landlinePhone'
                                     lazy-rules='ondemand'
@@ -125,7 +125,7 @@
                                     v-show='isCompany'
                                     v-model='form.mobilePhone'
                                     @update:model-value='resetFormValidation("basicDetails", basicDetailsFormRef)'
-                                    @keydown='filterPhoneInput'
+                                    @keydown='allowOnlyDigits'
                                     :label='$t("contacts.mobile_phone")'
                                     :rules='rules.mobilePhone'
                                     lazy-rules='ondemand'
@@ -419,6 +419,7 @@ import { useI18n } from 'vue-i18n'
 import { isURL, isEmail } from 'validator'
 import { useQuasar } from '../../quasar'
 import { useContactsApi, useContactsReusables } from '../composables'
+import { useCoreReusables } from '../../core/composables'
 
 export default {
     setup() {
@@ -437,6 +438,10 @@ export default {
             addressesFieldColumns,
             addressTypeOptionList
         } = useContactsReusables()
+
+        const {
+            allowOnlyDigits
+        } = useCoreReusables()
 
         const stepperRef = ref(null)
         const basicDetailsFormRef = ref(null)
@@ -608,14 +613,6 @@ export default {
             })
         }
 
-        const filterPhoneInput = event => {
-            const allowedKeys = ['Backspace', 'Enter', 'Tab']
-
-            if (isNaN(event.key) && !allowedKeys.includes(event.key)) {
-                event.preventDefault()
-            }
-        }
-
         const addNewTag = (value, done) => done(value.toUpperCase(), 'add-unique')
 
         watchEffect(() => {
@@ -705,6 +702,7 @@ export default {
             nameFieldRef,
             addressesFieldColumns,
             addressTypeOptionList,
+            allowOnlyDigits,
             dialogOpen,
             formSubmitted,
             contactAdded,
@@ -720,7 +718,6 @@ export default {
             resetForm,
             resetFormValidation,
             validationError,
-            filterPhoneInput,
             filterTags,
             addNewTag
         }

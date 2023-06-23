@@ -1,12 +1,17 @@
 import { Meteor } from 'meteor/meteor'
 import { Mongo } from 'meteor/mongo'
 import { Queue } from 'queue-system'
-import schema from './schema'
+
+import baseSchema from '../core/schemas/base-schema'
+import contactSchema from './schema'
+import tagsSchema from '../core/schemas/tags-schema'
 
 const Contacts = new Mongo.Collection('contacts')
 const ContactsQueue = new Queue()
 
-Contacts.attachSchema(schema)
+Contacts.attachSchema(baseSchema)
+Contacts.attachSchema(contactSchema)
+Contacts.attachSchema(tagsSchema)
 
 Contacts.deny({
     insert: () => true,

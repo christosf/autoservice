@@ -1,0 +1,6 @@
+import '../../api/counters/methods'
+import '../../api/contacts/methods'
+import '../../api/vehicles/methods'
+import '../../api/services/methods'
+import '../../api/parts/methods'
+import '../../api/settings/methods'
