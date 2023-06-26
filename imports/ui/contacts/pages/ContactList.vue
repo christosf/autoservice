@@ -82,6 +82,13 @@
                     </router-link>
                 </q-td>
             </template>
+            <template #body-cell-phoneNumber='props'>
+                <q-td :props='props'>
+                    <a :href='`tel:${props.value}`' class='text-black'>
+                        {{ props.value }}
+                    </a>
+                </q-td>
+            </template>
             <template #body-cell-primaryPhone='props'>
                 <q-td :props='props'>
                     <a :href='`tel:${getPhone("primary", props.row)}`' class='text-black'>
@@ -227,14 +234,9 @@ export default {
                 align: 'left'
             },
             {
-                name: 'primaryPhone',
+                name: 'phoneNumber',
                 label: 'contacts.phone',
-                required: true,
-                align: 'left',
-                classes: 'contact-phone'
-            },
-            {
-                name: 'secondaryPhone',
+                field: 'phoneNumber',
                 required: true,
                 align: 'left',
                 classes: 'contact-phone'

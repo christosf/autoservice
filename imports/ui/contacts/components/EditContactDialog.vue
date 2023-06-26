@@ -76,7 +76,7 @@
                                 v-show='isIndividual'
                                 v-model='form.mobilePhone'
                                 @update:model-value='resetFormValidation("basicDetails", basicDetailsFormRef)'
-                                @keydown='filterPhoneInput'
+                                @keydown='allowOnlyDigits'
                                 :error='steps.basicDetails.mobileError'
                                 :rules='rules.mobilePhone'
                                 lazy-rules='ondemand'
@@ -99,7 +99,7 @@
                             <q-input
                                 v-model='form.landlinePhone'
                                 @update:model-value='resetFormValidation("basicDetails", basicDetailsFormRef)'
-                                @keydown='filterPhoneInput'
+                                @keydown='allowOnlyDigits'
                                 :error='steps.basicDetails.landlineError'
                                 :rules='rules.landlinePhone'
                                 lazy-rules='ondemand'
@@ -123,7 +123,7 @@
                                 v-show='isCompany'
                                 v-model='form.mobilePhone'
                                 @update:model-value='resetFormValidation("basicDetails", basicDetailsFormRef)'
-                                @keydown='filterPhoneInput'
+                                @keydown='allowOnlyDigits'
                                 :label='$t("contacts.mobile_phone")'
                                 :rules='rules.mobilePhone'
                                 lazy-rules='ondemand'
@@ -182,9 +182,9 @@
                                 <template #header-cell-postalCode>
                                     <th class='text-left'>
                                         <span>
-                                            {{ $t('contacts.address_postal_code_short') }}
+                                            {{ $t('contacts.address_post_code_short') }}
                                             <q-tooltip anchor='top middle' self='bottom middle'>
-                                                {{ $t('contacts.address_postal_code') }}
+                                                {{ $t('contacts.address_post_code') }}
                                             </q-tooltip>
                                         </span>
                                     </th>
@@ -388,6 +388,7 @@ import { useI18n } from 'vue-i18n'
 import { isURL, isEmail } from 'validator'
 import { useQuasar } from '../../quasar'
 import { useContactsApi, useContactsReusables } from '../composables'
+import { useCoreReusables } from '../../core/composables'
 
 export default {
     setup() {
@@ -406,6 +407,10 @@ export default {
             addressesFieldColumns,
             addressTypeOptionList
         } = useContactsReusables()
+
+        const {
+            allowOnlyDigits
+        } = useCoreReusables()
 
         const stepperRef = ref(null)
         const basicDetailsFormRef = ref(null)
@@ -526,7 +531,7 @@ export default {
                 const contact = structuredClone(toRaw(form))
 
                 // Always remove last table row because it is empty.
-                contact.addresses.pop()
+                contact.addresses.pop()                
                 
                 updateContact({ _id: contactId.value, contact }).then(response => {
                     const { updated } = response
@@ -542,8 +547,8 @@ export default {
                             type: 'negative',
                             message: $t('core.error_occured')
                         })
+                        formSubmitted.value = false
                     }
-                    formSubmitted.value = false
                 }).catch(error => {
                     $q.notify({
                         type: 'negative',
@@ -576,6 +581,8 @@ export default {
             steps.basicDetails.landlineError = false
             steps.addresses.hasError = false
             steps.extraDetails.hasError = false
+
+            formSubmitted.value = false
         }
 
         const resetFormValidation = (step, formRef) => {
@@ -600,14 +607,6 @@ export default {
         }
 
         const addNewTag = (value, done) => done(value.toUpperCase(), 'add-unique')
-
-        const filterPhoneInput = event => {
-            const allowedKeys = ['Backspace', 'Enter', 'Tab']
-
-            if (isNaN(event.key) && !allowedKeys.includes(event.key)) {
-                event.preventDefault()
-            }
-        }
 
         const fetchUser = () => {
             const query = getContactEditableFields.clone({ id: contactId.value })
@@ -727,6 +726,7 @@ export default {
             rules,
             isCompany,
             isIndividual,
+            allowOnlyDigits,
             open,
             close,
             submitForm,
@@ -734,8 +734,7 @@ export default {
             resetFormValidation,
             validationError,
             filterTags,
-            addNewTag,
-            filterPhoneInput
+            addNewTag
         }
     }
 }

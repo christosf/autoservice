@@ -11,7 +11,7 @@ export default Contacts.createQuery('getContactExport', {
     tags: 1,
     email: 1,
     website: 1,
-    taxIdNumber: 1,
+    taxRegNumber: 1,
     notes: 1,
     isActive: 1,
     createdBy: {

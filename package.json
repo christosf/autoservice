@@ -10,9 +10,11 @@
   "dependencies": {
     "@babel/runtime": "^7.17.9",
     "deepmerge": "^4.3.1",
+    "just-diff": "^6.0.2",
     "meteor-node-stubs": "^1.2.1",
+    "object-path": "^0.11.8",
     "papaparse": "^5.4.1",
-    "queue": "^7.0.0",
+    "queue-system": "^4.1.1",
     "simpl-schema": "^3.4.1",
     "validator": "^13.9.0",
     "vue": "^3.3.4",

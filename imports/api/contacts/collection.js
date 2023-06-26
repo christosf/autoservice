@@ -1,12 +1,17 @@
 import { Meteor } from 'meteor/meteor'
 import { Mongo } from 'meteor/mongo'
 import { Queue } from 'queue-system'
-import schema from './schema'
+
+import baseSchema from '../core/schemas/base-schema'
+import contactSchema from './schema'
+import tagsSchema from '../core/schemas/tags-schema'
 
 const Contacts = new Mongo.Collection('contacts')
 const ContactsQueue = new Queue()
 
-Contacts.attachSchema(schema)
+Contacts.attachSchema(baseSchema)
+Contacts.attachSchema(contactSchema)
+Contacts.attachSchema(tagsSchema)
 
 Contacts.deny({
     insert: () => true,
@@ -20,23 +25,14 @@ if (Meteor.isServer) {
         unique: true
     })
     
-    Contacts.createIndex({ name: 1, mobilePhone: 1 }, {
-        name: 'nameMobilePhoneIndex',
-        unique: true,
-        sparse: true
-    })
-    
-    Contacts.createIndex({ name: 1, landlinePhone: 1 }, {
-        name: 'nameLandlinePhoneIndex',
-        unique: true,
-        sparse: true
+    Contacts.createIndex({ name: 1, phoneNumber: 1 }, {
+        name: 'namePhoneNumberIndex',
+        unique: true
     })
 
     Contacts.createIndex({ name: 1 }, { name: 'nameIndex' })
 
-    Contacts.createIndex({ mobilePhone: 1 }, { name: 'mobilePhoneIndex', sparse: true })
-    
-    Contacts.createIndex({ landlinePhone: 1 }, { name: 'landlinePhoneIndex', sparse: true })
+    Contacts.createIndex({ phoneNumber: 1 }, { name: 'phoneNumberIndex' })
 
     Contacts.createIndex({ updatedAt: 1 }, { name: 'updatedAtIndex' })
 }

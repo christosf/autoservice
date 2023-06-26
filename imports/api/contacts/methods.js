@@ -7,12 +7,6 @@ import { CounterNamesEnum } from '../counters/enums'
 
 Meteor.methods({
     async 'contacts.insert'(params) {
-        /*
-            No validation is needed here because no editing of params is done in this method.
-            Params are validated by the attached schema on the collection.
-        */
-        if (Meteor.isClient) return
-
         return await ContactsQueue.add(() => {
             const contact = { ...params }
             contact.code = 'C' + Meteor.call('counters.increaseCounter', { name: CounterNamesEnum.CONTACTS })
@@ -26,8 +20,6 @@ Meteor.methods({
         }).promise
     },
     'contacts.update'(params) {
-        if (Meteor.isClient) return
-
         const schema = new SimpleSchema({
             _id: String,
             contact: {
@@ -52,8 +44,6 @@ Meteor.methods({
         return { updated: Contacts.update(_id, { $set: fieldsToSet, $unset: fieldsToUnset }) === 1 }
     },
     'contacts.delete'(params) {
-        if (Meteor.isClient) return
-
         const schema = new SimpleSchema({
             _id: String
         })
@@ -71,8 +61,6 @@ Meteor.methods({
         return { deleted: Contacts.remove(_id) === 1 }
     },
     'contacts.deactivate'(params) {
-        if (Meteor.isClient) return
-
         const schema = new SimpleSchema({
             _id: String
         })
@@ -83,8 +71,6 @@ Meteor.methods({
         return { deactivated: Contacts.update(_id, { $set: { isActive: false }}) === 1 }
     },
     'contacts.activate'(params) {
-        if (Meteor.isClient) return
-
         const schema = new SimpleSchema({
             _id: String
         })
@@ -95,8 +81,6 @@ Meteor.methods({
         return { activated: Contacts.update(_id, { $set: { isActive: true }}) === 1 }
     },
     'contacts.updateNotes'(params) {
-        if (Meteor.isClient) return
-
         const schema = new SimpleSchema({
             _id: String,
             notes: {
@@ -114,12 +98,12 @@ Meteor.methods({
         return { updated: Contacts.update(_id, { $unset: { notes }}) === 1 }
     },
     'contacts.contactExists'(params) {
-        if (Meteor.isClient) return
-
         const schema = new SimpleSchema({
-            type: String,
             name: String,
-            phone: String,
+            phoneNumber: {
+                type: String,
+                defaultValue: ''
+            },
             excludeId: {
                 type: String,
                 optional: true
@@ -127,13 +111,12 @@ Meteor.methods({
         })
         schema.validate(schema.clean(params))
 
-        const { type, name, phone, excludeId } = params
+        const { name, phoneNumber, excludeId } = params
         
-        const query = type === ContactTypesEnum.COMPANY
-            ? { landlinePhone: phone}
-            : { mobilePhone: phone }
-        
-        query.name = name.toUpperCase()
+        const query = {
+            name: name.toUpperCase(),
+            phoneNumber
+        }
 
         if (excludeId) {
             query._id = { $ne: excludeId }
@@ -142,8 +125,6 @@ Meteor.methods({
         return !!Contacts.findOne(query, { fields: { _id: 1 }})
     },
     'contacts.filterContacts'(params) {
-        if (Meteor.isClient) return
-        
         const schema = new SimpleSchema({
             filter: String
         })
@@ -158,7 +139,7 @@ Meteor.methods({
                 { name: { $regex: filter, $options: 'i' }},
                 { mobilePhone: { $regex: filter, $options: 'i' }},
                 { landlinePhone: { $regex: filter, $options: 'i' }},
-            ],
+            ]
         }, {
             fields: {
                 code: 1,
@@ -171,8 +152,6 @@ Meteor.methods({
         }).fetch()
     },
     async 'contacts.getDistinctFieldValues'(params) {
-        if (Meteor.isClient) return
-
         const schema = new SimpleSchema({
             field: String,
             filter: {

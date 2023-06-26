@@ -1,12 +1,7 @@
 import SimpleSchema from 'simpl-schema'
-import { isURL, isEmail } from 'validator'
-import { AddressTypesEnum, ContactTypesEnum } from './enums'
+import { ContactTypesEnum } from './enums'
 
 export default new SimpleSchema({
-    code: {
-        type: String,
-        denyUpdate: true
-    },
     type: {
         type: String,
         allowedValues: Object.values(ContactTypesEnum),
@@ -20,27 +15,17 @@ export default new SimpleSchema({
             return this.isSet ? this.value.toUpperCase() : this.unset()
         }
     },
-    mobilePhone: {
+    phoneNumber: {
         type: String,
         min: 8,
         max: 20,
         regEx: /^$|^[0-9]{8,20}$/,
-        optional() {
-            return this.field('type').value === ContactTypesEnum.COMPANY
-        }
     },
-    landlinePhone: {
-        type: String,
-        min: 8,
-        max: 20,
-        regEx: /^$|^[0-9]{8,20}$/,
-        optional() {
-            return this.field('type').value === ContactTypesEnum.INDIVIDUAL
-        }
+    billingAddress: {
+        type: Object,
+        optional: true
     },
-    addresses: Array,
-    'addresses.$': Object,
-    'addresses.$.street': {
+    'billingAddress.street': {
         type: String,
         min: 3,
         max: 50,
@@ -48,54 +33,85 @@ export default new SimpleSchema({
             return this.isSet ? this.value.toUpperCase() : this.unset()
         }
     },
-    'addresses.$.city': {
-        type: String,
-        min: 2,
-        max: 30,
-        autoValue() {
-            return this.isSet ? this.value.toUpperCase() : this.unset()
-        }
-    },
-    'addresses.$.postalCode': {
+    'billingAddress.postCode': {
         type: String,
         min: 4,
         max: 10,
+        optional() {
+            return !this.field('billingAddress.street').isSet
+        },
         autoValue() {
             return this.isSet ? this.value.toUpperCase() : this.unset()
         }
     },
-    'addresses.$.type': {
+    'billingAddress.city': {
         type: String,
-        allowedValues: Object.values(AddressTypesEnum)
-    },
-    tags: Array,
-    'tags.$': {
-        type: String,
-        max: 40
-    },
-    email: {
-        type: String,
-        max: 100,
-        optional: true,
-        custom() {
-            if (!this.value || isEmail(this.value)) {
-                return undefined
-            }
-            return 'invalid_email'
+        min: 2,
+        max: 30,
+        optional() {
+            return !this.field('billingAddress.postCode').isSet
+        },
+        autoValue() {
+            return this.isSet ? this.value.toUpperCase() : this.unset()
         }
     },
-    website: {
+    'billingAddress.country': {
         type: String,
-        max: 100,
-        optional: true,
-        custom() {
-            if (!this.value || isURL(this.value)) {
-                return undefined
-            }
-            return 'invalid_url'
+        min: 2,
+        max: 30,
+        optional() {
+            return !this.field('billingAddress.city').isSet
+        },
+        autoValue() {
+            return this.isSet ? this.value.toUpperCase() : this.unset()
+        },
+    },
+    deliveryAddress: {
+        type: Object,
+        optional: true
+    },
+    'deliveryAddress.street': {
+        type: String,
+        min: 3,
+        max: 50,
+        autoValue() {
+            return this.isSet ? this.value.toUpperCase() : this.unset()
         }
     },
-    taxIdNumber: {
+    'deliveryAddress.postCode': {
+        type: String,
+        min: 4,
+        max: 10,
+        optional() {
+            return !this.field('deliveryAddress.street').isSet
+        },
+        autoValue() {
+            return this.isSet ? this.value.toUpperCase() : this.unset()
+        }
+    },
+    'deliveryAddress.city': {
+        type: String,
+        min: 2,
+        max: 30,
+        optional() {
+            return !this.field('deliveryAddress.postCode').isSet
+        },
+        autoValue() {
+            return this.isSet ? this.value.toUpperCase() : this.unset()
+        }
+    },
+    'deliveryAddress.country': {
+        type: String,
+        min: 2,
+        max: 30,
+        optional() {
+            return !this.field('deliveryAddress.city').isSet
+        },
+        autoValue() {
+            return this.isSet ? this.value.toUpperCase() : this.unset()
+        }
+    },
+    taxRegNumber: {
         type: String,
         max: 20,
         optional: true
@@ -109,40 +125,22 @@ export default new SimpleSchema({
         type: Number,
         defaultValue: 0
     },
-    isActive: {
-        type: Boolean,
-        defaultValue: true
-    },
-    createdById: {
+    contactMethods: Array,
+    'contactMethods.$': Object,
+    'contactMethods.$.type': {
         type: String,
-        denyUpdate: true,
-        autoValue() {
-            if (this.isInsert) {
-                return this.userId
-            } else if (this.isUpsert) {
-                return { $setOnInsert: this.userId }
-            } else {
-                this.unset()
-            }
-        }
+        allowedValues: ['email', 'phone', 'fax', 'website']
     },
-    createdAt: {
-        type: Date,
-        denyUpdate: true,
-        autoValue() {
-            if (this.isInsert) {
-                return new Date()
-            } else if (this.isUpsert) {
-                return { $setOnInsert: new Date() }
-            } else {
-                this.unset()
-            }
-        }
+    'contactMethods.$.value': {
+        type: String,
+        max: 100
     },
-    updatedAt: {
-        type: Date,
+    'contactMethods.$.description': {
+        type: String,
+        max: 60,
+        optional: true,
         autoValue() {
-            return new Date()
+            return this.isSet ? this.value.toUpperCase() : this.unset()
         }
     }
 })
