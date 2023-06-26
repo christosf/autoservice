@@ -25,23 +25,14 @@ if (Meteor.isServer) {
         unique: true
     })
     
-    Contacts.createIndex({ name: 1, mobilePhone: 1 }, {
-        name: 'nameMobilePhoneIndex',
-        unique: true,
-        sparse: true
-    })
-    
-    Contacts.createIndex({ name: 1, landlinePhone: 1 }, {
-        name: 'nameLandlinePhoneIndex',
-        unique: true,
-        sparse: true
+    Contacts.createIndex({ name: 1, phoneNumber: 1 }, {
+        name: 'namePhoneNumberIndex',
+        unique: true
     })
 
     Contacts.createIndex({ name: 1 }, { name: 'nameIndex' })
 
-    Contacts.createIndex({ mobilePhone: 1 }, { name: 'mobilePhoneIndex', sparse: true })
-    
-    Contacts.createIndex({ landlinePhone: 1 }, { name: 'landlinePhoneIndex', sparse: true })
+    Contacts.createIndex({ phoneNumber: 1 }, { name: 'phoneNumberIndex' })
 
     Contacts.createIndex({ updatedAt: 1 }, { name: 'updatedAtIndex' })
 }

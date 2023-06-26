@@ -182,9 +182,9 @@
                                 <template #header-cell-postalCode>
                                     <th class='text-left'>
                                         <span>
-                                            {{ $t('contacts.address_postal_code_short') }}
+                                            {{ $t('contacts.address_post_code_short') }}
                                             <q-tooltip anchor='top middle' self='bottom middle'>
-                                                {{ $t('contacts.address_postal_code') }}
+                                                {{ $t('contacts.address_post_code') }}
                                             </q-tooltip>
                                         </span>
                                     </th>

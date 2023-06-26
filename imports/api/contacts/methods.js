@@ -99,11 +99,10 @@ Meteor.methods({
     },
     'contacts.contactExists'(params) {
         const schema = new SimpleSchema({
-            type: String,
             name: String,
-            phone: {
+            phoneNumber: {
                 type: String,
-                optional: true
+                defaultValue: ''
             },
             excludeId: {
                 type: String,
@@ -112,13 +111,12 @@ Meteor.methods({
         })
         schema.validate(schema.clean(params))
 
-        const { type, name, phone, excludeId } = params
+        const { name, phoneNumber, excludeId } = params
         
-        const query = type === ContactTypesEnum.COMPANY
-            ? { landlinePhone: phone}
-            : { mobilePhone: phone }
-        
-        query.name = name.toUpperCase()
+        const query = {
+            name: name.toUpperCase(),
+            phoneNumber
+        }
 
         if (excludeId) {
             query._id = { $ne: excludeId }

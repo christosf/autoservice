@@ -17,9 +17,8 @@ export default new SimpleSchema({
                 return this.userId
             } else if (this.isUpsert) {
                 return { $setOnInsert: this.userId }
-            } else {
-                this.unset()
             }
+            this.unset()
         }
     },
     createdAt: {
@@ -30,15 +29,23 @@ export default new SimpleSchema({
                 return new Date()
             } else if (this.isUpsert) {
                 return { $setOnInsert: new Date() }
-            } else {
-                this.unset()
             }
+            this.unset()
         }
     },
     updatedAt: {
         type: Date,
         autoValue() {
-            return new Date()
+            if (this.isInsert) {
+                return new Date()
+            } else if (this.isUpsert) {
+                return { $setOnInsert: new Date() }
+            }
+            
+            if (this.isSet) {
+                return this.value
+            }
+            this.unset()
         }
     }
 })

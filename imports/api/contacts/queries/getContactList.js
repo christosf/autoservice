@@ -16,11 +16,11 @@ export default Contacts.createQuery('getContactList', {
         }
 
         filters.$or = [
-            { code: { $regex: params.filter, $options : 'i' }},
-            { name: { $regex: params.filter, $options : 'i' }},
-            { mobilePhone: { $regex: params.filter, $options : 'i' }},
-            { landlinePhone: { $regex: params.filter, $options : 'i' }},
-            { tags: { $regex: params.filter, $options : 'i' }}
+            { code: { $regex: params.filter, $options: 'i' }},
+            { name: { $regex: params.filter, $options: 'i' }},
+            { phoneNumber: { $regex: params.filter, $options: 'i' }},
+            { tags: { $regex: params.filter, $options: 'i' }},
+            { 'contactMethods.value': { $regex: params.filter, $options: 'i' }}
         ]
 
         options.sort[params.sortBy] = params.descending ? 1 : -1
@@ -29,9 +29,9 @@ export default Contacts.createQuery('getContactList', {
     code: 1,
     name: 1,
     type: 1,
-    mobilePhone: 1,
-    landlinePhone: 1,
+    phoneNumber: 1,
     tags: 1,
+    contactMethods: 1,
     vehiclesCount: 1,
     isActive: 1,
     updatedAt: 1

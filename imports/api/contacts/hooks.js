@@ -1,3 +1,4 @@
+/*
 import objectPath from 'object-path'
 import { diff } from 'just-diff'
 import { Contacts } from '../database'
@@ -44,3 +45,4 @@ const addUpdateToHistory = function(userId, contact) {
 
 Contacts.after.insert(addInsertToHistory)
 Contacts.after.update(addUpdateToHistory)
+*/

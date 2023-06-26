@@ -1,5 +1,5 @@
 export function useCoreReusables() {
-    const allowOnlyDigits = event => {
+    const filterInputDigitsOnly = event => {
         const allowedKeys = ['Backspace', 'Enter', 'Tab', 'Delete', 'ArrowLeft', 'ArrowRight']
         const ctrlC = (event.ctrlKey && event.key === 'c') || (event.ctrlKey && event.key === 'C')
         const ctrlV = (event.ctrlKey && event.key === 'v') || (event.ctrlKey && event.key === 'V')
@@ -10,6 +10,6 @@ export function useCoreReusables() {
     }
 
     return {
-        allowOnlyDigits
+        filterInputDigitsOnly
     }
 }
