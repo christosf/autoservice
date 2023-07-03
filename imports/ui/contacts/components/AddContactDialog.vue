@@ -9,7 +9,7 @@
         <q-card>
             <q-card-section class='q-pa-xs'>
                 <q-toolbar>
-                    <div class='text-h6'>{{ $t('contacts.new') }}</div>
+                    <div class='text-h4 text-bold'>{{ $t('contacts.new') }}</div>
                     <q-space />
                     <q-btn icon='close' flat round dense v-close-popup />
                 </q-toolbar>
@@ -21,6 +21,7 @@
                         v-if='!contactAdded'
                         v-model='steps.current'
                         :contracted='$q.screen.lt.sm'
+                        :keep-alive-max='3'
                         ref='stepperRef'
                         color='primary'
                         keep-alive
@@ -45,7 +46,7 @@
                                     <q-radio
                                         v-for='contactType in ContactTypesEnum'
                                         v-model='form.type'
-                                        @update:model-value='resetFormValAndFocusName'
+                                        @update:model-value='resetFormValAndFocusNameField'
                                         :label='$t(`contacts.${contactType}`)'
                                         :val='contactType'
                                         class='text-black q-pr-sm'
@@ -58,7 +59,6 @@
                                     :autofocus='$q.platform.is.desktop'
                                     lazy-rules='ondemand'
                                     ref='nameFieldRef'
-                                    input-class='text-uppercase'
                                     maxlength='60'
                                     bottom-slots
                                     label-slot
@@ -69,7 +69,7 @@
                                     </template>
                                     <template #label>
                                         <span>
-                                            {{ $t(`contacts.${isCompany ? 'company_name' : 'full_name'}`) }}
+                                            {{ $t(`contacts.${isCompany(form.type) ? 'company_name' : 'full_name'}`) }}
                                         </span>
                                         <span class='text-red-8 q-pl-xs'>*</span>
                                     </template>
@@ -80,6 +80,7 @@
                                     @keydown='filterInputDigitsOnly'
                                     :rules='rules.phoneNumber'
                                     lazy-rules='ondemand'
+                                    ref='phoneNumberFieldRef'
                                     maxlength='20'
                                     type='tel'
                                     bottom-slots
@@ -104,7 +105,6 @@
                                     @update:model-value='resetFormValidation("basicDetails", basicDetailsFormRef)'
                                     :label='$t("core.tags")'
                                     :options='tagsOptionList'
-                                    input-class='text-uppercase'
                                     multiple
                                     use-chips
                                     use-input
@@ -130,7 +130,7 @@
                                     <q-btn
                                         @click='steps.current = "addresses"'
                                         :label='$t("contacts.addresses")'
-                                        color='blue-grey-10'
+                                        color='secondary'
                                         icon='chevron_right'
                                         outline
                                         no-caps
@@ -152,7 +152,7 @@
                                 class='q-gutter-sm'
                             >
                                 <div class='q-mt-none'>
-                                    <div class='text-body1 text-weight-medium q-mb-md'>{{ $t('contacts.billing_address') }}</div>
+                                    <div class='text-h6 text-bold q-mb-md'>{{ $t('contacts.billing_address') }}</div>
                                     <div class='row q-col-gutter-sm'>
                                         <div class='col-xs-9 col-sm-12'>
                                             <q-input
@@ -162,7 +162,6 @@
                                                 :autofocus='$q.platform.is.desktop'
                                                 :rules='rules.billingAddressStreet'
                                                 lazy-rules='ondemand'
-                                                input-class='text-uppercase'
                                                 maxlength='50'
                                                 bottom-slots
                                                 outlined
@@ -179,7 +178,6 @@
                                                 :label='$t(`contacts.address_post_code${$q.screen.lt.sm ? "_short" : ""}`)'
                                                 :rules='rules.billingAddressPostCode'
                                                 lazy-rules='ondemand'
-                                                input-class='text-uppercase'
                                                 maxlength='10'
                                                 bottom-slots
                                                 outlined
@@ -196,7 +194,6 @@
                                                 :label='$t("contacts.address_city")'
                                                 :rules='rules.billingAddressCity'
                                                 lazy-rules='ondemand'
-                                                input-class='text-uppercase'
                                                 maxlength='30'
                                                 bottom-slots
                                                 outlined
@@ -213,7 +210,6 @@
                                                 :label='$t("contacts.address_country")'
                                                 :rules='rules.billingAddressCountry'
                                                 lazy-rules='ondemand'
-                                                input-class='text-uppercase'
                                                 maxlength='30'
                                                 bottom-slots
                                                 outlined
@@ -238,7 +234,7 @@
                                 <div v-show='isDeliveryAddressDifferent'>
                                     <q-separator />
                                     <div class='q-mt-md'>
-                                        <div class='text-body1 text-weight-medium q-mb-md'>{{ $t('contacts.delivery_address') }}</div>
+                                        <div class='text-h6 text-bold q-mb-md'>{{ $t('contacts.delivery_address') }}</div>
                                         <div class='row q-col-gutter-sm'>
                                             <div class='col-xs-9 col-sm-12'>
                                                 <q-input
@@ -247,7 +243,6 @@
                                                     :label='$t("contacts.address_street")'
                                                     :rules='rules.deliveryAddressStreet'
                                                     lazy-rules='ondemand'
-                                                    input-class='text-uppercase'
                                                     ref='deliveryAddressFieldRef'
                                                     maxlength='50'
                                                     bottom-slots
@@ -265,7 +260,6 @@
                                                     :label='$t(`contacts.address_post_code${$q.screen.lt.sm ? "_short" : ""}`)'
                                                     :rules='rules.deliveryAddressPostCode'
                                                     lazy-rules='ondemand'
-                                                    input-class='text-uppercase'
                                                     maxlength='10'
                                                     bottom-slots
                                                     outlined
@@ -282,7 +276,6 @@
                                                     :label='$t("contacts.address_city")'
                                                     :rules='rules.deliveryAddressCity'
                                                     lazy-rules='ondemand'
-                                                    input-class='text-uppercase'
                                                     maxlength='30'
                                                     bottom-slots
                                                     outlined
@@ -299,7 +292,6 @@
                                                     :label='$t("contacts.address_country")'
                                                     :rules='rules.deliveryAddressCountry'
                                                     lazy-rules='ondemand'
-                                                    input-class='text-uppercase'
                                                     maxlength='30'
                                                     bottom-slots
                                                     outlined
@@ -315,7 +307,7 @@
                                 <div class='q-gutter-sm q-ml-none'>
                                     <q-btn
                                         @click='steps.current = "basicDetails"'
-                                        color='blue-grey-10'
+                                        color='secondary'
                                         icon='chevron_left'
                                         outline
                                     />
@@ -330,7 +322,7 @@
                                     <q-btn
                                         @click='steps.current = "extraDetails"'
                                         :label='$q.screen.gt.xs ? $t("core.extra_details") : ""'
-                                        color='blue-grey-10'
+                                        color='secondary'
                                         icon='chevron_right'
                                         outline
                                         no-caps
@@ -364,11 +356,17 @@
                                         <q-icon name='tag' />
                                     </template>
                                 </q-input>
-                                <contact-methods-form @added='contactMethodAdded' :form='form' />
+                                <contact-methods-field
+                                    @submit='submitContactMethod'
+                                    @submit-edit='submitEditContactMethod'
+                                    @remove='removeContactMethod'
+                                    @edit-phone-number='focusPhoneNumberField'
+                                    :form='form'
+                                /> 
                                 <div class='q-gutter-sm q-ml-sm'>
                                     <q-btn
                                         @click='steps.current = "addresses"'
-                                        color='blue-grey-10'
+                                        color='secondary'
                                         icon='chevron_left'
                                         outline
                                     />
@@ -385,7 +383,7 @@
                         </q-step>
                     </q-stepper>
                     <div v-else class='q-pa-md'>
-                        <div v-html='$t("contacts.added_what_next", { contact: form.name.toUpperCase() })' class='text-subtitle1' />
+                        <div v-html='$t("contacts.added_what_next", { contact: form.name })' class='text-subtitle1' />
                         <div class='q-mt-lg q-gutter-sm'>
                             <q-btn
                                 :to='{ name: "ViewContact", params: { code: contactAdded.code }}'
@@ -405,7 +403,7 @@
                             <q-btn
                                 @click='close'
                                 :label='$t("core.close")'
-                                color='blue-grey-10'
+                                color='secondary'
                                 icon='cancel'
                                 outline
                                 no-caps
@@ -419,46 +417,56 @@
 </template>
 
 <script>
-import { ref, reactive, computed, toRaw, watchEffect, nextTick } from 'vue'
+import { ref, reactive, toRaw, watchEffect, nextTick } from 'vue'
+import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 
 import { useQuasar } from '../../quasar'
-import { useContactsApi } from '../composables'
-import { useCoreReusables } from '../../core/composables'
+import { useContactAPI, useContactFunctions, useContactRules } from '../composables'
+import { useCoreFunctions, useCoreRules } from '../../core/composables'
+import { useErrorLogAPI } from '../../error-log/composables'
 
-import ContactMethodsForm from './ContactMethodsForm.vue'
+import ContactMethodsField from './ContactMethodsField.vue'
 
 export default {
     components: {
-        ContactMethodsForm
+        ContactMethodsField
     },
     setup() {
+        const router = useRouter()
         const $q = useQuasar()
         const { t: $t } = useI18n()
 
         const {
             ContactTypesEnum,
             addContact,
-            contactExists,
             getDistinctFieldValues
-        } = useContactsApi()
+        } = useContactAPI()
 
         const {
-            filterInputDigitsOnly
-        } = useCoreReusables()
+            required,
+            optionalIfEmpty,
+            minLength,
+            phoneNumber
+        } = useCoreRules()
+        
+        const { isCompany } = useContactFunctions()
+        const { contactExists } = useContactRules()
+        const { filterInputDigitsOnly } = useCoreFunctions()
+        const { insertErrorLog } = useErrorLogAPI()
 
         const stepperRef = ref(null)
         const basicDetailsFormRef = ref(null)
         const addressesFormRef = ref(null)
         const extraDetailsFormRef = ref(null)
         const nameFieldRef = ref(null)
+        const phoneNumberFieldRef = ref(null)
         const deliveryAddressFieldRef = ref(null)
 
-        const isDialogOpen = ref(true)
+        const isDialogOpen = ref(false)
         const contactAdded = ref(null)
         const isFormSubmitted = ref(false)
         const isDeliveryAddressDifferent = ref(false)
-
         const tagsOptionList = ref([])
 
         const steps = reactive({
@@ -481,58 +489,45 @@ export default {
 
         const rules = {
             name: [
-                v => !!v || $t('core.field_required'),
-                v => v.length > 2 || $t('core.field_minlength', { count: 3 }),
-                () => new Promise(resolve => {
-                    contactExists({
-                        name: form.name,
-                        phoneNumber: form.phoneNumber
-                    }).then(response => {
-                        if (response) {
-                            resolve($t('contacts.already_exists'))
-                            return
-                        }
-                        resolve(true)
-                    })
-                })
+                v => required(v, $t('core.field_required')),
+                v => minLength(v, 3, $t('core.field_minlength', { count: 3 })),
+                v => contactExists(v, form.phoneNumber, $t('contacts.already_exists'))
             ],
             phoneNumber: [
-                v => !!v || $t('core.field_required'),
-                v => /^$|^[0-9]{8,20}$/.test(v) || $t('contacts.phone_number_invalid')
+                v => required(v, $t('core.field_required')),
+                v => phoneNumber(v, $t('contacts.phone_number_invalid'))
             ],
             billingAddressStreet: [
-                v => (!v || v.length > 2) || $t('core.field_minlength', { count: 3 })
+                v => minLength(v, 3, $t('core.field_minlength', { count: 3 }))
             ],
             billingAddressPostCode: [
-                v => (!!v || !form.billingAddress.street) || $t('core.field_required_short'),
-                v => (!v || v.length > 3) || $t('core.field_minlength_short', { count: 4 })
+                v => optionalIfEmpty(v, form.billingAddress.street, $t('core.field_required_short')),
+                v => minLength(v, 4, $t('core.field_minlength_short', { count: 4 }))
             ],
             billingAddressCity: [
-                v => (!!v || !form.billingAddress.postCode) || $t('core.field_required_short'),
-                v => (!v || v.length > 1) || $t('core.field_minlength_short', { count: 2 })
+                v => optionalIfEmpty(v, form.billingAddress.postCode, $t('core.field_required_short')),
+                v => minLength(v, 2, $t('core.field_minlength_short', { count: 2 }))
             ],
             billingAddressCountry: [
-                v => (!!v || !form.billingAddress.city) || $t('core.field_required_short'),
-                v => (!v || v.length > 2) || $t('core.field_minlength_short', { count: 3 })
+                v => optionalIfEmpty(v, form.billingAddress.city, $t('core.field_required_short')),
+                v => minLength(v, 3, $t('core.field_minlength_short', { count: 3 }))
             ],
             deliveryAddressStreet: [
-                v => (!v || v.length > 2) || $t('core.field_minlength', { count: 3 })
+                v => minLength(v, 3, $t('core.field_minlength_short', { count: 3 }))
             ],
             deliveryAddressPostCode: [
-                v => (!!v || !form.deliveryAddress.street) || $t('core.field_required_short'),
-                v => (!v || v.length > 3) || $t('core.field_minlength_short', { count: 4 })
+                v => optionalIfEmpty(v, form.deliveryAddress.street, $t('core.field_required_short')),
+                v => minLength(v, 4, $t('core.field_minlength_short', { count: 4 }))
             ],
             deliveryAddressCity: [
-                v => (!!v || !form.deliveryAddress.postCode) || $t('core.field_required_short'),
-                v => (!v || v.length > 1) || $t('core.field_minlength_short', { count: 2 })
+                v => optionalIfEmpty(v, form.deliveryAddress.postCode, $t('core.field_required_short')),
+                v => minLength(v, 2, $t('core.field_minlength_short', { count: 2 }))
             ],
             deliveryAddressCountry: [
-                v => (!!v || !form.deliveryAddress.city) || $t('core.field_required_short'),
-                v => (!v || v.length > 2) || $t('core.field_minlength_short', { count: 3 })
+                v => optionalIfEmpty(v, form.deliveryAddress.city, $t('core.field_required_short')),
+                v => minLength(v, 3, $t('core.field_minlength_short', { count: 3 }))
             ]
         }
-
-        const isCompany = computed(() => form.type === ContactTypesEnum.COMPANY)
 
         const open = () => isDialogOpen.value = true
 
@@ -547,7 +542,7 @@ export default {
             })
         }
 
-        const addNewTag = (value, done) => done(value.toUpperCase(), 'add-unique')
+        const addNewTag = (value, done) => done(value, 'add-unique')
 
         const atValidationError = step => {
             steps.current = step
@@ -559,7 +554,7 @@ export default {
             steps[step].hasError = false
         }
 
-        const resetFormValAndFocusName = () => {
+        const resetFormValAndFocusNameField = () => {
             basicDetailsFormRef.value.resetValidation()
             nameFieldRef.value.focus()
         }
@@ -572,10 +567,28 @@ export default {
             }
         }
 
-        const contactMethodAdded = method => form.contactMethods.push(method)
+        const focusPhoneNumberField = () => {
+            steps.current = 'basicDetails'
+            nextTick(() => {
+                phoneNumberFieldRef.value.focus()
+            })
+        }
+
+        const submitContactMethod = method => form.contactMethods.push(method)
+
+        const submitEditContactMethod = (method, index) => {
+            form.contactMethods[index].type = method.type
+            form.contactMethods[index].value = method.value
+            form.contactMethods[index].description = method.description
+        }
+
+        const removeContactMethod = index  => form.contactMethods.splice(index, 1)
 
         const resetForm = () => {
+            isFormSubmitted.value = false
+            isDeliveryAddressDifferent.value = false
             contactAdded.value = null
+            tagsOptionList.value = []
 
             form.type = ContactTypesEnum.INDIVIDUAL
             form.name = ''
@@ -593,6 +606,8 @@ export default {
         }
 
         const submitForm = async(formType) => {
+            isFormSubmitted.value = true
+
             let basicDetailsFormVal = true
             let addressesFormVal = true
             let extraDetailsFormVal = true
@@ -606,18 +621,10 @@ export default {
             if (formType !== 'extraDetails' && extraDetailsFormRef.value) {
                 extraDetailsFormVal = await extraDetailsFormRef.value.validate()
             }
+            
 
             if (basicDetailsFormVal && addressesFormVal && extraDetailsFormVal) {
-                isFormSubmitted.value = true
                 const contact = structuredClone(toRaw(form))
-                
-                if (Object.keys(contact.billingAddress).length === 0) {
-                    delete contact.billingAddress
-                }
-
-                if (Object.keys(contact.deliveryAddress).length === 0) {
-                    delete contact.deliveryAddress
-                }
 
                 addContact(contact).then(response => {
                     contactAdded.value = response
@@ -628,13 +635,18 @@ export default {
                         message: $t('core.error_occured')
                     })
                     isFormSubmitted.value = false
-                    console.log(error)
+                    insertErrorLog({
+                        location: 'insertContactDialog',
+                        path: router.currentRoute.value.fullPath,
+                        object: error
+                    })
                 })
+            } else {
+                isFormSubmitted.value = false
             }
         }
-
+        
         watchEffect(() => {
-            // filter tags option list and remove values that are already selected.
             tagsOptionList.value = tagsOptionList.value.filter(tag => !form.tags.includes(tag))
         })
 
@@ -645,6 +657,7 @@ export default {
             addressesFormRef,
             extraDetailsFormRef,
             nameFieldRef,
+            phoneNumberFieldRef,
             deliveryAddressFieldRef,
             isDialogOpen,
             contactAdded,
@@ -662,9 +675,12 @@ export default {
             addNewTag,
             atValidationError,
             resetFormValidation,
-            resetFormValAndFocusName,
+            resetFormValAndFocusNameField,
             focusDeliveryAddressField,
-            contactMethodAdded,
+            focusPhoneNumberField,
+            submitContactMethod,
+            submitEditContactMethod,
+            removeContactMethod,
             resetForm,
             submitForm
         }
@@ -673,14 +689,10 @@ export default {
 </script>
 
 
-<style>
+<style scoped>
 #add-contact-dialog .q-card {
     width: 100%;
     max-width: 800px;
-}
-
-#add-contact-dialog .contact-type.q-field--outlined .q-field__control {
-    padding-left: 4px;
 }
 
 </style>

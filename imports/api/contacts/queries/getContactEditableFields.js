@@ -6,11 +6,10 @@ export default Contacts.createQuery('getContactEditableFields', {
     },
     type: 1,
     name: 1,
-    mobilePhone: 1,
-    landlinePhone: 1,
-    addresses: 1,
+    phoneNumber: 1,
     tags: 1,
-    email: 1,
-    website: 1,
-    taxRegNumber: 1
+    billingAddress: 1,
+    deliveryAddress: 1,
+    taxRegNumber: 1,
+    contactMethods: 1
 })

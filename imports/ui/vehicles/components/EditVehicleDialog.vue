@@ -400,7 +400,7 @@
 import { ref, reactive, toRaw, watchEffect } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useQuasar } from '../../quasar'
-import { useContactsApi } from '../../contacts/composables'
+import { useContactAPI } from '../../contacts/composables'
 import { useVehiclesApi } from '../../vehicles/composables'
 
 export default {
@@ -411,7 +411,7 @@ export default {
         const {
             ContactTypesEnum,
             filterContacts: filterContactsFn
-        } = useContactsApi()
+        } = useContactAPI()
 
         const {
             getVehicleEditableFields,

@@ -3,15 +3,17 @@ import { Tracker } from 'meteor/tracker'
 import { ref } from 'vue'
 import SimpleSchema from 'simpl-schema'
 
-export function useUsers() {
+export function useUsersAPI() {
     const userId = ref(null)
 
-    const login = credentials => {
-        new SimpleSchema({
+    const login = params => {
+        const schema = new SimpleSchema({
             username: String,
             password: String
-        }).validate(credentials)
-        const { username, password } = credentials
+        })
+        schema.validate(schema.clean(params))
+        
+        const { username, password } = params
 
         return new Promise((resolve, reject) => {
             Meteor.loginWithPassword(

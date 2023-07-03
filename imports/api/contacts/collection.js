@@ -25,12 +25,12 @@ if (Meteor.isServer) {
         unique: true
     })
     
-    Contacts.createIndex({ name: 1, phoneNumber: 1 }, {
-        name: 'namePhoneNumberIndex',
+    Contacts.createIndex({ searchableName: 1, phoneNumber: 1 }, {
+        name: 'searchableNamePhoneNumberIndex',
         unique: true
     })
 
-    Contacts.createIndex({ name: 1 }, { name: 'nameIndex' })
+    Contacts.createIndex({ searchableName: 1 }, { name: 'searchableNameIndex' })
 
     Contacts.createIndex({ phoneNumber: 1 }, { name: 'phoneNumberIndex' })
 

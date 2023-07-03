@@ -2,21 +2,28 @@ import { Meteor } from 'meteor/meteor'
 import SimpleSchema from 'simpl-schema'
 import { Contacts } from '../database'
 import { ContactsQueue } from './collection'
-import { ContactTypesEnum } from './enums'
 import { CounterNamesEnum } from '../counters/enums'
+import { convertToSearchableString } from '../core/functions'
 
 Meteor.methods({
     async 'contacts.insert'(params) {
         return await ContactsQueue.add(() => {
             const contact = { ...params }
             contact.code = 'C' + Meteor.call('counters.increaseCounter', { name: CounterNamesEnum.CONTACTS })
-    
-            try {
-                return { added: true, _id: Contacts.insert(contact), code: contact.code }
-            } catch(error) {
-                Meteor.call('counters.decreaseCounter', { name: CounterNamesEnum.CONTACTS })
-                throw error
+
+            contact.contactMethods.forEach((method, index) => {
+                if (method.value === contact.phoneNumber) {
+                    contact.contactMethods.splice(index, 1)
+                }
+            })
+            if (Object.keys(contact.billingAddress).length === 0) {
+                delete contact.billingAddress
             }
+            if (Object.keys(contact.deliveryAddress).length === 0) {
+                delete contact.deliveryAddress
+            }
+    
+            return { added: true, _id: Contacts.insert(contact), code: contact.code }
         }).promise
     },
     'contacts.update'(params) {
@@ -31,16 +38,31 @@ Meteor.methods({
         
         const { _id, contact } = params
 
+        contact.contactMethods.forEach((method, index) => {
+            if (method.value === contact.phoneNumber) {
+                contact.contactMethods.splice(index, 1)
+            }
+        })
+
         const fieldsToSet = {}
         const fieldsToUnset = {}
         Object.keys(contact).forEach(field => {
-            if (contact[field] === '') {
+            if (
+                (
+                    typeof contact[field] === 'string' && contact[field] === ''
+                ) ||
+                (
+                    typeof contact[field] === 'object' &&
+                    !Array.isArray(contact[field]) &&
+                    Object.keys(contact[field]).length === 0
+                )
+            ) {
                 fieldsToUnset[field] = ''
             } else {
                 fieldsToSet[field] = contact[field]
             }
         })
-        
+
         return { updated: Contacts.update(_id, { $set: fieldsToSet, $unset: fieldsToUnset }) === 1 }
     },
     'contacts.delete'(params) {
@@ -114,7 +136,7 @@ Meteor.methods({
         const { name, phoneNumber, excludeId } = params
         
         const query = {
-            name: name.toUpperCase(),
+            searchableName: convertToSearchableString(name),
             phoneNumber
         }
 
@@ -137,16 +159,16 @@ Meteor.methods({
             $or: [
                 { code: { $regex: filter, $options: 'i' }},
                 { name: { $regex: filter, $options: 'i' }},
-                { mobilePhone: { $regex: filter, $options: 'i' }},
-                { landlinePhone: { $regex: filter, $options: 'i' }},
+                { phoneNumber: { $regex: filter, $options: 'i' }},
+                { 'contactMethods.value': { $regex: filter, $options: 'i' }},
             ]
         }, {
             fields: {
                 code: 1,
                 type: 1,
                 name: 1,
-                mobilePhone: 1,
-                landlinePhone: 1
+                phoneNumber: 1,
+                contactMethods: 1
             },
             limit: 8
         }).fetch()

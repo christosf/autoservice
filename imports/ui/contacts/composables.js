@@ -1,9 +1,8 @@
 import { Meteor } from 'meteor/meteor'
-import { useI18n } from 'vue-i18n'
-import { ContactTypesEnum } from '../../api/contacts/enums'
+import { ContactTypesEnum, ContactMethodsEnum } from '../../api/contacts/enums'
 import { getContact, getContactList, getContactEditableFields } from '../../api/contacts/queries'
 
-export function useContactsApi() {
+export function useContactAPI() {
     const addContact = params => Meteor.callAsync('contacts.insert', params)
     const updateContact = params => Meteor.callAsync('contacts.update', params)
     const deleteContact = params => Meteor.callAsync('contacts.delete', params)
@@ -15,10 +14,14 @@ export function useContactsApi() {
     const getDistinctFieldValues = params => Meteor.callAsync('contacts.getDistinctFieldValues', params)
     
     return {
+        // Enums
         ContactTypesEnum,
+        ContactMethodsEnum,
+        // Queries
         getContact,
         getContactList,
         getContactEditableFields,
+        // Methods
         addContact,
         updateContact,
         deleteContact,
@@ -31,9 +34,34 @@ export function useContactsApi() {
     }
 }
 
-export function useContactsReusables() {
+export function useContactFunctions() {
+    const isCompany = type => type === ContactTypesEnum.COMPANY
 
     return {
-        
+        isCompany
+    }
+}
+
+export function useContactRules() {
+    const { contactExists: contactExistsFn } = useContactAPI()
+
+    const contactExists = (name, phoneNumber, msg, excludeId) => {
+        return new Promise(resolve => {
+            contactExistsFn({
+                name,
+                phoneNumber,
+                excludeId: excludeId ? excludeId : ''
+            }).then(response => {
+                if (response) {
+                    resolve(msg)
+                    return
+                }
+                resolve(true)
+            })
+        })
+    }
+
+    return {
+        contactExists
     }
 }

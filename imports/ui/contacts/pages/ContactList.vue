@@ -16,7 +16,7 @@
             flat
         >
             <template #top-left>
-                <div class='text-h6'>{{ $t('contacts.many') }}</div>
+                <div class='text-h3'>{{ $t('contacts.many') }}</div>
             </template>
             <template #top-right>
                 <div class='row q-gutter-sm'>
@@ -43,9 +43,8 @@
                     </q-btn-dropdown>
                     <q-input
                         v-model='filter'
-                        :placeholder='$t("core.search_td")'
+                        :placeholder='`${$t("core.search")}...`'
                         :autofocus='$q.platform.is.desktop'
-                        input-class='text-uppercase'
                         class='search-contacts'
                         ref='filterRef'
                         debounce='400'
@@ -64,14 +63,14 @@
                 </q-th>
             </template>
             <template #body-cell='props'>
-                <q-td :props='props'>
+                <q-td :props='props' auto-width>
                     <router-link :to='{ name: "ViewContact", params: { code: props.row.code }}' class='text-black'>
                         {{ props.value }}
                     </router-link>
                 </q-td>
             </template>
             <template #body-cell-type='props'>
-                <q-td :props='props' :class='{"dense": $q.screen.lt.sm}'>
+                <q-td :props='props' :class='{"dense": $q.screen.lt.sm}' auto-width>
                     <router-link :to='{ name: "ViewContact", params: { code: props.row.code }}'>
                         <q-icon v-if='isCompany(props.value)' name='domain' color='primary' size='22px'>
                             <q-tooltip anchor='top middle' self='bottom middle'>{{ $t('contacts.company') }}</q-tooltip>
@@ -82,43 +81,35 @@
                     </router-link>
                 </q-td>
             </template>
-            <template #body-cell-phoneNumber='props'>
+            <template #body-cell-name='props'>
                 <q-td :props='props'>
+                    <router-link :to='{ name: "ViewContact", params: { code: props.row.code }}' class='text-black'>
+                        {{ props.value }}
+                    </router-link>
+                </q-td>
+            </template>
+            <template #body-cell-phoneNumber='props'>
+                <q-td :props='props' auto-width>
                     <a :href='`tel:${props.value}`' class='text-black'>
                         {{ props.value }}
-                    </a>
-                </q-td>
-            </template>
-            <template #body-cell-primaryPhone='props'>
-                <q-td :props='props'>
-                    <a :href='`tel:${getPhone("primary", props.row)}`' class='text-black'>
-                        {{ getPhone('primary', props.row) }}
-                    </a>
-                </q-td>
-            </template>
-            <template #body-cell-secondaryPhone='props'>
-                <q-td :props='props'>
-                    <a :href='`tel:${getPhone("secondary", props.row)}`' class='text-black'>
-                        {{ getPhone('secondary', props.row) }}
                     </a>
                 </q-td>
             </template>
             <template #body-cell-tags='props'>
                 <q-td :props='props'>
                     <q-chip
+                        v-if='props.value.length > 0'
                         v-for='tag in props.value'
                         @click='addTagFilter(tag)'
                         :label='tag'
-                        class='q-ml-none'
-                        style='font-size: 12px;'
                         clickable
                         square
                     />
-                    {{ props.value.length === 0 ? '-' : '' }}
+                    <span v-else>-</span>
                 </q-td>
             </template>
             <template #body-cell-operations='props'>
-                <q-td :props='props'>
+                <q-td :props='props' auto-width>
                     <div class='q-gutter-sm'>
                         <template v-if='props.row.isActive'>
                             <q-btn
@@ -178,7 +169,8 @@ import { ref, watch, nextTick } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useQuasar, useMeta, date } from '../../quasar'
-import { useContactsApi } from '../composables'
+import { useContactAPI } from '../composables'
+import { useErrorLogAPI } from '../../error-log/composables'
 import EditContactDialog from '../components/EditContactDialog.vue'
 
 export default {
@@ -197,7 +189,10 @@ export default {
             activateContact: activateContactFn,
             deactivateContact: deactivateContactFn,
             deleteContact: deleteContactFn
-        } = useContactsApi()
+        } = useContactAPI()
+        const {
+            insertErrorLog
+        } = useErrorLogAPI()
         
         const vueReactiveDependencies = new Tracker.Dependency
         const editContactDialogRef = ref(null)
@@ -222,8 +217,7 @@ export default {
             {
                 name: 'type',
                 field: 'type',
-                required: true,
-                classes: 'contact-type',
+                required: true
             },
             {
                 name: 'name',
@@ -238,8 +232,8 @@ export default {
                 label: 'contacts.phone',
                 field: 'phoneNumber',
                 required: true,
-                align: 'left',
-                classes: 'contact-phone'
+                sortable: true,
+                align: 'left'
             },
             {
                 name: 'vehiclesCount',
@@ -259,11 +253,10 @@ export default {
                 name: 'updatedAt',
                 label: 'core.updated_at_short',
                 field: 'updatedAt',
-                format: val => formatDate(val, 'DD.MM.YYYY HH:mm'),
+                format: v => formatDate(v, 'DD.MM.YYYY HH:mm'),
                 required: true,
                 sortable: true,
-                align: 'left',
-                classes: 'contact-date'
+                align: 'left'
             },
             {
                 name: 'code',
@@ -271,8 +264,7 @@ export default {
                 field: 'code',
                 required: true,
                 sortable: true,
-                align: 'left',
-                classes: 'contact-code'
+                align: 'left'
             },
             {
                 name: 'operations',
@@ -289,15 +281,6 @@ export default {
 
         const isCompany = type => type === ContactTypesEnum.COMPANY
 
-        const getPhone = (phoneType, contact) => {
-            const { type, mobilePhone, landlinePhone } = contact
-
-            if (phoneType === 'primary') {
-                return isCompany(type) ? landlinePhone : mobilePhone
-            }
-            return isCompany(type) ? mobilePhone : landlinePhone
-        }
-
         const addTagFilter = tag => {
             filter.value = tag
             if ($q.platform.is.desktop) {
@@ -307,8 +290,8 @@ export default {
             }
         }
 
-        const activateContact = contactId => {
-            activateContactFn({ _id: contactId }).then(response => {
+        const activateContact = _id => {
+            activateContactFn({ _id }).then(response => {
                 const { activated } = response
 
                 if (activated) {
@@ -318,11 +301,15 @@ export default {
                     })
                 }
             }).catch(error => {
-                console.log(error)
+                insertErrorLog({
+                    location: 'activateContact',
+                    path: router.currentRoute.value.fullPath,
+                    object: error
+                })
             })
         }
 
-        const deactivateContact = contactId => {
+        const deactivateContact = _id => {
             $q.dialog({
                 title: $t('contacts.deactivate'),
                 message: $t('contacts.deactivate_prompt_msg'),
@@ -341,7 +328,7 @@ export default {
                     noCaps: true
                 }
             }).onOk(() => {
-                deactivateContactFn({ _id: contactId }).then(response => {
+                deactivateContactFn({ _id }).then(response => {
                     const { deactivated } = response
 
                     if (deactivated) {
@@ -351,12 +338,16 @@ export default {
                         })
                     }
                 }).catch(error => {
-                    console.log(error)
+                    insertErrorLog({
+                        location: 'deactivateContact',
+                        path: router.currentRoute.value.fullPath,
+                        object: error
+                    })
                 })
             })
         }
 
-        const deleteContact = contactId => {
+        const deleteContact = _id => {
             $q.dialog({
                 title: $t('contacts.delete'),
                 message: $t('contacts.delete_prompt_msg'),
@@ -375,7 +366,7 @@ export default {
                     noCaps: true
                 }
             }).onOk(() => {
-                deleteContactFn({ _id: contactId }).then(response => {
+                deleteContactFn({ _id }).then(response => {
                     const { deleted } = response
 
                     if (deleted) {
@@ -391,7 +382,11 @@ export default {
                             message: $t('contacts.error_associated_vehicles')
                         })
                     } else {
-                        console.log(error)
+                        insertErrorLog({
+                            location: 'deleteContact',
+                            path: router.currentRoute.value.fullPath,
+                            object: error
+                        })
                     }
                 })
             })
@@ -439,7 +434,11 @@ export default {
             if (subscription.ready()) {
                 query.getCount((error, response) => {
                     if (error) {
-                        console.log(error)
+                        insertErrorLog({
+                            location: 'getContactListQueryCount',
+                            path: router.currentRoute.value.fullPath,
+                            object: error
+                        })
                         return
                     }
                     pagination.value.rowsNumber = response
@@ -466,7 +465,6 @@ export default {
             columns,
             updateContactList,
             isCompany,
-            getPhone,
             addTagFilter,
             activateContact,
             deactivateContact,
@@ -476,37 +474,25 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 #contacts-table tbody td {
     font-size: 14px;
+}
+
+#contacts-table tbody td.dense {
+    padding: 7px;
 }
 
 #contacts-table .search-contacts {
     width: 120px;
 }
 
-#contacts-table .contact-type {
-    width: 22px;
-}
-#contacts-table .contact-type.dense {
-    padding-right: 0;
-    padding-left: 0;
-}
-
-#contacts-table .contact-code {
-    width: 50px;
-}
-
-#contacts-table .contact-phone {
-    width: 120px;
-}
-
-#contacts-table .contact-date {
-    width: 150px;
+#contacts-table .q-chip {
+    margin-left: 0;
+    font-size: 12px;
 }
 
 #contacts-table .contact-operations {
-    width: 70px;
     padding-left: 6px;
     padding-right: 10px;
 }

@@ -20,6 +20,57 @@
     }
 }
 
+.text-h1 {
+    font-size: 3rem;
+    font-weight: 300;
+    line-height: rem;
+    letter-spacing: -0.01562em;
+}
+.text-h2 {
+    font-size: 2rem;
+    font-weight: 300;
+    line-height: 2rem;
+    letter-spacing: -0.00833em;
+}
+.text-h3 {
+    font-size: 1.5rem;
+    font-weight: 400;
+    line-height: 1.5rem;
+    letter-spacing: normal;
+}
+.text-h4 {
+    font-size: 1.25rem;
+    font-weight: 400;
+    line-height: 1.25rem;
+    letter-spacing: 0.00735em;
+}
+.text-h5 {
+    font-size: 1.1rem;
+    font-weight: 400;
+    line-height: 1.1rem;
+    letter-spacing: normal;
+}
+.text-h6 {
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1rem;
+    letter-spacing: 0.0125em;
+}
+
+.text-bold {
+    font-weight: 500;
+}
+
 .q-dialog__inner--minimized {
     padding: 12px;
+}
+
+.q-tab-panels {
+    background: transparent;
+}
+
+.q-field__control .q-chip {
+    margin-left: 0;
+    margin-bottom: 0;
+    font-size: 13px;
 }

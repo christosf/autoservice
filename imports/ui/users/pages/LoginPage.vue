@@ -1,7 +1,7 @@
 <template>
     <q-page class='flex flex-center' padding>
-        <q-card class='login-form' bordered flat>
-            <q-card-section class='text-h6'>
+        <q-card id='login-form' bordered flat>
+            <q-card-section class='text-h4 text-bold'>
                 {{ $t('users.login') }}
             </q-card-section>
             <q-separator />
@@ -9,13 +9,13 @@
                 <q-form @submit='submitForm' ref='formRef' class='q-gutter-md'>
                     <q-input
                         v-model='form.username'
-                        @update:model-value='resetValidation'
+                        @update:model-value='resetFormValidation'
                         :label='$t("users.username")'
-                        :error='usernameFieldHasError'
+                        :error='usernameHasError'
                         :error-message='$t("users.incorrect_credentials")'
                         :rules='rules.username'
                         lazy-rules='ondemand'
-                        ref='usernameFieldRef'
+                        ref='usernameRef'
                         bottom-slots
                         autofocus
                         outlined
@@ -26,9 +26,9 @@
                     </q-input>
                     <q-input
                         v-model='form.password'
-                        @update:model-value='resetValidation'
+                        @update:model-value='resetFormValidation'
                         :label='$t("users.password")'
-                        :error='passwordFieldHasError'
+                        :error='passwordHasError'
                         :rules='rules.password'
                         lazy-rules='ondemand'
                         type='password'
@@ -53,27 +53,29 @@
 </template>
 
 <script>
-import { ref, reactive } from 'vue'
+import { ref, reactive, toRaw } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import { useQuasar } from '../../quasar'
-import { useUsers } from '../composables'
+import { useQuasar, useMeta } from '../../quasar'
+import { useUsersAPI } from '../composables'
+import { useErrorLogAPI } from '../../error-log/composables'
 
 export default {
     setup() {
         const $q = useQuasar()
         const router = useRouter()
         const { t: $t } = useI18n()
-        const { login } = useUsers()
+        const { login } = useUsersAPI()
+        const { insertErrorLog } = useErrorLogAPI()
 
-        const usernameFieldRef = ref(null)
+        const usernameRef = ref(null)
         const formRef = ref(null)
         const form = reactive({
             username: '',
             password: ''
         })
-        const usernameFieldHasError = ref(false)
-        const passwordFieldHasError = ref(false)
+        const usernameHasError = ref(false)
+        const passwordHasError = ref(false)
         
         const rules = {
             username: [
@@ -85,7 +87,9 @@ export default {
         }
 
         const submitForm = () => {
-            login(form).then(() => {
+            const credentials = toRaw(form)
+
+            login(credentials).then(() => {
                 router.push({ name: 'IndexPage' })
                 $q.notify({
                     type: 'positive',
@@ -93,38 +97,52 @@ export default {
                 })
             }).catch(error => {
                 if (error.error === 403) {
-                    usernameFieldRef.value.focus()
-                    usernameFieldHasError.value = true
-                    passwordFieldHasError.value = true
+                    usernameRef.value.focus()
+                    usernameHasError.value = true
+                    passwordHasError.value = true
                 } else {
-                    console.log(error)
+                    $q.notify({
+                        type: 'negative',
+                        message: $t('core.error_occured')
+                    })
+                    insertErrorLog({
+                        location: 'LoginForm',
+                        path: router.currentRoute.value.fullPath,
+                        object: error
+                    })
                 }
             })
         }
 
-        const resetValidation = () => {
+        const resetFormValidation = () => {
             formRef.value.resetValidation()
-            usernameFieldHasError.value = false
-            passwordFieldHasError.value = false
+            usernameHasError.value = false
+            passwordHasError.value = false
         }
 
+        useMeta({
+            title: $t('users.login')
+        })
+
         return {
-            usernameFieldRef,
+            usernameRef,
             formRef,
             form,
-            usernameFieldHasError,
-            passwordFieldHasError,
+            usernameHasError,
+            passwordHasError,
             rules,
             submitForm,
-            resetValidation
+            resetFormValidation
         }
     }
 }
 </script>
 
-<style>
-.login-form {
+<style scoped>
+
+#login-form {
     width: 100%;
     max-width: 500px;
 }
+
 </style>

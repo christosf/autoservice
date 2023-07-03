@@ -1,3 +1,4 @@
+import ErrorLog from './error-log/collection'
 import Counters from './counters/collection'
 import Settings from './settings/collection'
 import Users from './users/collection'
@@ -11,6 +12,7 @@ import './contacts/links'
 import './vehicles/links'
 
 export {
+    ErrorLog,
     Counters,
     Settings,
     Users,

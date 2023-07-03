@@ -1,7 +1,7 @@
 <template>
-    <q-page padding>
-        <q-card bordered flat>
-            <template v-if='contact'>
+    <q-page id='view-contact' class='q-gutter-sm' padding>
+        <template v-if='contact'>
+            <q-card bordered flat>
                 <q-card-section class='q-pa-none'>
                     <q-toolbar>
                         <q-icon :name='isCompany? "domain" : "person"' color='primary' size='36px' class='q-mr-md q-ml-xs' />
@@ -44,62 +44,129 @@
                         icon='history'
                     />
                 </q-tabs>
-                <q-separator />
-                <q-tab-panels
-                    v-model='activeTab'
-                    transition-prev='fade'
-                    transition-next='fade'
-                    animated
-                >
-                    <q-tab-panel name='overview'>
-                        <pre>{{ contact }}</pre>
-                    </q-tab-panel>
-                    <q-tab-panel name='vehicles'>
-                        <q-table :rows='contact.vehicles' flat bordered />
-                    </q-tab-panel>
-                    <q-tab-panel name='notes'>
-                        <q-input
-                            v-model='notes'
-                            :label='$t("core.notes")'
-                            :autofocus='$q.platform.is.desktop'
-                            input-style='min-height: 100px;'
-                            ref='notesFieldRef'
-                            type='textarea'
-                            maxlength='2000'
-                            counter
-                            autogrow
-                            outlined
-                        />
-                        <div class='q-mt-xs q-gutter-sm'>
-                            <q-btn
-                                @click='updateNotes'
-                                :label='$t("core.save")'
-                                :disabled='notesBtnDisabled'
-                                :loading='notesUpdateSubmitted'
-                                color='primary'
-                                icon='save'
-                                class='q-mt-sm'
-                                no-caps
-                            />
-                            <q-btn
-                                @click='resetNotes'
-                                :label='$t("core.reset")'
-                                :disabled='notesBtnDisabled'
-                                :loading='notesUpdateSubmitted'
-                                color='secondary'
-                                icon='undo'
-                                class='q-mt-sm'
-                                outline
-                                no-caps
-                            />
+            </q-card>
+            <q-tab-panels
+                v-model='activeTab'
+                transition-prev='fade'
+                transition-next='fade'
+                animated
+            >
+                <q-tab-panel name='overview' class='q-pa-none'>
+                    <div class='row q-col-gutter-sm'>
+                        
+                        <div class='col-xs-12 col-sm-6'>
+                            <q-table
+                                :title='$t("contacts.contact_details")'
+                                :rows='contact.contactMethods'
+                                hide-no-data
+                                hide-pagination
+                                bordered
+                                flat
+                            >
+                                <template #top-row>
+                                    <q-tr>
+                                        <q-td>{{ $t('contacts.phone') }}</q-td>
+                                        <q-td v-if='contact.phoneNumber'>{{ contact.phoneNumber }}</q-td>
+                                        <q-td v-else class='text-italic text-grey'>{{ $t('core.not_set') }}</q-td>
+                                        <q-td class='text-italic text-grey'>{{ $t('contacts.main_phone_number') }}</q-td>
+                                    </q-tr>
+                                </template>
+                            </q-table>
                         </div>
-                    </q-tab-panel>
-                    <q-tab-panel name='history'>
-                        <q-table :rows='contact.history' flat bordered />
-                    </q-tab-panel>
-                </q-tab-panels>
-            </template>
-            <q-card-section v-else class='q-py-xl'>
+                        <div class='col-xs-12 col-sm-6'>
+                            <q-card class='q-mb-sm' bordered flat>
+                                <q-card-section class='contact-tags'>
+                                    <div class='field-title'>{{ $t('core.tags') }}</div>
+                                    <q-chip
+                                        v-if='contact.tags && contact.tags.length > 0'
+                                        v-for='tag in contact.tags'
+                                    >
+                                        {{ tag }}
+                                    </q-chip>
+                                    <span v-else class='field-empty'>{{ $t('core.none_1') }}</span>
+                                </q-card-section>
+                            </q-card>
+                            <q-card bordered flat>
+                                <q-card-section class='text-body1'>
+                                    <div class='field-title'>{{ $t('contacts.billing_address') }}</div>
+                                    <span v-if='billingAddress'>{{  billingAddress }}</span>
+                                    <span v-else class='field-empty'>{{ $t('core.none_1') }}</span>
+                                </q-card-section>
+                                <q-separator />
+                                <q-card-section class='text-body1'>
+                                    <div class='field-title'>{{ $t('contacts.delivery_address') }}</div>
+                                    <span v-if='deliveryAddress'>{{  deliveryAddress }}</span>
+                                    <span v-else-if='billingAddress'>{{  billingAddress }}</span>
+                                    <span v-else class='field-empty'>{{ $t('core.none_1') }}</span>
+                                </q-card-section>
+                            </q-card>
+                        </div>
+                    </div>
+                </q-tab-panel>
+                <q-tab-panel name='vehicles' class='q-pa-none'>
+                    <q-table
+                        :columns='vehiclesTableColumns'
+                        :rows='contact.vehicles'
+                        :rows-per-page-options='[0]'
+                        hide-pagination
+                        bordered
+                        flat
+                    >
+                        <template #header-cell='props'>
+                            <q-th :props='props'>
+                                {{ props.col.label ? $t(props.col.label) : '' }}
+                            </q-th>
+                        </template>
+                    </q-table>
+                </q-tab-panel>
+                <q-tab-panel name='notes' class='q-pa-none'>
+                    <q-card bordered flat>
+                        <q-card-section>
+                            <q-input
+                                v-model='notes'
+                                :label='$t("core.notes")'
+                                :autofocus='$q.platform.is.desktop'
+                                input-style='min-height: 100px;'
+                                ref='notesFieldRef'
+                                type='textarea'
+                                maxlength='4000'
+                                counter
+                                autogrow
+                                outlined
+                            />
+                            <div class='q-mt-xs q-gutter-sm'>
+                                <q-btn
+                                    @click='updateNotes'
+                                    :label='$t("core.save")'
+                                    :disabled='notesBtnDisabled'
+                                    :loading='notesUpdateSubmitted'
+                                    color='primary'
+                                    icon='save'
+                                    class='q-mt-sm'
+                                    no-caps
+                                />
+                                <q-btn
+                                    @click='resetNotes'
+                                    :label='$t("core.reset")'
+                                    :disabled='notesBtnDisabled'
+                                    :loading='notesUpdateSubmitted'
+                                    color='secondary'
+                                    icon='undo'
+                                    class='q-mt-sm'
+                                    outline
+                                    no-caps
+                                />
+                            </div>
+                        </q-card-section>
+                    </q-card>
+                </q-tab-panel>
+                <q-tab-panel name='history'>
+                    <q-table :rows='contact.history' flat bordered />
+                </q-tab-panel>
+            </q-tab-panels>
+        </template>
+        <q-card v-else bordered flat>
+            <q-card-section class='q-py-xl'>
                 <q-inner-loading :showing='loading'>
                     <q-spinner-ball size='50px' color='primary'  />
                 </q-inner-loading>
@@ -114,7 +181,7 @@ import { ref, computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useQuasar, useMeta } from '../../quasar'
-import { useContactsApi } from '../composables'
+import { useContactAPI } from '../composables'
 
 export default {
     setup() {
@@ -126,7 +193,7 @@ export default {
             ContactTypesEnum,
             getContact,
             updateNotes: updateNotesFn
-        } = useContactsApi()
+        } = useContactAPI()
 
         const vueReactiveDependencies = new Tracker.Dependency
         const notesFieldRef = ref(null)
@@ -138,12 +205,59 @@ export default {
         const notes = ref('')
         const notesUpdateSubmitted = ref(false)
 
+        const vehiclesTableColumns = [
+        {
+                name: 'regNumber',
+                field: 'regNumber',
+                label: 'vehicles.reg_number',
+                sortable: true,
+                align: 'left'
+            },
+            {
+                name: 'make',
+                field: 'make',
+                label: 'vehicles.make',
+                sortable: true,
+                align: 'left'
+            },
+            {
+                name: 'model',
+                field: 'model',
+                label: 'vehicles.model',
+                sortable: true,
+                align: 'left'
+            },
+            {
+                name: 'code',
+                field: 'code',
+                label: 'core.code',
+                sortable: true,
+                align: 'left'
+            },
+            {
+                name: 'operations',
+                align: 'right'
+            },
+        ]
+
         const notesBtnDisabled = computed(() =>
             notes.value.trim() === contact.value.notes
             || (notes.value === '' && !contact.value.notes)
         )
 
         const isCompany = computed(() => contact.value.type === ContactTypesEnum.COMPANY)
+
+        const billingAddress = computed(() => {
+            return contact.value.billingAddress
+                ? Object.values(contact.value.billingAddress).join(', ')
+                : null
+        })
+
+        const deliveryAddress = computed(() => {
+            return contact.value.billingAddress
+                ? Object.values(contact.value.billingAddress).join(', ')
+                : null
+        })
 
         const updateNotes = () => {
             notesUpdateSubmitted.value = true
@@ -220,11 +334,33 @@ export default {
             contact,
             notes,
             notesUpdateSubmitted,
+            vehiclesTableColumns,
             notesBtnDisabled,
             isCompany,
+            billingAddress,
+            deliveryAddress,
             updateNotes,
             resetNotes
         }
     }
 }
 </script>
+
+<style>
+#view-contact .contact-tags .q-chip {
+    margin-left: 0;
+}
+
+#view-contact .field-title {
+    font-size: 16px;
+    font-weight: 500;
+    margin-bottom: 8px;
+}
+
+#view-contact .field-empty {
+    color: #9e9e9e;
+    font-style: italic;
+    font-size: 14px
+}
+
+</style>

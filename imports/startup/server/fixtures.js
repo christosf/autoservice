@@ -10,6 +10,10 @@ if (Users.find().count() === 0) {
     console.log('Administrator account created.')
 }
 
+if (Counters.find({ name: CounterNamesEnum.ERROR_LOG }).count() === 0) {
+    Counters.insert({ name: CounterNamesEnum.ERROR_LOG, counter: 1 })
+}
+
 if (Counters.find({ name: CounterNamesEnum.CONTACTS }).count() === 0) {
     Counters.insert({ name: CounterNamesEnum.CONTACTS })
 }

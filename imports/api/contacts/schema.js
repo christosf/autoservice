@@ -1,5 +1,6 @@
 import SimpleSchema from 'simpl-schema'
 import { ContactTypesEnum } from './enums'
+import { convertToSearchableString } from '../core/functions'
 
 export default new SimpleSchema({
     type: {
@@ -10,9 +11,15 @@ export default new SimpleSchema({
     name: {
         type: String,
         min: 3,
-        max: 60,
+        max: 60
+    },
+    searchableName: {
+        type: String,
         autoValue() {
-            return this.isSet ? this.value.toUpperCase() : this.unset()
+            const nameField = this.field('name')
+            return nameField.isSet
+                ? convertToSearchableString(nameField.value)
+                : this.unset()
         }
     },
     phoneNumber: {
@@ -28,10 +35,7 @@ export default new SimpleSchema({
     'billingAddress.street': {
         type: String,
         min: 3,
-        max: 50,
-        autoValue() {
-            return this.isSet ? this.value.toUpperCase() : this.unset()
-        }
+        max: 50
     },
     'billingAddress.postCode': {
         type: String,
@@ -39,9 +43,6 @@ export default new SimpleSchema({
         max: 10,
         optional() {
             return !this.field('billingAddress.street').isSet
-        },
-        autoValue() {
-            return this.isSet ? this.value.toUpperCase() : this.unset()
         }
     },
     'billingAddress.city': {
@@ -50,9 +51,6 @@ export default new SimpleSchema({
         max: 30,
         optional() {
             return !this.field('billingAddress.postCode').isSet
-        },
-        autoValue() {
-            return this.isSet ? this.value.toUpperCase() : this.unset()
         }
     },
     'billingAddress.country': {
@@ -61,10 +59,7 @@ export default new SimpleSchema({
         max: 30,
         optional() {
             return !this.field('billingAddress.city').isSet
-        },
-        autoValue() {
-            return this.isSet ? this.value.toUpperCase() : this.unset()
-        },
+        }
     },
     deliveryAddress: {
         type: Object,
@@ -73,10 +68,7 @@ export default new SimpleSchema({
     'deliveryAddress.street': {
         type: String,
         min: 3,
-        max: 50,
-        autoValue() {
-            return this.isSet ? this.value.toUpperCase() : this.unset()
-        }
+        max: 50
     },
     'deliveryAddress.postCode': {
         type: String,
@@ -84,9 +76,6 @@ export default new SimpleSchema({
         max: 10,
         optional() {
             return !this.field('deliveryAddress.street').isSet
-        },
-        autoValue() {
-            return this.isSet ? this.value.toUpperCase() : this.unset()
         }
     },
     'deliveryAddress.city': {
@@ -95,9 +84,6 @@ export default new SimpleSchema({
         max: 30,
         optional() {
             return !this.field('deliveryAddress.postCode').isSet
-        },
-        autoValue() {
-            return this.isSet ? this.value.toUpperCase() : this.unset()
         }
     },
     'deliveryAddress.country': {
@@ -106,9 +92,6 @@ export default new SimpleSchema({
         max: 30,
         optional() {
             return !this.field('deliveryAddress.city').isSet
-        },
-        autoValue() {
-            return this.isSet ? this.value.toUpperCase() : this.unset()
         }
     },
     taxRegNumber: {
@@ -118,7 +101,7 @@ export default new SimpleSchema({
     },
     notes: {
         type: String,
-        max: 2000,
+        max: 4000,
         optional: true,
     },
     vehiclesCount: {
@@ -135,12 +118,18 @@ export default new SimpleSchema({
         type: String,
         max: 100
     },
+    'contactMethods.$.searchableValue': {
+        type: String,
+        autoValue() {
+            const valueField = this.siblingField('value')
+            return valueField.isSet
+                ? convertToSearchableString(valueField.value)
+                : this.unset()
+        }
+    },
     'contactMethods.$.description': {
         type: String,
-        max: 60,
-        optional: true,
-        autoValue() {
-            return this.isSet ? this.value.toUpperCase() : this.unset()
-        }
+        max: 80,
+        optional: true
     }
 })

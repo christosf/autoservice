@@ -17,7 +17,11 @@ export default Contacts.createQuery('getContact', {
     billingAddress: 1,
     deliveryAddress: 1,
     taxRegNumber: 1,
-    contactMethods: 1,
+    contactMethods: {
+        type: 1,
+        value: 1,
+        description: 1
+    },
     notes: 1,
     balance: 1,
     vehiclesCount: 1,
@@ -34,7 +38,6 @@ export default Contacts.createQuery('getContact', {
         code: 1,
         make: 1,
         model: 1,
-        regNumber: 1,
-        vinNumber: 1,
+        regNumber: 1
     }
 })

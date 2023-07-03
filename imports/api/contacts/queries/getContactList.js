@@ -1,10 +1,11 @@
 import { Contacts } from '../../database'
+import { convertToSearchableRegex } from '../../core/functions'
 
 export default Contacts.createQuery('getContactList', {
     $filter({ filters, options, params }) {
         options.sort = {}
 
-        params.filter = params.filter.replace(/([()[{*+.$^\\|?])/g, '\\$1').toUpperCase()
+        params.filter = convertToSearchableRegex(params.filter)
 
         filters.isActive = true
         if (params.statusFilter === 'deactivated') {
@@ -16,14 +17,26 @@ export default Contacts.createQuery('getContactList', {
         }
 
         filters.$or = [
-            { code: { $regex: params.filter, $options: 'i' }},
-            { name: { $regex: params.filter, $options: 'i' }},
-            { phoneNumber: { $regex: params.filter, $options: 'i' }},
-            { tags: { $regex: params.filter, $options: 'i' }},
-            { 'contactMethods.value': { $regex: params.filter, $options: 'i' }}
+            { code: { $regex: params.filter }},
+            { searchableName: { $regex: params.filter }},
+            { phoneNumber: { $regex: params.filter }},
+            { searchableTags: { $regex: params.filter }},
+            { 'contactMethods.searchableValue': { $regex: params.filter }}
         ]
 
-        options.sort[params.sortBy] = params.descending ? 1 : -1
+        if (params.sortBy === 'name') {
+            options.sort['searchableName'] = params.descending ? 1 : -1
+        } else {
+            options.sort[params.sortBy] = params.descending ? 1 : -1
+        }
+    },
+    $postFilter(results) {
+        results.forEach(result => {
+            delete result.contactMethods
+            delete result.searchableName
+            delete result.searchableTags
+        })
+        return results
     },
     $paginate: true,
     code: 1,
@@ -31,8 +44,12 @@ export default Contacts.createQuery('getContactList', {
     type: 1,
     phoneNumber: 1,
     tags: 1,
-    contactMethods: 1,
     vehiclesCount: 1,
     isActive: 1,
-    updatedAt: 1
+    updatedAt: 1,
+    contactMethods: {
+        searchableValue: 1
+    },
+    searchableName: 1,
+    searchableTags: 1
 })

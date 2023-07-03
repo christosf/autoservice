@@ -129,7 +129,7 @@ import { ref, computed, provide } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useQuasar } from './quasar'
-import { useUsers } from './users/composables'
+import { useUsersAPI } from './users/composables'
 import AddContactDialog from './contacts/components/AddContactDialog.vue'
 import AddVehicleDialog from './vehicles/components/AddVehicleDialog.vue'
 import AddJobCardDialog from './job-cards/components/AddJobCardDialog.vue'
@@ -147,7 +147,7 @@ export default {
         const router = useRouter()
         const route = useRoute()
         const { t: $t } = useI18n()
-        const { logout, userId } = useUsers()
+        const { logout, userId } = useUsersAPI()
 
         const addContactDialogRef = ref(null)
         const addVehicleDialogRef = ref(null)
