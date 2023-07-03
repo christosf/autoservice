@@ -22,6 +22,7 @@
                     ref='stepperRef'
                     color='primary'
                     keep-alive
+                    swipeable
                     header-nav
                     animated
                     flat
@@ -379,6 +380,9 @@
                         </q-form>
                     </q-step>
                 </q-stepper>
+                <q-inner-loading :showing='loading'>
+                    <q-spinner-ball size='50px' color='primary'  />
+                </q-inner-loading>
             </q-card-section>
         </q-card>
     </q-dialog>
@@ -432,6 +436,7 @@ export default {
         const phoneNumberFieldRef = ref(null)
         const deliveryAddressFieldRef = ref(null)
         
+        const loading = ref(false)
         const isDialogOpen = ref(false)
         const isFormSubmitted = ref(false)
         const isDeliveryAddressDifferent = ref(false)
@@ -637,6 +642,7 @@ export default {
         }     
 
         const fetchContact = () => {
+            loading.value = true
             const query = getContactEditableFields.clone({ id: contactId.value })
             query.fetchOne((error, contact) => {
                 if (error) {
@@ -659,6 +665,7 @@ export default {
                     }
                 })
                 title.value = `${$t('core.edit')}: ${contactCode.value} - ${contact.name}`
+                loading.value = false
             })
         }
 
@@ -675,6 +682,7 @@ export default {
             nameFieldRef,
             phoneNumberFieldRef,
             deliveryAddressFieldRef,
+            loading,
             isDialogOpen,
             isFormSubmitted,
             isDeliveryAddressDifferent,

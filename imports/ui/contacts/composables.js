@@ -8,7 +8,7 @@ export function useContactAPI() {
     const deleteContact = params => Meteor.callAsync('contacts.delete', params)
     const activateContact = params => Meteor.callAsync('contacts.activate', params)
     const deactivateContact = params => Meteor.callAsync('contacts.deactivate', params)
-    const updateNotes = params => Meteor.callAsync('contacts.updateNotes', params)
+    const updateContactNotes = params => Meteor.callAsync('contacts.updateContactNotes', params)
     const contactExists = params => Meteor.callAsync('contacts.contactExists', params)
     const filterContacts = params => Meteor.callAsync('contacts.filterContacts', params)
     const getDistinctFieldValues = params => Meteor.callAsync('contacts.getDistinctFieldValues', params)
@@ -27,7 +27,7 @@ export function useContactAPI() {
         deleteContact,
         activateContact,
         deactivateContact,
-        updateNotes,
+        updateContactNotes,
         contactExists,
         filterContacts,
         getDistinctFieldValues

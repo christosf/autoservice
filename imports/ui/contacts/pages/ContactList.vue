@@ -169,7 +169,7 @@ import { ref, watch, nextTick } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useQuasar, useMeta, date } from '../../quasar'
-import { useContactAPI } from '../composables'
+import { useContactAPI, useContactFunctions } from '../composables'
 import { useErrorLogAPI } from '../../error-log/composables'
 import EditContactDialog from '../components/EditContactDialog.vue'
 
@@ -183,16 +183,16 @@ export default {
         const $q = useQuasar()
         const { t: $t } = useI18n()
         const { formatDate } = date
+        
         const {
-            ContactTypesEnum,
             getContactList,
             activateContact: activateContactFn,
             deactivateContact: deactivateContactFn,
             deleteContact: deleteContactFn
         } = useContactAPI()
-        const {
-            insertErrorLog
-        } = useErrorLogAPI()
+
+        const { isCompany } = useContactFunctions()
+        const { insertErrorLog } = useErrorLogAPI()
         
         const vueReactiveDependencies = new Tracker.Dependency
         const editContactDialogRef = ref(null)
@@ -279,8 +279,6 @@ export default {
             vueReactiveDependencies.changed()
         }
 
-        const isCompany = type => type === ContactTypesEnum.COMPANY
-
         const addTagFilter = tag => {
             filter.value = tag
             if ($q.platform.is.desktop) {
@@ -298,6 +296,11 @@ export default {
                     $q.notify({
                         type: 'positive',
                         message: $t('contacts.activate_successful')
+                    })
+                } else {
+                    $q.notify({
+                        type: 'negative',
+                        message: $t('core.error_occured')
                     })
                 }
             }).catch(error => {
@@ -336,6 +339,11 @@ export default {
                             type: 'positive',
                             message: $t('contacts.deactivate_successful')
                         })
+                    } else {
+                        $q.notify({
+                            type: 'negative',
+                            message: $t('core.error_occured')
+                        })
                     }
                 }).catch(error => {
                     insertErrorLog({
@@ -373,6 +381,11 @@ export default {
                         $q.notify({
                             type: 'positive',
                             message: $t('contacts.delete_successful')
+                        })
+                    } else {
+                        $q.notify({
+                            type: 'negative',
+                            message: $t('core.error_occured')
                         })
                     }
                 }).catch(error => {

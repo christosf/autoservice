@@ -47,9 +47,7 @@ export default Contacts.createQuery('getContactList', {
     vehiclesCount: 1,
     isActive: 1,
     updatedAt: 1,
-    contactMethods: {
-        searchableValue: 1
-    },
+    contactMethods: 1,
     searchableName: 1,
     searchableTags: 1
 })

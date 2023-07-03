@@ -3,7 +3,7 @@ import SimpleSchema from 'simpl-schema'
 import { Contacts } from '../database'
 import { ContactsQueue } from './collection'
 import { CounterNamesEnum } from '../counters/enums'
-import { convertToSearchableString } from '../core/functions'
+import { convertToSearchableRegex, convertToSearchableString } from '../core/functions'
 
 Meteor.methods({
     async 'contacts.insert'(params) {
@@ -23,7 +23,13 @@ Meteor.methods({
                 delete contact.deliveryAddress
             }
     
-            return { added: true, _id: Contacts.insert(contact), code: contact.code }
+            const _id = Contacts.insert(contact)
+
+            return {
+                added: !!_id,
+                _id,
+                code: contact.code
+            }
         }).promise
     },
     'contacts.update'(params) {
@@ -102,7 +108,7 @@ Meteor.methods({
 
         return { activated: Contacts.update(_id, { $set: { isActive: true }}) === 1 }
     },
-    'contacts.updateNotes'(params) {
+    'contacts.updateContactNotes'(params) {
         const schema = new SimpleSchema({
             _id: String,
             notes: {
@@ -114,10 +120,12 @@ Meteor.methods({
         
         const { _id, notes } = params
 
-        if (notes) {
-            return { updated: Contacts.update(_id, { $set: { notes }}) === 1 }
+        return {
+            updated: Contacts.update(_id, notes
+                ? { $set: { notes }}
+                : { $unset: { notes }}
+            ) === 1
         }
-        return { updated: Contacts.update(_id, { $unset: { notes }}) === 1 }
     },
     'contacts.contactExists'(params) {
         const schema = new SimpleSchema({
@@ -152,15 +160,15 @@ Meteor.methods({
         })
         schema.validate(schema.clean(params))
 
-        const filter = params.filter.replace(/([()[{*+.$^\\|?])/g, '\\$1').toUpperCase()
+        const filter = convertToSearchableRegex(params.filter)
 
         return Contacts.find({
             isActive: true,
             $or: [
-                { code: { $regex: filter, $options: 'i' }},
-                { name: { $regex: filter, $options: 'i' }},
-                { phoneNumber: { $regex: filter, $options: 'i' }},
-                { 'contactMethods.value': { $regex: filter, $options: 'i' }},
+                { code: { $regex: filter }},
+                { searchableName: { $regex: filter }},
+                { phoneNumber: { $regex: filter }},
+                { 'contactMethods.searchableValue': { $regex: filter }},
             ]
         }, {
             fields: {
@@ -168,7 +176,10 @@ Meteor.methods({
                 type: 1,
                 name: 1,
                 phoneNumber: 1,
-                contactMethods: 1
+                searchableName: 1,
+                contactMethods: {
+                    searchableValue: 1
+                }
             },
             limit: 8
         }).fetch()
@@ -184,10 +195,10 @@ Meteor.methods({
         schema.validate(schema.clean(params))
 
         const { field } = params
-        const filter = params.filter.replace(/([()[{*+.$^\\|?])/g, '\\$1').toUpperCase()
+        const filter = convertToSearchableRegex(params.filter)
         const query = {}
 
-        query[field] = { $regex: filter, $options: 'i' }
+        query[field] = { $regex: filter }
 
         const response = await Contacts.rawCollection().distinct(field, query)
 

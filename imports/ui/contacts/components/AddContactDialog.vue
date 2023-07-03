@@ -21,10 +21,11 @@
                         v-if='!contactAdded'
                         v-model='steps.current'
                         :contracted='$q.screen.lt.sm'
-                        :keep-alive-max='3'
+                        :keep-alive-max='4'
                         ref='stepperRef'
                         color='primary'
                         keep-alive
+                        swipeable
                         header-nav
                         animated
                         flat
@@ -627,8 +628,17 @@ export default {
                 const contact = structuredClone(toRaw(form))
 
                 addContact(contact).then(response => {
-                    contactAdded.value = response
-                    isFormSubmitted.value = false
+                    const { added, _id, code } = response
+
+                    if (added) {
+                        contactAdded.value = { _id, code }
+                    } else {
+                        $q.notify({
+                            type: 'negative',
+                            message: $t('core.error_occured')
+                        })
+                        isFormSubmitted.value = false
+                    }
                 }).catch(error => {
                     $q.notify({
                         type: 'negative',
