@@ -108,7 +108,7 @@ export default {
                     insertErrorLog({
                         location: 'LoginForm',
                         path: router.currentRoute.value.fullPath,
-                        object: error
+                        metadata: error
                     })
                 }
             })

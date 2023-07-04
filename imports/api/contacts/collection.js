@@ -34,6 +34,10 @@ if (Meteor.isServer) {
 
     Contacts.createIndex({ phoneNumber: 1 }, { name: 'phoneNumberIndex' })
 
+    Contacts.createIndex({ vehicleCount: 1 }, { name: 'vehicleCountIndex' })
+
+    Contacts.createIndex({ 'contactMethods.searchableValue': 1 }, { name: 'contactMethodsSearchableValueIndex' })
+
     Contacts.createIndex({ updatedAt: 1 }, { name: 'updatedAtIndex' })
 }
 

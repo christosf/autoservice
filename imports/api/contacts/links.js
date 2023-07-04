@@ -1,14 +1,16 @@
-import { Contacts, Users, Vehicles } from '../database'
+import { Contacts, Users, HistoryLog, Vehicles } from '../database'
 
 Contacts.addLinks({
     createdBy: {
         collection: Users,
         type: 'one',
         field: 'createdById'
-    }
-})
-
-Contacts.addLinks({
+    },
+    history: {
+        collection: HistoryLog,
+        inversedBy: 'contact',
+        autoremove: true
+    },
     vehicles: {
         collection: Vehicles,
         inversedBy: 'owner'

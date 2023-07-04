@@ -2,9 +2,9 @@ import { Vehicles, Contacts } from '../database'
 
 const updateOwnerVehicleCount = (_userId, vehicle) => {
     const vehiclesLink = Contacts.getLink(vehicle.ownerId, 'vehicles')
-    const vehiclesCount = vehiclesLink.find({ isActive: true }, { fields: { _id: 1 }}).count()
+    const vehicleCount = vehiclesLink.find({ isActive: true }, { fields: { _id: 1 }}).count()
 
-    Contacts.update(vehicle.ownerId, { $set: { vehiclesCount }})
+    Contacts.update(vehicle.ownerId, { $set: { vehicleCount }})
 }
 
 Vehicles.after.insert(updateOwnerVehicleCount)

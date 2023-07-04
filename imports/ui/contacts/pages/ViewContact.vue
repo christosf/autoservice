@@ -43,139 +43,152 @@
                 <q-tab-panel name='overview' class='q-pa-none'>
                     <div class='row q-col-gutter-sm'>
                         <div class='col-xs-12 col-sm-6'>
-                            <q-card class='q-mb-sm' bordered flat>
-                                <q-card-section class='text-h6 text-bold'>
-                                    {{ $t('contacts.contact_phone_numbers') }}
-                                </q-card-section>
-                                <q-separator />
-                                <q-card-section class='q-pa-none'>
-                                    <q-list separator>
-                                        <q-item :href='`tel:${contact.phoneNumber}`' class='q-py-md' clickable>
-                                            <q-item-section avatar>
-                                                <q-icon name='call' color='primary' />
-                                            </q-item-section>
-                                            <q-item-section>
-                                                <q-item-label class='text-body1'>{{ contact.phoneNumber }}</q-item-label>
-                                                <q-item-label caption>{{ $t('contacts.main_phone_number') }}</q-item-label>
-                                            </q-item-section>
-                                        </q-item>
-                                        <q-item v-for='phoneNumber in phoneNumbers' :href='`tel:${phoneNumber.value}`' class='q-py-md' clickable>
-                                            <q-item-section avatar>
-                                                <q-icon name='call' color='secondary' />
-                                            </q-item-section>
-                                            <q-item-section>
-                                                <q-item-label class='text-body1'>{{ phoneNumber.value }}</q-item-label>
-                                                <q-item-label caption>{{ phoneNumber.description }}</q-item-label>
-                                            </q-item-section>
-                                        </q-item>
-                                    </q-list>
-                                </q-card-section>
-                            </q-card>
-                            <q-card bordered flat>
-                                <q-card-section class='text-h6 text-bold'>
-                                    {{ $t('contacts.email_addresses') }}
-                                </q-card-section>
-                                <q-separator />
-                                <q-card-section class='q-pa-none'>
-                                    <q-list separator>
-                                        <q-item v-for='email in emails' :href='`mailto:${email.value}`' class='q-py-md' clickable>
-                                            <q-item-section avatar>
-                                                <q-icon name='email' color='secondary' />
-                                            </q-item-section>
-                                            <q-item-section>
-                                                <q-item-label class='text-body1'>{{ email.value }}</q-item-label>
-                                                <q-item-label caption>{{ email.description }}</q-item-label>
-                                            </q-item-section>
-                                        </q-item>
-                                        <q-item v-if='emails.length === 0' class='q-py-md'>
-                                            <q-item-section>
-                                                <q-item-label class='text-body1 text-italic text-grey'>{{ $t('core.none_1') }}</q-item-label>
-                                            </q-item-section>
-                                        </q-item>
-                                    </q-list>
-                                </q-card-section>
-                            </q-card>
+                            <div class='q-gutter-sm'>
+                                <q-card v-if='$q.screen.lt.sm' bordered flat>
+                                    <q-card-section>
+                                        <div class='text-h6 text-bold q-mb-xs'>{{ $t('contacts.balance') }}</div>
+                                        <div class='text-body1'>
+                                            <template v-if='contact.balance'>&euro; {{ contact.balance }}</template>
+                                            <span v-else>&euro; 0</span>
+                                        </div>
+                                    </q-card-section>
+                                </q-card>
+                                <q-card bordered flat>
+                                    <q-card-section class='text-h6 text-bold'>
+                                        {{ $t('contacts.contact_phone_numbers') }}
+                                    </q-card-section>
+                                    <q-separator />
+                                    <q-card-section class='q-pa-none'>
+                                        <q-list separator>
+                                            <q-item :href='`tel:${contact.phoneNumber}`' class='q-py-md' clickable>
+                                                <q-item-section avatar>
+                                                    <q-icon name='call' color='primary' />
+                                                </q-item-section>
+                                                <q-item-section>
+                                                    <q-item-label class='text-body1'>{{ contact.phoneNumber }}</q-item-label>
+                                                    <q-item-label caption>{{ $t('contacts.main_phone_number') }}</q-item-label>
+                                                </q-item-section>
+                                            </q-item>
+                                            <q-item v-for='phoneNumber in phoneNumbers' :href='`tel:${phoneNumber.value}`' class='q-py-md' clickable>
+                                                <q-item-section avatar>
+                                                    <q-icon name='call' color='secondary' />
+                                                </q-item-section>
+                                                <q-item-section>
+                                                    <q-item-label class='text-body1'>{{ phoneNumber.value }}</q-item-label>
+                                                    <q-item-label caption>{{ phoneNumber.description }}</q-item-label>
+                                                </q-item-section>
+                                            </q-item>
+                                        </q-list>
+                                    </q-card-section>
+                                </q-card>
+                                <q-card bordered flat>
+                                    <q-card-section class='text-h6 text-bold'>
+                                        {{ $t('contacts.email_addresses') }}
+                                    </q-card-section>
+                                    <q-separator />
+                                    <q-card-section class='q-pa-none'>
+                                        <q-list separator>
+                                            <q-item v-for='email in emails' :href='`mailto:${email.value}`' class='q-py-md' clickable>
+                                                <q-item-section avatar>
+                                                    <q-icon name='email' color='secondary' />
+                                                </q-item-section>
+                                                <q-item-section>
+                                                    <q-item-label class='text-body1'>{{ email.value }}</q-item-label>
+                                                    <q-item-label caption>{{ email.description }}</q-item-label>
+                                                </q-item-section>
+                                            </q-item>
+                                            <q-item v-if='emails.length === 0' class='q-py-md'>
+                                                <q-item-section>
+                                                    <q-item-label class='text-body1 text-italic text-grey'>{{ $t('core.none_1') }}</q-item-label>
+                                                </q-item-section>
+                                            </q-item>
+                                        </q-list>
+                                    </q-card-section>
+                                </q-card>
+                            </div>
                         </div>
                         <div class='col-xs-12 col-sm-6'>
-                            <q-card class='q-mb-sm' bordered flat>
-                                <q-card-section>
-                                    <div class='text-h6 text-bold q-mb-xs'>{{ $t('contacts.balance') }}</div>
-                                    <div class='text-body1'>
-                                        <template v-if='contact.balance'>&euro; {{ contact.balance }}</template>
-                                        <span v-else>&euro; 0</span>
-                                    </div>
-                                </q-card-section>
-                            </q-card>
-                            <q-card class='q-mb-sm' bordered flat>
-                                <q-card-section>
-                                    <div class='text-h6 text-bold q-mb-xs'>{{ $t('contacts.billing_address') }}</div>
-                                    <div class='text-body1'>
-                                        <template v-if='billingAddress'>{{ billingAddress }}</template>
-                                        <span v-else class='text-italic text-grey'>{{ $t('core.not_set') }}</span>
-                                    </div>
-                                </q-card-section>
-                                <template v-if='deliveryAddress'>
-                                    <q-separator />
+                            <div class='q-gutter-sm'>
+                                <q-card v-if='$q.screen.gt.xs' bordered flat>
                                     <q-card-section>
-                                        <div class='text-h6 text-bold q-mb-xs'>{{ $t('contacts.delivery_address') }}</div>
-                                        <div class='text-body1'>{{ deliveryAddress }}</div>
+                                        <div class='text-h6 text-bold q-mb-xs'>{{ $t('contacts.balance') }}</div>
+                                        <div class='text-body1'>
+                                            <template v-if='contact.balance'>&euro; {{ contact.balance }}</template>
+                                            <span v-else>&euro; 0</span>
+                                        </div>
                                     </q-card-section>
-                                </template>
-                            </q-card>
-                            <q-card bordered flat>
-                                <q-card-section>
-                                    <div class='text-h6 text-bold q-mb-xs'>{{ $t('core.tags') }}</div>
-                                    <div class='text-body1'>
-                                        <q-chip
-                                            v-if='contact.tags && contact.tags.length > 0'
-                                            v-for='tag in contact.tags'
-                                            class='q-ml-none'
-                                            square
-                                        >
-                                            {{ tag }}
-                                        </q-chip>
-                                        <span v-else class='text-italic text-grey'>{{ $t('core.none_1') }}</span>
-                                    </div>
-                                </q-card-section>
-                            </q-card>
-                            <q-card v-if='faxNumbers.length > 0' class='q-mt-sm' bordered flat>
-                                <q-card-section class='text-h6 text-bold'>
-                                    {{ $t('contacts.fax') }}
-                                </q-card-section>
-                                <q-separator />
-                                <q-card-section class='q-pa-none'>
-                                    <q-list separator>
-                                        <q-item v-for='fax in faxNumbers' :href='`tel:${fax.value}`' class='q-py-md' clickable>
-                                            <q-item-section avatar>
-                                                <q-icon name='fax' color='secondary' />
-                                            </q-item-section>
-                                            <q-item-section>
-                                                <q-item-label class='text-body1'>{{ fax.value }}</q-item-label>
-                                                <q-item-label caption>{{ fax.description }}</q-item-label>
-                                            </q-item-section>
-                                        </q-item>
-                                    </q-list>
-                                </q-card-section>
-                            </q-card>
-                            <q-card v-if='websites.length > 0' class='q-mt-sm' bordered flat>
-                                <q-card-section class='text-h6 text-bold'>
-                                    {{ $t('contacts.websites') }}
-                                </q-card-section>
-                                <q-separator />
-                                <q-card-section class='q-pa-none'>
-                                    <q-list separator>
-                                        <q-item v-for='website in websites' :href='website.value' target='_blank' class='q-py-md' clickable>
-                                            <q-item-section avatar>
-                                                <q-icon name='travel_explore' color='secondary' />
-                                            </q-item-section>
-                                            <q-item-section>
-                                                <q-item-label class='text-body1'>{{ website.value }}</q-item-label>
-                                                <q-item-label caption>{{ website.description }}</q-item-label>
-                                            </q-item-section>
-                                        </q-item>
-                                    </q-list>
-                                </q-card-section>
-                            </q-card>
+                                </q-card>
+                                <q-card bordered flat>
+                                    <q-card-section>
+                                        <div class='text-h6 text-bold q-mb-xs'>{{ $t('contacts.billing_address') }}</div>
+                                        <div class='text-body1'>
+                                            <template v-if='billingAddress'>{{ billingAddress }}</template>
+                                            <span v-else class='text-italic text-grey'>{{ $t('core.not_set') }}</span>
+                                        </div>
+                                    </q-card-section>
+                                    <template v-if='deliveryAddress'>
+                                        <q-separator />
+                                        <q-card-section>
+                                            <div class='text-h6 text-bold q-mb-xs'>{{ $t('contacts.delivery_address') }}</div>
+                                            <div class='text-body1'>{{ deliveryAddress }}</div>
+                                        </q-card-section>
+                                    </template>
+                                </q-card>
+                                <q-card bordered flat>
+                                    <q-card-section>
+                                        <div class='text-h6 text-bold q-mb-xs'>{{ $t('core.tags') }}</div>
+                                        <div class='text-body1'>
+                                            <q-chip
+                                                v-if='contact.tags && contact.tags.length > 0'
+                                                v-for='tag in contact.tags'
+                                                class='q-ml-none'
+                                                square
+                                            >
+                                                {{ tag }}
+                                            </q-chip>
+                                            <span v-else class='text-italic text-grey'>{{ $t('core.none_1') }}</span>
+                                        </div>
+                                    </q-card-section>
+                                </q-card>
+                                <q-card v-if='faxNumbers.length > 0' bordered flat>
+                                    <q-card-section class='text-h6 text-bold'>
+                                        {{ $t('contacts.fax') }}
+                                    </q-card-section>
+                                    <q-separator />
+                                    <q-card-section class='q-pa-none'>
+                                        <q-list separator>
+                                            <q-item v-for='fax in faxNumbers' :href='`tel:${fax.value}`' class='q-py-md' clickable>
+                                                <q-item-section avatar>
+                                                    <q-icon name='fax' color='secondary' />
+                                                </q-item-section>
+                                                <q-item-section>
+                                                    <q-item-label class='text-body1'>{{ fax.value }}</q-item-label>
+                                                    <q-item-label caption>{{ fax.description }}</q-item-label>
+                                                </q-item-section>
+                                            </q-item>
+                                        </q-list>
+                                    </q-card-section>
+                                </q-card>
+                                <q-card v-if='websites.length > 0' bordered flat>
+                                    <q-card-section class='text-h6 text-bold'>
+                                        {{ $t('contacts.websites') }}
+                                    </q-card-section>
+                                    <q-separator />
+                                    <q-card-section class='q-pa-none'>
+                                        <q-list separator>
+                                            <q-item v-for='website in websites' :href='website.value' target='_blank' class='q-py-md' clickable>
+                                                <q-item-section avatar>
+                                                    <q-icon name='travel_explore' color='secondary' />
+                                                </q-item-section>
+                                                <q-item-section>
+                                                    <q-item-label class='text-body1'>{{ website.value }}</q-item-label>
+                                                    <q-item-label caption>{{ website.description }}</q-item-label>
+                                                </q-item-section>
+                                            </q-item>
+                                        </q-list>
+                                    </q-card-section>
+                                </q-card>
+                            </div>
                         </div>
                     </div>
                 </q-tab-panel>
@@ -199,17 +212,10 @@
                     <q-card bordered flat>
                         <q-card-section>
                             <q-form @submit='submitNoteChanges' class='q-gutter-sm'>
-                                <q-input
+                                <q-editor
                                     v-model='notesField'
-                                    :label='$t("core.notes")'
-                                    :autofocus='$q.platform.is.desktop'
-                                    input-style='min-height: 100px;'
                                     ref='notesFieldRef'
-                                    type='textarea'
-                                    maxlength='4000'
-                                    counter
-                                    autogrow
-                                    outlined
+                                    min-height='100px'
                                 />
                                 <div class='q-gutter-sm q-ml-none'>
                                     <q-btn
@@ -237,7 +243,33 @@
                     </q-card>
                 </q-tab-panel>
                 <q-tab-panel name='history' class='q-pa-none'>
-                    <q-table :rows='contact.history' flat bordered />
+                    <q-card bordered flat>
+                        <q-card-section>
+                            <q-timeline color='primary' class='q-mx-sm q-my-none'>
+                                <q-timeline-entry
+                                    v-for='log in historyLog'
+                                    :subtitle='formatDate(log.createdAt, "dddd, DD.MM.YYYY - HH:mm")'
+                                    :icon='historyLogIcon(log.type)'
+                                >
+                                    <i18n-t :keypath='`contacts.history_log_${log.type}`' tag='div' class='text-body2' scope='global'>
+                                        <router-link :to='{ name: "ViewUser", params: { username: log.createdBy.username }}' class='text-bold text-secondary'>
+                                            {{ log.createdBy.username }}
+                                        </router-link>
+                                    </i18n-t>
+                                    <q-btn
+                                        v-if='log.type === HistoryLogTypesEnum.UPDATE || log.type === HistoryLogTypesEnum.NOTES_UPDATE'
+                                        @click='viewChanges(log.metadata)'
+                                        :label='$t("core.view_changes")'
+                                        color='primary'
+                                        class='q-mt-sm'
+                                        size='sm'
+                                        outline
+                                        no-caps
+                                    />
+                                </q-timeline-entry>
+                            </q-timeline>
+                        </q-card-section>
+                    </q-card>
                 </q-tab-panel>
             </q-tab-panels>
         </template>
@@ -250,8 +282,9 @@ import { Tracker } from 'meteor/tracker'
 import { ref, computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import { useQuasar, useMeta } from '../../quasar'
+import { useQuasar, useMeta, date } from '../../quasar'
 import { useContactAPI, useContactFunctions } from '../composables'
+import { useHistoryLogAPI } from '../../history-log/composables'
 
 import LoadingCard from '../../core/components/LoadingCard.vue'
 
@@ -264,8 +297,14 @@ export default {
         const router = useRouter()
         const route = useRoute()
         const { t: $t } = useI18n()
+        const { formatDate } = date
         
         const { isCompany } = useContactFunctions()
+
+        const {
+            HistoryLogTypesEnum,
+            getHistoryLog
+        } = useHistoryLogAPI()
 
         const {
             ContactMethodsEnum,
@@ -280,6 +319,7 @@ export default {
         const loading = ref(false)
         const activeTab = ref('overview')
         const contact = ref(null)
+        const historyLog = ref([])
         const notesField = ref('')
         const isNotesFormSubmitted = ref(false)
 
@@ -377,6 +417,16 @@ export default {
             || (notesField.value === '' && !contact.value.notes)
         )
 
+        const historyLogIcon = type => {
+            switch (type) {
+                case HistoryLogTypesEnum.INSERT: return 'person_add'
+                case HistoryLogTypesEnum.UPDATE: return 'update'
+                case HistoryLogTypesEnum.NOTES_UPDATE: return 'notes'
+                case HistoryLogTypesEnum.ACTIVATION: return 'visibility'
+                case HistoryLogTypesEnum.DEACTIVATION: return 'visibility_off'
+            }
+        }
+
         const handleSwipeRight = () => router.push({ name: 'ContactList' })
 
         const submitNoteChanges = () => {
@@ -404,6 +454,10 @@ export default {
         const discardNoteChanges = () => {
             notesField.value = contact.value.notes ? contact.value.notes : ''
             notesFieldRef.value.focus()
+        }
+
+        const viewChanges = changeList => {
+            console.log(changeList)
         }
 
         watch(route, () => {
@@ -441,7 +495,14 @@ export default {
 
                 notesField.value = contact.value.notes ? contact.value.notes : ''
                 title.value = `${contact.value.name} (${$t('contacts.one')})`
-                loading.value = false
+
+                const historyQuery = getHistoryLog.clone({ contactId: contact.value._id })
+                const historySubscription = historyQuery.subscribe()
+
+                if (historySubscription.ready()) {
+                    historyLog.value = historyQuery.fetch()
+                    loading.value = false
+                }
             }
         })
 
@@ -452,10 +513,12 @@ export default {
         })
 
         return {
+            HistoryLogTypesEnum,
             notesFieldRef,
             loading,
             activeTab,
             contact,
+            historyLog,
             notesField,
             isNotesFormSubmitted,
             routeTabs,
@@ -467,10 +530,13 @@ export default {
             faxNumbers,
             emails,
             websites,
+            formatDate,
             isCompany,
+            historyLogIcon,
             handleSwipeRight,
             submitNoteChanges,
-            discardNoteChanges
+            discardNoteChanges,
+            viewChanges
         }
     }
 }

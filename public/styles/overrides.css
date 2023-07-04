@@ -78,3 +78,9 @@
 .q-item__section--avatar {
     min-width: 40px;
 }
+
+.q-timeline__subtitle {
+    font-size: 13px;
+    opacity: 0.7;
+    font-weight: 500;
+}

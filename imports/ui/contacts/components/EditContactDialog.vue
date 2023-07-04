@@ -625,16 +625,20 @@ export default {
                         isFormSubmitted.value = false
                     }
                 }).catch(error => {
-                    $q.notify({
-                        type: 'negative',
-                        message: $t('core.error_occured')
-                    })
-                    isFormSubmitted.value = false
-                    insertErrorLog({
-                        location: 'updateContactDialog',
-                        path: router.currentRoute.value.fullPath,
-                        object: error
-                    })
+                    if (error.error === 'no-updated-fields') {
+                        close()
+                    } else {
+                        $q.notify({
+                            type: 'negative',
+                            message: $t('core.error_occured')
+                        })
+                        isFormSubmitted.value = false
+                        insertErrorLog({
+                            location: 'updateContactDialog',
+                            path: router.currentRoute.value.fullPath,
+                            metadata: error
+                        })
+                    }
                 })
             } else {
                 isFormSubmitted.value = false
@@ -649,7 +653,7 @@ export default {
                     insertErrorLog({
                         location: 'getContactEditableFieldsQuery',
                         path: router.currentRoute.value.fullPath,
-                        object: error
+                        metadata: error
                     })
                     return
                 }

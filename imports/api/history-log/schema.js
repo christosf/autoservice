@@ -1,19 +1,23 @@
 import SimpleSchema from 'simpl-schema'
+import { HistoryLogTypesEnum } from './enums'
 
 export default new SimpleSchema({
-    code: {
+    type: {
         type: String,
-        denyUpdate: true
+        allowedValues: Object.values(HistoryLogTypesEnum)
     },
-    location: String,
-    path: String,
     metadata: {
         type: Object,
+        optional: true,
         blackbox: true
     },
-    isArchived: {
-        type: Boolean,
-        defaultValue: false
+    contactId: {
+        type: String,
+        optional: true
+    },
+    createdAt: {
+        type: Date,
+        denyUpdate: true,
     },
     createdById: {
         type: String,
@@ -23,18 +27,6 @@ export default new SimpleSchema({
                 return this.userId
             } else if (this.isUpsert) {
                 return { $setOnInsert: this.userId }
-            }
-            this.unset()
-        }
-    },
-    createdAt: {
-        type: Date,
-        denyUpdate: true,
-        autoValue() {
-            if (this.isInsert) {
-                return new Date()
-            } else if (this.isUpsert) {
-                return { $setOnInsert: new Date() }
             }
             this.unset()
         }

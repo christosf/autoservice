@@ -11,7 +11,7 @@ export default Contacts.createQuery('getContactList', {
         if (params.statusFilter === 'deactivated') {
             filters.isActive = false
         } else if (params.statusFilter === 'customers') {
-            filters.vehiclesCount = { $gt: 0 }
+            filters.vehicleCount = { $gt: 0 }
         } else if (params.statusFilter === 'suppliers') {
             // TODO: Filter contacts if they have PartSupplies.
         }
@@ -44,7 +44,7 @@ export default Contacts.createQuery('getContactList', {
     type: 1,
     phoneNumber: 1,
     tags: 1,
-    vehiclesCount: 1,
+    vehicleCount: 1,
     isActive: 1,
     updatedAt: 1,
     contactMethods: 1,

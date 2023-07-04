@@ -1,4 +1,5 @@
 import '../../api/error-log/methods'
+import '../../api/history-log/methods'
 import '../../api/counters/methods'
 import '../../api/contacts/methods'
 import '../../api/vehicles/methods'

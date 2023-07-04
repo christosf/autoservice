@@ -24,7 +24,7 @@ export default Contacts.createQuery('getContact', {
     },
     notes: 1,
     balance: 1,
-    vehiclesCount: 1,
+    vehicleCount: 1,
     isActive: 1,
     createdAt: 1,
     updatedAt: 1,

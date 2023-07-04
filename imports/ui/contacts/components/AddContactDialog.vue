@@ -21,7 +21,6 @@
                         v-if='!contactAdded'
                         v-model='steps.current'
                         :contracted='$q.screen.lt.sm'
-                        :keep-alive-max='4'
                         ref='stepperRef'
                         color='primary'
                         keep-alive
@@ -648,7 +647,7 @@ export default {
                     insertErrorLog({
                         location: 'insertContactDialog',
                         path: router.currentRoute.value.fullPath,
-                        object: error
+                        metadata: error
                     })
                 })
             } else {

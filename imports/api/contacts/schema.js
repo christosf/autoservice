@@ -101,10 +101,9 @@ export default new SimpleSchema({
     },
     notes: {
         type: String,
-        max: 4000,
         optional: true,
     },
-    vehiclesCount: {
+    vehicleCount: {
         type: Number,
         defaultValue: 0
     },

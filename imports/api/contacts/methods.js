@@ -1,8 +1,10 @@
 import { Meteor } from 'meteor/meteor'
 import SimpleSchema from 'simpl-schema'
+
 import { Contacts } from '../database'
 import { ContactsQueue } from './collection'
 import { CounterNamesEnum } from '../counters/enums'
+import { contactHasUpdates } from './functions'
 import { convertToSearchableRegex, convertToSearchableString } from '../core/functions'
 
 Meteor.methods({
@@ -50,6 +52,10 @@ Meteor.methods({
             }
         })
 
+        if (!contactHasUpdates(_id, contact)) {
+            throw new Meteor.Error('no-updated-fields')
+        }
+
         const fieldsToSet = {}
         const fieldsToUnset = {}
         Object.keys(contact).forEach(field => {
@@ -68,6 +74,7 @@ Meteor.methods({
                 fieldsToSet[field] = contact[field]
             }
         })
+        fieldsToSet.updatedAt = new Date()
 
         return { updated: Contacts.update(_id, { $set: fieldsToSet, $unset: fieldsToUnset }) === 1 }
     },
@@ -80,9 +87,9 @@ Meteor.methods({
         const { _id } = params
 
         const linkedVehicles = Contacts.getLink(_id, 'vehicles')
-        const vehiclesCount = linkedVehicles.find({}, { fields: { _id: 1 }}).count()
+        const vehicleCount = linkedVehicles.find({}, { fields: { _id: 1 }}).count()
 
-        if (vehiclesCount > 0) {
+        if (vehicleCount > 0) {
             throw new Meteor.Error('vehicles-associated')
         }
 
@@ -122,8 +129,8 @@ Meteor.methods({
 
         return {
             updated: Contacts.update(_id, notes
-                ? { $set: { notes }}
-                : { $unset: { notes }}
+                ? { $set: { notes, updatedAt: new Date() }}
+                : { $unset: { notes }, $set: { updatedAt: new Date() }}
             ) === 1
         }
     },
