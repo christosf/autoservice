@@ -405,8 +405,8 @@ export default {
         ContactMethodsField
     },
     setup() {
-        const router = useRouter()
         const $q = useQuasar()
+        const router = useRouter()
         const { t: $t } = useI18n()
 
         const {
@@ -436,6 +436,7 @@ export default {
         const phoneNumberFieldRef = ref(null)
         const deliveryAddressFieldRef = ref(null)
         
+        const getContactEditableFieldsQuery = getContactEditableFields.clone()
         const loading = ref(false)
         const isDialogOpen = ref(false)
         const isFormSubmitted = ref(false)
@@ -647,8 +648,8 @@ export default {
 
         const fetchContact = () => {
             loading.value = true
-            const query = getContactEditableFields.clone({ id: contactId.value })
-            query.fetchOne((error, contact) => {
+            getContactEditableFieldsQuery.setParams({ id: contactId.value })
+            getContactEditableFieldsQuery.fetchOne((error, contact) => {
                 if (error) {
                     insertErrorLog({
                         location: 'getContactEditableFieldsQuery',

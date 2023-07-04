@@ -299,14 +299,13 @@ export default {
         })
 
         const valueFieldInputType = computed(() => {
-            if ([ContactMethodsEnum.PHONE, ContactMethodsEnum.FAX].includes(form.type)) {
-                return 'tel'
-            } else if (form.type === ContactMethodsEnum.EMAIL) {
-                return 'email'
-            } else if (form.type === ContactMethodsEnum.WEBSITE) {
-                return 'url'
+            switch(form.type) {
+                case ContactMethodsEnum.PHONE: return 'tel'
+                case ContactMethodsEnum.EMAIL: return 'email'
+                case ContactMethodsEnum.FAX: return 'tel'
+                case ContactMethodsEnum.WEBSITE: return 'url'
+                default: return 'text'
             }
-            return 'text' 
         })
 
         const valueAlreadyExists = (value, msg, type) => {
@@ -416,7 +415,6 @@ export default {
 </script>
 
 <style scoped>
-
 .q-card.contact-methods-form {
     width: 100%;
     max-width: 500px;

@@ -433,8 +433,8 @@ export default {
         ContactMethodsField
     },
     setup() {
-        const router = useRouter()
         const $q = useQuasar()
+        const router = useRouter()
         const { t: $t } = useI18n()
 
         const {
