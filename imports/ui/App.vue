@@ -61,11 +61,17 @@
                         <q-tooltip>{{ userId }}</q-tooltip>
                     </q-btn>
                     <q-btn
+                        @click='$i18n.locale = $i18n.locale === "en" ? "el" : "en"'
+                        icon='language'
+                        color='primary'
+                        dense
+                        flat
+                    />
+                    <q-btn
                         @click='logoutFn'
                         icon='logout'
                         color='primary'
                         dense
-                        round
                         flat
                     />
                 </div>

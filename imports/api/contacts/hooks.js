@@ -1,11 +1,42 @@
-import objectPath from 'object-path'
+import { Meteor } from 'meteor/meteor'
 import { diff } from 'just-diff'
+import objectPath from 'object-path'
+
 import { Contacts } from '../database'
 import { HistoryLogTypesEnum } from '../history-log/enums'
 
+const allowedFields = [
+    'type',
+    'name',
+    'phoneNumber',
+    'billingAddress',
+    'deliveryAddress',
+    'taxRegNumber',
+    'tags',
+    'contactMethods',
+    'notes'
+]
+
 const addInsertToHistory = (_userId, contact) => {
+    const prev = { tags: [], contactMethods: [] }
+    const rawChanges = diff(prev, contact)
+    const changeList = new Array()
+
+    rawChanges.forEach(change => {
+        const { op, path, value } = change
+
+        if (allowedFields.includes(path[0])) {
+            changeList.push({ op, path, value })   
+        }
+    })
+
+    if (changeList.length === 0) {
+        return
+    }
+    
     Meteor.call('history_log.insert', {
         type: HistoryLogTypesEnum.INSERT,
+        metadata: { changeList },
         contactId: contact._id,
         createdById: contact.createdById,
         createdAt: contact.createdAt
@@ -18,21 +49,14 @@ const addUpdateToHistory = function(userId, contact) {
     const changeList = new Array()
 
     rawChanges.forEach(change => {
-        if (
-            change.path[0] === 'updatedAt' ||
-            change.path[0] === 'searchableName' ||
-            (change.path.length === 2 && change.path[1] === 'searchableValue')
-        ) {
-            return
-        }
+        const { op, path, value } = change
+        const oldValue = objectPath.get(prev, path.join('.'))
 
-        changeList.push({
-            op: change.op,
-            path: change.path,
-            value: change.value,
-            oldValue: objectPath.get(prev, change.path.join('.'))
-        })
+        if (allowedFields.includes(path[0]) || path[0] === 'isActive') {
+            changeList.push({ op, path, value, oldValue })
+        }
     })
+
     if (changeList.length === 0) {
         return
     }
@@ -54,9 +78,7 @@ const addUpdateToHistory = function(userId, contact) {
     } else if (changeList.length === 1 && changeList[0].path[0] === 'notes') {
         Meteor.call('history_log.insert', {
             type: HistoryLogTypesEnum.NOTES_UPDATE,
-            metadata: {
-                changeList
-            },
+            metadata: { changeList },
             contactId: contact._id,
             createdById: userId,
             createdAt: contact.updatedAt
@@ -64,9 +86,7 @@ const addUpdateToHistory = function(userId, contact) {
     } else {
         Meteor.call('history_log.insert', {
             type: HistoryLogTypesEnum.UPDATE,
-            metadata: {
-                changeList
-            },
+            metadata: { changeList },
             contactId: contact._id,
             createdById: userId,
             createdAt: contact.updatedAt
@@ -76,48 +96,3 @@ const addUpdateToHistory = function(userId, contact) {
 
 Contacts.after.insert(addInsertToHistory)
 Contacts.after.update(addUpdateToHistory)
-
-/*
-const addInsertToHistory = (_userId, contact) => {
-    Contacts.update(contact._id, { $push: {
-        history: {
-            type: 'insert',
-            createdById: contact.createdById,
-            createdAt: contact.createdAt
-        }
-    }})
-}
-
-const addUpdateToHistory = function(userId, contact) {
-    const rawChanges = diff(this.previous, contact)
-    const changeList = new Array()
-
-    rawChanges.forEach(change => {
-        if (change.path[0] === 'updatedAt' || change.path[0] === 'history') {
-            return
-        }
-        changeList.push({
-            op: change.op,
-            path: change.path,
-            value: change.value,
-            oldValue: objectPath.get(this.previous, change.path.join('.'))
-        })
-    })
-    if (changeList.length === 0) {
-        return
-    }
-    const changes = { changeList }
-
-    Contacts.update(contact._id, { $push: {
-        history: {
-            type: 'update',
-            createdById: userId,
-            createdAt: contact.updatedAt,
-            metadata: changes
-        }
-    }})
-}
-
-Contacts.after.insert(addInsertToHistory)
-Contacts.after.update(addUpdateToHistory)
-*/

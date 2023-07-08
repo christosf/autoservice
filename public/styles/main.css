@@ -26,9 +26,67 @@ a {
     opacity: 0;
 }
 
+.slide-enter-active {
+	-moz-transition-duration: 0.3s;
+	-webkit-transition-duration: 0.3s;
+	-o-transition-duration: 0.3s;
+	transition-duration: 0.3s;
+	-moz-transition-timing-function: ease-in;
+	-webkit-transition-timing-function: ease-in;
+	-o-transition-timing-function: ease-in;
+	transition-timing-function: ease-in;
+}
+ 
+.slide-leave-active {
+	-moz-transition-duration: 0.3s;
+	-webkit-transition-duration: 0.3s;
+	-o-transition-duration: 0.3s;
+	transition-duration: 0.3s;
+	-moz-transition-timing-function: cubic-bezier(0, 1, 0.5, 1);
+	-webkit-transition-timing-function: cubic-bezier(0, 1, 0.5, 1);
+	-o-transition-timing-function: cubic-bezier(0, 1, 0.5, 1);
+	transition-timing-function: cubic-bezier(0, 1, 0.5, 1);
+}
+ 
+.slide-enter-to, .slide-leave {
+	max-height: 600px;
+	overflow: hidden;
+}
+ 
+.slide-enter, .slide-leave-to {
+	overflow: hidden;
+	max-height: 0;
+}
+
 .add-relation-item {
     border-bottom: 1px solid rgba(0,0,0,0.05);
 }
 .add-relation-item:last-child {
     border-bottom: none;
+}
+
+.q-table th {
+    font-size: 13px;
+}
+
+.q-table tbody td {
+    font-size: 14px;
+}
+
+.q-table tbody td.dense {
+    padding: 7px;
+}
+
+
+.q-table tbody td.operations {
+	padding-left: 6px;
+    padding-right: 10px;
+}
+
+.q-table thead th.operations,
+.q-table tbody td.operations {
+    background-color: #ffffff;
+    position: sticky;
+    right: 0;
+    z-index: 1;
 }

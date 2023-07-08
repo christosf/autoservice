@@ -359,6 +359,7 @@
                                 @submit-edit='submitEditContactMethod'
                                 @remove='removeContactMethod'
                                 @edit-phone-number='focusPhoneNumberField'
+                                @order-update='contactMethodsToRaw'
                                 :form='form'
                             /> 
                             <div class='q-gutter-sm q-ml-sm'>
@@ -566,6 +567,12 @@ export default {
 
         const removeContactMethod = index  => form.contactMethods.splice(index, 1)
 
+        const contactMethodsToRaw = () => {
+            form.contactMethods.forEach((method, index) => {
+                form.contactMethods[index] = toRaw(method)
+            })
+        }
+
         const resetForm = () => {
             isFormSubmitted.value = false
             isDeliveryAddressDifferent.value = false
@@ -608,6 +615,10 @@ export default {
 
             if (basicDetailsFormVal && addressesFormVal && extraDetailsFormVal) {
                 const contact = structuredClone(toRaw(form))
+
+                if (!isDeliveryAddressDifferent.value && Object.keys(contact.deliveryAddress).length > 0) {
+                    contact.deliveryAddress = {}
+                }
                 
                 updateContact({ _id: contactId.value, contact }).then(response => {
                     const { updated } = response
@@ -669,6 +680,10 @@ export default {
                         }
                     }
                 })
+
+                if (contact.deliveryAddress && Object.keys(contact.deliveryAddress).length > 0) {
+                    isDeliveryAddressDifferent.value = true
+                }
                 title.value = `${$t('core.edit')}: ${contactCode.value} - ${contact.name}`
                 loading.value = false
             })
@@ -710,6 +725,7 @@ export default {
             submitContactMethod,
             submitEditContactMethod,
             removeContactMethod,
+            contactMethodsToRaw,
             resetForm,
             submitForm
         }

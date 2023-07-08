@@ -1,10 +1,6 @@
 import SimpleSchema from 'simpl-schema'
 
 export default new SimpleSchema({
-    code: {
-        type: String,
-        denyUpdate: true
-    },
     location: String,
     path: String,
     metadata: {

@@ -361,6 +361,7 @@
                                     @submit-edit='submitEditContactMethod'
                                     @remove='removeContactMethod'
                                     @edit-phone-number='focusPhoneNumberField'
+                                    @order-update='contactMethodsToRaw'
                                     :form='form'
                                 /> 
                                 <div class='q-gutter-sm q-ml-sm'>
@@ -584,6 +585,12 @@ export default {
 
         const removeContactMethod = index  => form.contactMethods.splice(index, 1)
 
+        const contactMethodsToRaw = () => {
+            form.contactMethods.forEach((method, index) => {
+                form.contactMethods[index] = toRaw(method)
+            })
+        }
+
         const resetForm = () => {
             isFormSubmitted.value = false
             isDeliveryAddressDifferent.value = false
@@ -690,6 +697,7 @@ export default {
             submitContactMethod,
             submitEditContactMethod,
             removeContactMethod,
+            contactMethodsToRaw,
             resetForm,
             submitForm
         }

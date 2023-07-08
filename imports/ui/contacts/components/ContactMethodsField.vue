@@ -2,6 +2,7 @@
     <div class='q-mb-lg'>
         <draggable
             v-model='contactForm.contactMethods'
+            @change='$emit("orderUpdate")'
             item-key='value'
             tag='q-list'
             handle='.handle'
@@ -200,7 +201,7 @@
 </template>
 
 <script>
-import { reactive, ref, computed, toRaw, onBeforeMount } from 'vue'
+import { reactive, ref, toRefs, computed, toRaw, onBeforeMount } from 'vue'
 import { useI18n } from 'vue-i18n'
 import draggable from 'vuedraggable'
 
@@ -219,7 +220,7 @@ export default {
         const $q = useQuasar()
         const { t: $t } = useI18n()
         const { emit } = context
-        const { form: contactForm } = props
+        const { form: contactForm } = toRefs(props)
 
         const {
             ContactMethodsEnum
@@ -309,12 +310,12 @@ export default {
         })
 
         const valueAlreadyExists = (value, msg, type) => {
-            if (type === ContactMethodsEnum.PHONE && value === contactForm.phoneNumber) {
+            if (type === ContactMethodsEnum.PHONE && value === contactForm.value.phoneNumber) {
                 return msg
             }
 
             let exists = false
-            contactForm.contactMethods.forEach((item, index) => {
+            contactForm.value.contactMethods.forEach((item, index) => {
                 if (value === item.value && index !== editIndex.value) {
                     exists = true
                 }

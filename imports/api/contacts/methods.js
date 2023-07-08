@@ -6,6 +6,7 @@ import { ContactsQueue } from './collection'
 import { CounterNamesEnum } from '../counters/enums'
 import { contactHasUpdates } from './functions'
 import { convertToSearchableRegex, convertToSearchableString } from '../core/functions'
+import contactsSchema from './schema'
 
 Meteor.methods({
     async 'contacts.insert'(params) {
@@ -44,7 +45,8 @@ Meteor.methods({
         })
         schema.validate(schema.clean(params))
         
-        const { _id, contact } = params
+        const { _id } = params
+        let contact = params.contact
 
         contact.contactMethods.forEach((method, index) => {
             if (method.value === contact.phoneNumber) {
@@ -60,9 +62,7 @@ Meteor.methods({
         const fieldsToUnset = {}
         Object.keys(contact).forEach(field => {
             if (
-                (
-                    typeof contact[field] === 'string' && contact[field] === ''
-                ) ||
+                (typeof contact[field] === 'string' && contact[field] === '') ||
                 (
                     typeof contact[field] === 'object' &&
                     !Array.isArray(contact[field]) &&
@@ -70,6 +70,20 @@ Meteor.methods({
                 )
             ) {
                 fieldsToUnset[field] = ''
+            } else if (
+                typeof contact[field] === 'object' &&
+                !Array.isArray(contact[field])
+            ) {
+                Object.keys(contact[field]).forEach(insideField => {
+                    if (contact[field][insideField] === '') {
+                        delete contact[field][insideField]
+                    }
+                })
+                if (Object.keys(contact[field]).length === 0) {
+                    fieldsToUnset[field] = ''
+                } else {
+                    fieldsToSet[field] = contact[field]
+                }
             } else {
                 fieldsToSet[field] = contact[field]
             }

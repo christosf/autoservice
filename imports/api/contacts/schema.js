@@ -35,7 +35,8 @@ export default new SimpleSchema({
     'billingAddress.street': {
         type: String,
         min: 3,
-        max: 50
+        max: 50,
+        optional: true
     },
     'billingAddress.postCode': {
         type: String,
@@ -68,7 +69,8 @@ export default new SimpleSchema({
     'deliveryAddress.street': {
         type: String,
         min: 3,
-        max: 50
+        max: 50,
+        optional: true
     },
     'deliveryAddress.postCode': {
         type: String,

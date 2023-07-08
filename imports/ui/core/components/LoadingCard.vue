@@ -8,13 +8,16 @@
 </template>
 
 <script>
+import { computed } from 'vue'
+
 export default {
     props: {
         loading: Boolean,
         message: String
     },
     setup(props) {
-        const { loading, message } = props
+        const loading = computed(() => props.loading)
+        const message = computed(() => props.message)
 
         return {
             loading,

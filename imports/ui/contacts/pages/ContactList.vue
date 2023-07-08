@@ -8,7 +8,7 @@
             :loading='loading'
             :filter='filter'
             :visible-columns='visibleColumns'
-            :rows-per-page-options='[15,30,50,100]'
+            :rows-per-page-options='[10,20,30,50]'
             row-key='_id'
             id='contacts-table'
             binary-state-sort
@@ -22,7 +22,7 @@
                 <div class='row q-gutter-sm'>
                     <q-btn-dropdown
                         :label='$t(`contacts.${statusFilter}`)'
-                        :padding='$q.screen.lt.sm ? "sm" : "sm md"'
+                        padding='sm'
                         color='primary'
                         auto-close
                         no-caps
@@ -45,10 +45,12 @@
                         v-model='filter'
                         :placeholder='`${$t("core.search")}...`'
                         :autofocus='$q.platform.is.desktop'
+                        :borderless='$q.screen.lt.md'
+                        :outlined='$q.screen.gt.sm'
+                        :class='{ "small": $q.screen.lt.md }'
                         class='search-contacts'
                         ref='filterRef'
                         debounce='400'
-                        borderless
                         dense
                     >
                         <template #prepend>
@@ -58,7 +60,7 @@
                 </div>
             </template>
             <template #header-cell='props'>
-                <q-th :props='props'>
+                <q-th :props='props' :class='props.col.classes'>
                     {{ props.col.label ? $t(props.col.label) : '' }}
                 </q-th>
             </template>
@@ -165,7 +167,7 @@
 
 <script>
 import { Tracker } from 'meteor/tracker'
-import { ref, watch, nextTick } from 'vue'
+import { ref, watch, nextTick, onMounted, onUnmounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 
@@ -203,11 +205,14 @@ export default {
         const statusFilter = ref('all')
         const statusFilterItems = ['all', 'customers', 'suppliers', 'deactivated']
 
+        let subscription
+        let countSubscription
+
         const pagination = ref({
             sortBy: 'updatedAt',
             descending: false,
             page: 1,
-            rowsPerPage: 15,
+            rowsPerPage: 10,
             rowsNumber: 0
         })
 
@@ -268,7 +273,7 @@ export default {
                 name: 'operations',
                 required: true,
                 align: 'right',
-                classes: 'contact-operations'
+                classes: 'operations'
             }
         ]
 
@@ -283,20 +288,15 @@ export default {
         
         const updateContactList = props => {
             pagination.value = props.pagination
+            setLocalStorage()
             vueReactiveDependencies.changed()
         }
 
-        const getContactListQueryCount = () => {
-            getContactListQuery.getCount((error, response) => {
-                if (error) {
-                    insertErrorLog({
-                        location: 'getContactListQueryCount',
-                        path: router.currentRoute.value.fullPath,
-                        metadata: error
-                    })
-                    return
-                }
-                pagination.value.rowsNumber = response
+        const setLocalStorage = () => {
+            $q.localStorage.set('contactListPagination', {
+                sortBy: pagination.value.sortBy,
+                descending: pagination.value.descending,
+                rowsPerPage: pagination.value.rowsPerPage
             })
         }
 
@@ -325,7 +325,7 @@ export default {
             }
         }, { immediate: true })
 
-        Tracker.autorun(() => {
+        const tracker = Tracker.autorun(() => {
             vueReactiveDependencies.depend()
             loading.value = true
 
@@ -337,16 +337,34 @@ export default {
                 limit: pagination.value.rowsPerPage,
                 skip: (pagination.value.page - 1) * pagination.value.rowsPerPage
             })
-            const subscription = getContactListQuery.subscribe()
+            subscription = getContactListQuery.subscribe()
+            countSubscription = getContactListQuery.subscribeCount()
 
-            if (subscription.ready()) {
-                getContactListQueryCount()
+            if (subscription.ready() && countSubscription.ready()) {
                 contacts.value = getContactListQuery.fetch()
+                pagination.value.rowsNumber = getContactListQuery.getCount()
                 loading.value = false
             }
         })
 
-        Meteor.setInterval(() => getContactListQueryCount(), 10000)
+        onUnmounted(() => {
+            subscription.stop()
+            countSubscription.stop()
+            tracker.stop()
+        })
+
+        onMounted(() => {
+            if ($q.localStorage.has('contactListPagination')) {
+                const localStoragePagination = $q.localStorage.getItem('contactListPagination')
+                
+                pagination.value.sortBy = localStoragePagination.sortBy
+                pagination.value.descending = localStoragePagination.descending
+                pagination.value.rowsPerPage = localStoragePagination.rowsPerPage
+            } 
+            else {
+                setLocalStorage()
+            }
+        })
 
         useMeta({
             title: $t('contacts.many')
@@ -375,33 +393,16 @@ export default {
 </script>
 
 <style scoped>
-#contacts-table tbody td {
-    font-size: 14px;
-}
-
-#contacts-table tbody td.dense {
-    padding: 7px;
-}
-
 #contacts-table .search-contacts {
+    width: 300px;
+}
+
+#contacts-table .search-contacts.small {
     width: 120px;
 }
 
 #contacts-table .q-chip {
     margin-left: 0;
     font-size: 12px;
-}
-
-#contacts-table .contact-operations {
-    padding-left: 6px;
-    padding-right: 10px;
-}
-
-#contacts-table th:last-child,
-#contacts-table td:last-child {
-    background-color: #ffffff;
-    position: sticky;
-    right: 0;
-    z-index: 1;
 }
 </style>

@@ -28,7 +28,7 @@
                         <q-route-tab
                             v-if='tab.name === "vehicles" ? contact.vehicles.length > 0 : true'
                             :to='{ name: "ViewContact", params: { code: contact.code }, query: tab.query ? { view: tab.query } : undefined}'
-                            :label='tab.label'
+                            :label='$t(tab.label)'
                             :icon='tab.icon'
                         />
                     </template>
@@ -209,67 +209,10 @@
                     </q-table>
                 </q-tab-panel>
                 <q-tab-panel name='notes' class='q-pa-none'>
-                    <q-card bordered flat>
-                        <q-card-section>
-                            <q-form @submit='submitNoteChanges' class='q-gutter-sm'>
-                                <q-editor
-                                    v-model='notesField'
-                                    ref='notesFieldRef'
-                                    min-height='100px'
-                                />
-                                <div class='q-gutter-sm q-ml-none'>
-                                    <q-btn
-                                        :label='$t("core.save")'
-                                        :disabled='isNotesButtonDisabled'
-                                        :loading='isNotesFormSubmitted'
-                                        type='submit'
-                                        color='primary'
-                                        icon='save'
-                                        no-caps
-                                    />
-                                    <q-btn
-                                        @click='discardNoteChanges'
-                                        :label='$q.screen.gt.xs ? $t("core.discard_changes") : ""'
-                                        :disabled='isNotesButtonDisabled'
-                                        :loading='isNotesFormSubmitted'
-                                        color='secondary'
-                                        icon='undo'
-                                        outline
-                                        no-caps
-                                    />
-                                </div>
-                            </q-form>
-                        </q-card-section>
-                    </q-card>
+                    <notes-tab-panel :id='contact._id' :notes='contact.notes' type='contacts' />
                 </q-tab-panel>
                 <q-tab-panel name='history' class='q-pa-none'>
-                    <q-card bordered flat>
-                        <q-card-section>
-                            <q-timeline color='primary' class='q-mx-sm q-my-none'>
-                                <q-timeline-entry
-                                    v-for='log in historyLog'
-                                    :subtitle='formatDate(log.createdAt, "dddd, DD.MM.YYYY - HH:mm")'
-                                    :icon='historyLogIcon(log.type)'
-                                >
-                                    <i18n-t :keypath='`contacts.history_log_${log.type}`' tag='div' class='text-body2' scope='global'>
-                                        <router-link :to='{ name: "ViewUser", params: { username: log.createdBy.username }}' class='text-bold text-secondary'>
-                                            {{ log.createdBy.username }}
-                                        </router-link>
-                                    </i18n-t>
-                                    <q-btn
-                                        v-if='log.type === HistoryLogTypesEnum.UPDATE || log.type === HistoryLogTypesEnum.NOTES_UPDATE'
-                                        @click='viewChanges(log.metadata)'
-                                        :label='$t("core.view_changes")'
-                                        color='primary'
-                                        class='q-mt-sm'
-                                        size='sm'
-                                        outline
-                                        no-caps
-                                    />
-                                </q-timeline-entry>
-                            </q-timeline>
-                        </q-card-section>
-                    </q-card>
+                    <history-tab-panel :id='contact._id' type='contacts' />
                 </q-tab-panel>
             </q-tab-panels>
         </template>
@@ -279,71 +222,62 @@
 
 <script>
 import { Tracker } from 'meteor/tracker'
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, onUnmounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import { useQuasar, useMeta, date } from '../../quasar'
+import { useMeta } from '../../quasar'
 import { useContactAPI, useContactFunctions } from '../composables'
-import { useHistoryLogAPI } from '../../history-log/composables'
 
 import LoadingCard from '../../core/components/LoadingCard.vue'
+import NotesTabPanel from '../../core/components/NotesTabPanel.vue'
+import HistoryTabPanel from '../../history-log/components/HistoryTabPanel.vue'
 
 export default {
     components: {
-        LoadingCard
+        LoadingCard,
+        NotesTabPanel,
+        HistoryTabPanel
     },
     setup() {
-        const $q = useQuasar()
         const router = useRouter()
         const route = useRoute()
         const { t: $t } = useI18n()
-        const { formatDate } = date
         
         const { isCompany } = useContactFunctions()
 
         const {
-            HistoryLogTypesEnum,
-            getHistoryLog
-        } = useHistoryLogAPI()
-
-        const {
             ContactMethodsEnum,
-            getContact,
-            updateContactNotes
+            getContact
         } = useContactAPI()
 
-        const vueReactiveDependencies = new Tracker.Dependency
-        const notesFieldRef = ref(null)
-        
+        const vueReactiveDependencies = new Tracker.Dependency        
+        const getContactQuery = getContact.clone()
         const title = ref($t('contacts.view'))
         const loading = ref(false)
         const activeTab = ref('overview')
         const contact = ref(null)
-        const historyLog = ref([])
-        const notesField = ref('')
-        const isNotesFormSubmitted = ref(false)
 
         const routeTabs = [
             {
                 name: 'overview',
-                label: $t('core.overview'),
+                label: 'core.overview',
                 icon: 'dataset'
             },
             {
                 name: 'vehicles',
-                label: $t('vehicles.many'),
+                label: 'vehicles.many',
                 icon: 'commute',
                 query: 'vehicles'
             },
             {
                 name: 'notes',
-                label: $t('core.notes'),
+                label: 'core.notes',
                 icon: 'notes',
                 query: 'notes'
             },
             {
                 name: 'history',
-                label: $t('core.history'),
+                label: 'core.history',
                 icon: 'history',
                 query: 'history'
             }
@@ -412,53 +346,7 @@ export default {
                 : null
         })
 
-        const isNotesButtonDisabled = computed(() =>
-            (notesField.value && notesField.value.trim() === contact.value.notes)
-            || (notesField.value === '' && !contact.value.notes)
-        )
-
-        const historyLogIcon = type => {
-            switch (type) {
-                case HistoryLogTypesEnum.INSERT: return 'person_add'
-                case HistoryLogTypesEnum.UPDATE: return 'update'
-                case HistoryLogTypesEnum.NOTES_UPDATE: return 'notes'
-                case HistoryLogTypesEnum.ACTIVATION: return 'visibility'
-                case HistoryLogTypesEnum.DEACTIVATION: return 'visibility_off'
-            }
-        }
-
         const handleSwipeRight = () => router.push({ name: 'ContactList' })
-
-        const submitNoteChanges = () => {
-            isNotesFormSubmitted.value = true
-
-            updateContactNotes({ _id: contact.value._id, notes: notesField.value }).then(response => {
-                const { updated } = response
-
-                if (updated) {
-                    $q.notify({
-                        type: 'positive',
-                        message: $t('core.notes_update_successful')
-                    })
-                } else {
-                    $q.notify({
-                        type: 'negative',
-                        message: $t('core.error_occured')
-                    })
-                }
-                isNotesFormSubmitted.value = false
-                notesFieldRef.value.focus()
-            })
-        }
-
-        const discardNoteChanges = () => {
-            notesField.value = contact.value.notes ? contact.value.notes : ''
-            notesFieldRef.value.focus()
-        }
-
-        const viewChanges = changeList => {
-            console.log(changeList)
-        }
 
         watch(route, () => {
             if (route.name === 'ViewContact') {
@@ -476,35 +364,27 @@ export default {
             }
         }, { immediate: true })
 
-        Tracker.autorun(() => {
+        const tracker = Tracker.autorun(() => {
             vueReactiveDependencies.depend()
             loading.value = true
             
-            const query = getContact.clone({
-                code: route.params.code
-            })
-            const subscription = query.subscribe()
+            getContactQuery.setParams({ code: route.params.code })
+            const subscription = getContactQuery.subscribe()
 
             if (subscription.ready()) {
-                contact.value = query.fetchOne()
+                contact.value = getContactQuery.fetchOne()
                 
                 if (!contact.value) {
                     router.push({ name: 'NotFound' })
                     return
                 }
 
-                notesField.value = contact.value.notes ? contact.value.notes : ''
                 title.value = `${contact.value.name} (${$t('contacts.one')})`
-
-                const historyQuery = getHistoryLog.clone({ contactId: contact.value._id })
-                const historySubscription = historyQuery.subscribe()
-
-                if (historySubscription.ready()) {
-                    historyLog.value = historyQuery.fetch()
-                    loading.value = false
-                }
+                loading.value = false
             }
         })
+
+        onUnmounted(() => tracker.stop())
 
         useMeta(() => {
             return {
@@ -513,30 +393,19 @@ export default {
         })
 
         return {
-            HistoryLogTypesEnum,
-            notesFieldRef,
             loading,
             activeTab,
             contact,
-            historyLog,
-            notesField,
-            isNotesFormSubmitted,
             routeTabs,
             vehiclesTableColumns,
-            isNotesButtonDisabled,
             billingAddress,
             deliveryAddress,
             phoneNumbers,
             faxNumbers,
             emails,
             websites,
-            formatDate,
             isCompany,
-            historyLogIcon,
-            handleSwipeRight,
-            submitNoteChanges,
-            discardNoteChanges,
-            viewChanges
+            handleSwipeRight
         }
     }
 }
