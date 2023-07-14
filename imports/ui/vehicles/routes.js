@@ -4,24 +4,25 @@ import ViewVehicle from './pages/ViewVehicle.vue'
 
 export default [
     {
-        path: '/vehicles',
-        children: [
-            {
-                name: 'VehicleList',
-                path: '',
-                components: {
-                    default: VehicleList,
-                    leftSidebar: LeftSidebar
-                }
-            },
-            {
-                name: 'ViewVehicle',
-                path: ':code',
-                components: {
-                    default: ViewVehicle,
-                    leftSidebar: LeftSidebar
-                }
-            }
-        ]
+        name: 'VehicleList',
+        path: '/vehicles/:view?',
+        components: {
+            default: VehicleList,
+            leftSidebar: LeftSidebar
+        },
+        meta: {
+            group: 'Vehicles'
+        }
+    },
+    {
+        name: 'ViewVehicle',
+        path: '/vehicle/:code/:view?',
+        components: {
+            default: ViewVehicle,
+            leftSidebar: LeftSidebar
+        },
+        meta: {
+            group: 'Vehicles'
+        }
     }
 ]

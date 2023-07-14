@@ -61,8 +61,13 @@ a {
 .add-relation-item {
     border-bottom: 1px solid rgba(0,0,0,0.05);
 }
+
 .add-relation-item:last-child {
     border-bottom: none;
+}
+
+.add-relation-item > .q-item__section {
+	padding-left: 32px;
 }
 
 .q-table th {

@@ -84,3 +84,7 @@
     opacity: 0.7;
     font-weight: 500;
 }
+
+.q-select__dialog > label.q-field--with-bottom {
+    padding-bottom: 0;
+}

@@ -2,8 +2,13 @@ import { Meteor } from 'meteor/meteor'
 import { useI18n } from 'vue-i18n'
 import { useQuasar } from '../quasar'
 import { ContactTypesEnum, ContactMethodsEnum } from '../../api/contacts/enums'
-import { getContact, getContactList, getContactEditableFields } from '../../api/contacts/queries'
 import { useErrorLogAPI } from '../error-log/composables'
+
+import {
+    getContact,
+    getContactList,
+    getContactEditableFields
+} from '../../api/contacts/queries'
 
 export function useContactAPI() {
     const addContact = params => Meteor.callAsync('contacts.insert', params)
@@ -11,10 +16,11 @@ export function useContactAPI() {
     const deleteContact = params => Meteor.callAsync('contacts.delete', params)
     const activateContact = params => Meteor.callAsync('contacts.activate', params)
     const deactivateContact = params => Meteor.callAsync('contacts.deactivate', params)
-    const updateContactNotes = params => Meteor.callAsync('contacts.updateContactNotes', params)
+    const updateNotes = params => Meteor.callAsync('contacts.updateNotes', params)
     const contactExists = params => Meteor.callAsync('contacts.contactExists', params)
     const filterContacts = params => Meteor.callAsync('contacts.filterContacts', params)
     const getDistinctFieldValues = params => Meteor.callAsync('contacts.getDistinctFieldValues', params)
+    const getBasicDetails = params => Meteor.callAsync('contacts.getBasicDetails', params)
     
     return {
         // Enums
@@ -30,10 +36,11 @@ export function useContactAPI() {
         deleteContact,
         activateContact,
         deactivateContact,
-        updateContactNotes,
+        updateNotes,
         contactExists,
         filterContacts,
-        getDistinctFieldValues
+        getDistinctFieldValues,
+        getBasicDetails
     }
 }
 
@@ -53,7 +60,7 @@ export function useContactFunctions() {
     const deleteContact = _id => {
         $q.dialog({
             title: $t('contacts.delete'),
-            message: $t('contacts.delete_prompt_msg'),
+            message: $t('contacts.msg_delete_prompt'),
             cancel: true,
             persistent: true,
             ok: {
@@ -75,7 +82,7 @@ export function useContactFunctions() {
                 if (deleted) {
                     $q.notify({
                         type: 'positive',
-                        message: $t('contacts.delete_successful')
+                        message: $t('contacts.msg_delete_successful')
                     })
                 } else {
                     $q.notify({
@@ -87,7 +94,7 @@ export function useContactFunctions() {
                 if (error.error === 'vehicles-associated') {
                     $q.notify({
                         type: 'negative',
-                        message: $t('contacts.error_associated_vehicles')
+                        message: $t('contacts.msg_error_associated_vehicles')
                     })
                 } else {
                     insertErrorLog({
@@ -107,7 +114,7 @@ export function useContactFunctions() {
             if (activated) {
                 $q.notify({
                     type: 'positive',
-                    message: $t('contacts.activate_successful')
+                    message: $t('contacts.msg_activate_successful')
                 })
             } else {
                 $q.notify({
@@ -127,7 +134,7 @@ export function useContactFunctions() {
     const deactivateContact = _id => {
         $q.dialog({
             title: $t('contacts.deactivate'),
-            message: $t('contacts.deactivate_prompt_msg'),
+            message: $t('contacts.msg_deactivate_prompt'),
             cancel: true,
             persistent: true,
             ok: {
@@ -149,7 +156,7 @@ export function useContactFunctions() {
                 if (deactivated) {
                     $q.notify({
                         type: 'positive',
-                        message: $t('contacts.deactivate_successful')
+                        message: $t('contacts.msg_deactivate_successful')
                     })
                 } else {
                     $q.notify({
@@ -184,8 +191,8 @@ export function useContactRules() {
                 name,
                 phoneNumber,
                 excludeId: excludeId ? excludeId : ''
-            }).then(response => {
-                if (response) {
+            }).then(exists => {
+                if (exists) {
                     resolve(msg)
                     return
                 }

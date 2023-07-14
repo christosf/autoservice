@@ -18,8 +18,6 @@ export default Vehicles.createQuery('getVehicleEditableFields', {
     owner: {
         code: 1,
         type: 1,
-        name: 1,
-        mobilePhone: 1,
-        landlinePhone: 1
+        name: 1
     }
 })

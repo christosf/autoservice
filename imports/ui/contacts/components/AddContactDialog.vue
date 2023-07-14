@@ -152,7 +152,7 @@
                                 class='q-gutter-sm'
                             >
                                 <div class='q-mt-none'>
-                                    <div class='text-h6 text-bold q-mb-md'>{{ $t('contacts.billing_address') }}</div>
+                                    <div class='text-h6 text-bold q-mb-md'>{{ $t('contacts.address_billing') }}</div>
                                     <div class='row q-col-gutter-sm'>
                                         <div class='col-xs-9 col-sm-12'>
                                             <q-input
@@ -224,7 +224,7 @@
                                                 <q-toggle
                                                     v-model='isDeliveryAddressDifferent'
                                                     @update:model-value='focusDeliveryAddressField'
-                                                    :label='$t("contacts.different_delivery_address")'
+                                                    :label='$t("contacts.address_delivery_different")'
                                                     class='text-black'
                                                 />
                                             </q-field>
@@ -234,7 +234,7 @@
                                 <div v-show='isDeliveryAddressDifferent'>
                                     <q-separator />
                                     <div class='q-mt-md'>
-                                        <div class='text-h6 text-bold q-mb-md'>{{ $t('contacts.delivery_address') }}</div>
+                                        <div class='text-h6 text-bold q-mb-md'>{{ $t('contacts.address_delivery') }}</div>
                                         <div class='row q-col-gutter-sm'>
                                             <div class='col-xs-9 col-sm-12'>
                                                 <q-input
@@ -384,7 +384,9 @@
                         </q-step>
                     </q-stepper>
                     <div v-else class='q-pa-md'>
-                        <div v-html='$t("contacts.added_what_next", { contact: form.name })' class='text-subtitle1' />
+                        <i18n-t keypath='contacts.msg_insert_successful' tag='div' class='text-subtitle1' scope='global'>
+                            <span class='text-bold'>{{ form.name }}</span>
+                        </i18n-t>
                         <div class='q-mt-lg q-gutter-sm'>
                             <q-btn
                                 :to='{ name: "ViewContact", params: { code: contactAdded.code }}'
@@ -492,11 +494,11 @@ export default {
             name: [
                 v => required(v, $t('core.field_required')),
                 v => minLength(v, 3, $t('core.field_minlength', { count: 3 })),
-                v => contactExists(v, form.phoneNumber, $t('contacts.already_exists'))
+                v => contactExists(v, form.phoneNumber, $t('contacts.msg_already_exists'))
             ],
             phoneNumber: [
                 v => required(v, $t('core.field_required')),
-                v => phoneNumber(v, $t('contacts.phone_number_invalid'))
+                v => phoneNumber(v, $t('contacts.msg_phone_number_invalid'))
             ],
             billingAddressStreet: [
                 v => minLength(v, 3, $t('core.field_minlength', { count: 3 }))
@@ -595,7 +597,6 @@ export default {
             isFormSubmitted.value = false
             isDeliveryAddressDifferent.value = false
             contactAdded.value = null
-            tagsOptionList.value = []
 
             form.type = ContactTypesEnum.INDIVIDUAL
             form.name = ''

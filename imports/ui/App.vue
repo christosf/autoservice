@@ -68,7 +68,7 @@
                         flat
                     />
                     <q-btn
-                        @click='logoutFn'
+                        @click='logout'
                         icon='logout'
                         color='primary'
                         dense
@@ -81,7 +81,6 @@
         <q-drawer
             v-model='leftSidebarVisible'
             @click='leftSidebarOpen = false'
-            :width='$q.screen.lt.md ? 200 : 250'
             :overlay='leftSidebarOpen'
             behavior='desktop'
             side='left'
@@ -96,7 +95,6 @@
 
         <q-drawer
             v-model='rightSidebarVisible'
-            :width='$q.screen.lt.md ? 200 : 250'
             side='right'
             behavior='desktop'
             bordered
@@ -116,13 +114,10 @@
 	  		</router-view>
         </q-page-container>
 
-        <!--
-        <q-footer class='bg-grey-2 text-white'>
-            <q-toolbar>
-                
-            </q-toolbar>
+        <q-footer class='bg-grey-2 text-black'>
+
         </q-footer>
-        -->
+
         <add-contact-dialog ref='addContactDialogRef' />
         <add-vehicle-dialog ref='addVehicleDialogRef' />
         <add-job-card-dialog ref='addJobCardDialogRef' />
@@ -153,7 +148,7 @@ export default {
         const router = useRouter()
         const route = useRoute()
         const { t: $t } = useI18n()
-        const { logout, userId } = useUsersAPI()
+        const { logout: logoutFn, userId } = useUsersAPI()
 
         const addContactDialogRef = ref(null)
         const addVehicleDialogRef = ref(null)
@@ -188,8 +183,8 @@ export default {
             return ($q.screen.gt.sm && sidebar) || leftSidebarOpen.value
         })
 
-        const logoutFn = () => {
-            logout().then(() => {
+        const logout = () => {
+            logoutFn().then(() => {
                 router.push({ name: 'LoginPage' })
                 $q.notify({
                     type: 'positive',
@@ -214,7 +209,7 @@ export default {
             leftSidebarOpen,
             leftSidebarVisible,
             rightSidebarVisible,
-            logoutFn
+            logout
         }
     }
 }

@@ -24,14 +24,27 @@
                 <q-td :class='{"dense": $q.screen.lt.sm}' auto-width>
                     <q-icon :name='historyLogIcon(props.row.type)' color='secondary' size='22px' />
                 </q-td>
-                <q-td>{{ formatDate(props.row.createdAt, 'DD.MM.YYYY - HH:mm') }}</q-td>
                 <q-td>
-                    <span>{{ $t(`history_log.type_${props.row.type}`) }}</span>
-                    <span v-if='isChangeListLengthVisible(props.row)'>
-                        ({{ props.row.metadata.changeList.length }})
-                    </span>
+                    <div>
+                        <span v-if='props.row.metadata && props.row.metadata.linkType'>
+                            {{ $t(`history_log.type_${props.row.type}_${props.row.metadata.linkType}`) }}
+                        </span>
+                        <span v-else>{{ $t(`history_log.type_${props.row.type}`) }}</span>
+                        <span v-if='isChangeListLengthVisible(props.row)'>
+                            ({{ props.row.metadata.changeList.length }})
+                        </span>
+                    </div>
+                    <div v-if='props.row.metadata && props.row.metadata.linkType' class='text-caption'>
+                        <span v-if='props.row.metadata[props.row.metadata.linkType].deleted'>
+                            {{ getLinkDetails(props.row.metadata) }}
+                        </span>
+                        <router-link v-else :to='getLinkUrl(props.row.metadata)' class='text-secondary'>
+                            {{ getLinkDetails(props.row.metadata) }}
+                        </router-link>
+                    </div>
                 </q-td>
-                <q-td>
+                <q-td auto-width>{{ formatDate(props.row.createdAt, 'DD.MM.YYYY - HH:mm') }}</q-td>
+                <q-td auto-width>
                     <router-link
                         :to='{ name: "ViewUser", params: { username: props.row.createdBy.username }}'
                         class='text-secondary'
@@ -41,7 +54,7 @@
                 </q-td>
                 <q-td class='operations' auto-width>
                     <q-btn
-                        v-if='isExpandBtnVisible(props.row.type)'
+                        v-if='isExpandBtnVisible(props.row)'
                         @click='props.expand = !props.expand'
                         :icon='props.expand ? "close" : "fact_check"'
                         color='primary'
@@ -55,7 +68,7 @@
             </q-tr>
             <q-tr v-if='props.expand' :props='props' class='history-log-change-list'>
                 <q-td colspan='5' class='bg-grey-2'>
-                    <div v-if='props.row.metadata' class='q-gutter-xs'>
+                    <div v-if='props.row.metadata && props.row.metadata.changeList' class='q-gutter-xs'>
                         <q-card v-for='change in props.row.metadata.changeList' class='bg-white' bordered square flat>
                             <q-card-section class='q-pa-sm text-bold'>           
                                 <span :class='{
@@ -71,25 +84,37 @@
                             <div class='row'>
                                 <div v-if='change.op === "add"' class='col-12'>
                                     <div class='q-pa-sm'>
-                                        <div v-html='getValue(change)' />
+                                        <router-link v-if='isValueUrl(change)' :to='getValueUrl(change)' class='text-secondary'>
+                                            {{ getValue(change) }}
+                                        </router-link>
+                                        <span v-else>{{ getValue(change) }}</span>
                                     </div>
                                 </div>
                                 <div v-if='change.op === "remove"' class='col-12'>
                                     <div class='q-pa-sm'>
-                                        <div v-html='getOldValue(change)' />
+                                        <router-link v-if='isOldValueUrl(change)' :to='getOldValueUrl(change)' class='text-secondary'>
+                                            {{ getOldValue(change) }}
+                                        </router-link>
+                                        <span v-else>{{ getOldValue(change) }}</span>
                                     </div>
                                 </div>
                                 <template v-if='change.op === "replace"'>
                                     <div class='col-xs-12 col-sm-6'>
                                         <div class='q-pa-sm'>
                                             <div class='text-bold'>{{ $t('history_log.value_prev') }}:</div>
-                                            <div v-html='getOldValue(change)' />
+                                            <router-link v-if='isOldValueUrl(change)' :to='getOldValueUrl(change)' class='text-secondary'>
+                                                {{ getOldValue(change) }}
+                                            </router-link>
+                                            <span v-else>{{ getOldValue(change) }}</span>
                                         </div>
                                     </div>
                                     <div class='col-xs-12 col-sm-6'>
                                         <div class='q-pa-sm'>
                                             <div class='text-bold'>{{ $t('history_log.value_new') }}:</div>
-                                            <div v-html='getValue(change)' />
+                                            <router-link v-if='isValueUrl(change)' :to='getValueUrl(change)' class='text-secondary'>
+                                                {{ getValue(change) }}
+                                            </router-link>
+                                            <span v-else>{{ getValue(change) }}</span>
                                         </div>
                                     </div>
                                 </template>
@@ -104,10 +129,12 @@
 
 <script>
 import { Tracker } from 'meteor/tracker'
-import { ref, toRefs, onUnmounted } from 'vue'
+import { ref, toRefs, onUnmounted, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { date } from '../../quasar'
 import { useHistoryLogAPI } from '../composables'
+import { useContactAPI } from '../../contacts/composables'
+import { useVehicleAPI } from '../../vehicles/composables'
 
 export default {
     props: {
@@ -118,6 +145,8 @@ export default {
         const { t: $t } = useI18n()
         const { id, type } = toRefs(props)
         const { formatDate } = date
+        const { getBasicDetails: getContactBasicDetails } = useContactAPI()
+        const { getBasicDetails: getVehicleBasicDetails } = useVehicleAPI()
 
         const {
             HistoryLogTypesEnum,
@@ -147,16 +176,16 @@ export default {
                 align: 'center'
             },
             {
+                name: 'action',
+                field: 'type',
+                label: 'core.action',
+                align: 'left'
+            },
+            {
                 name: 'createdAt',
                 field: 'createdAt',
                 label: 'core.date',
                 sortable: true,
-                align: 'left'
-            },
-            {
-                name: 'action',
-                field: 'type',
-                label: 'core.action',
                 align: 'left'
             },
             {
@@ -179,10 +208,21 @@ export default {
                 case HistoryLogTypesEnum.NOTES_UPDATE: return 'notes'
                 case HistoryLogTypesEnum.ACTIVATION: return 'visibility'
                 case HistoryLogTypesEnum.DEACTIVATION: return 'visibility_off'
+                case HistoryLogTypesEnum.LINK: return 'link'
+                case HistoryLogTypesEnum.UNLINK: return 'link_off'
+                case HistoryLogTypesEnum.UNLINK_DELETE: return 'link_off'
             }
         }
 
-        const isExpandBtnVisible = type => ![HistoryLogTypesEnum.ACTIVATION, HistoryLogTypesEnum.DEACTIVATION].includes(type)
+        const isExpandBtnVisible = logItem => {
+            const { type, metadata } = logItem
+            const types = [
+                HistoryLogTypesEnum.ACTIVATION,
+                HistoryLogTypesEnum.DEACTIVATION
+            ]
+
+            return metadata && metadata.changeList && !types.includes(type)
+        }
 
         const isChangeListLengthVisible = logItem => {
             const { type, metadata } = logItem
@@ -213,6 +253,14 @@ export default {
                 return $t(`history_log.contacts_${path[0]}`)
             }
 
+            if (type.value === 'vehicles') {
+                if (path[0] === 'tags' && path.length === 2) {
+                    return $t('history_log.vehicles_tag', { index: path[1] + 1 })
+                }
+
+                return $t(`history_log.vehicles_${path[0]}`)
+            }
+
             return path
         }
 
@@ -239,7 +287,26 @@ export default {
                 }
             }
 
+            if (type.value === 'vehicles') {
+                if (path[0] === 'ownerId') {
+                    return change.oldDeleted ? $t('history_log.deleted') : `${change.oldName} - ${change.oldCode}`
+                }
+            }
+
             return oldValue
+        }
+
+        const isOldValueUrl = change => {
+            if (type.value === 'vehicles' && change.path[0] === 'ownerId' && !change.oldDeleted) {
+                return true
+            }
+            return false
+        }
+
+        const getOldValueUrl = change => {
+            if (type.value === 'vehicles' && change.path[0] === 'ownerId' && !change.oldDeleted) {
+                return { name: 'ViewContact', params: { code: change.oldCode } }
+            }
         }
 
         const getValue = change => {
@@ -265,7 +332,56 @@ export default {
                 }
             }
 
+            if (type.value === 'vehicles') {
+                if (path[0] === 'ownerId') {
+                    return change.deleted ? $t('history_log.deleted') : `${change.name} - ${change.code}`
+                }
+            }
+
             return value
+        }
+
+        const isValueUrl = change => {
+            if (type.value === 'vehicles' && change.path[0] === 'ownerId' && !change.deleted) {
+                return true
+            }
+            return false
+        }
+
+        const getValueUrl = change => {
+            if (type.value === 'vehicles' && change.path[0] === 'ownerId' && !change.deleted) {
+                return { name: 'ViewContact', params: { code: change.code } }
+            }
+        }
+
+        const getUnlinkDeleteDetails = metadata => {
+            const { linkType: type } = metadata
+
+            if (type === 'vehicle') {
+                return metadata.vehicle.regNumber
+                    ? `${metadata.vehicle.regNumber} - ${metadata.vehicle.makeModel}`
+                    : `${metadata.vehicle.makeModel} (${metadata.vehicle.code})`
+            }
+        }
+
+        const getLinkDetails = metadata => {
+            const { linkType: type } = metadata
+
+            if (type === 'vehicle') {
+                return metadata.vehicle.regNumber
+                    ? `${metadata.vehicle.regNumber} - ${metadata.vehicle.makeModel}`
+                    : `${metadata.vehicle.makeModel} (${metadata.vehicle.code})`
+            }
+
+            return metadata[type]
+        }
+
+        const getLinkUrl = metadata => {
+            const { linkType: type } = metadata
+
+            if (type === 'vehicle') {
+                return { name: 'ViewVehicle', params: { code: metadata.vehicle.code }}
+            }
         }
 
         const updateHistoryLog = props => {
@@ -303,7 +419,53 @@ export default {
             tracker.stop()
         })
 
+        watch(historyLog, () => {
+            historyLog.value.forEach(log => {
+                if (log.metadata && log.metadata.linkType === 'vehicle') {
+                    getVehicleBasicDetails({ _id: log.metadata.vehicle._id }).then(response => {
+                        if (response) {
+                            const { makeModel, regNumber } = response
+                            log.metadata.vehicle.makeModel = makeModel
+                            log.metadata.vehicle.regNumber = regNumber
+                        } else {
+                            log.metadata.vehicle.deleted = true
+                        }
+                    })
+                }
+
+                if (type.value === 'vehicles' && log.metadata && log.metadata.changeList) {
+                    log.metadata.changeList.forEach(item => {
+                        if (item.path.includes('ownerId')) {
+                            if (item.value) {
+                                getContactBasicDetails({ _id: item.value }).then(response => {
+                                    if (response) {
+                                        const { name, code } = response
+                                        item.name = name
+                                        item.code = code
+                                    } else {
+                                        item.deleted = true
+                                    }
+                                })
+                            }
+                            if (item.oldValue) {
+                                getContactBasicDetails({ _id: item.oldValue }).then(response => {
+                                    if (response) {
+                                        const { name, code } = response
+                                        item.oldName = name
+                                        item.oldCode = code
+                                    } else {
+                                        item.oldDeleted = true
+                                    }
+                                })
+                            }
+                        }
+                    })
+                }
+            })
+        })
+
         return {
+            HistoryLogTypesEnum,
             loading,
             historyLog,
             pagination,
@@ -314,7 +476,14 @@ export default {
             isChangeListLengthVisible,
             getFieldName,
             getOldValue,
+            getOldValueUrl,
+            isOldValueUrl,
             getValue,
+            getValueUrl,
+            isValueUrl,
+            getUnlinkDeleteDetails,
+            getLinkDetails,
+            getLinkUrl,
             updateHistoryLog
         }
     }

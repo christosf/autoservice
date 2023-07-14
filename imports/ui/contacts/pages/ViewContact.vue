@@ -1,16 +1,25 @@
 <template>
-    <q-page v-touch-swipe.mouse.right='handleSwipeRight' id='view-contact' class='q-gutter-sm' padding>
+    <q-page v-touch-swipe.mouse.right='handleSwipeRight' class='q-gutter-sm' padding>
         <template v-if='contact'>
             <q-card bordered flat>
                 <q-card-section class='q-pa-none'>
                     <q-toolbar>
                         <q-icon :name='isCompany(contact.type) ? "domain" : "person"' color='primary' size='36px' class='q-mr-md q-ml-xs' />
-                        <div class='q-my-sm'>
+                        <div class='q-my-sm' :class='{ "q-my-md": $q.screen.gt.sm }'>
                             <div class='text-h4 text-bold q-mb-xs'>{{ contact.name }}</div>
                             <div class='text-caption'>{{ `${$t('core.code')}: ${contact.code}` }}</div>
                         </div>
                         <q-space />
-                        <div>
+                        <div class='q-gutter-sm'>
+                            <q-btn
+                                @click='editDialogRef.open(contact._id, contact.code)'
+                                :label='$q.screen.gt.xs ? $t("core.edit") : ""'
+                                :dense='$q.screen.lt.sm'
+                                color='primary'
+                                icon='edit'
+                                outline
+                                no-caps
+                            />
                             <q-icon name='more_vert' color='primary' size='26px' />
                         </div>
                     </q-toolbar>                    
@@ -27,7 +36,7 @@
                     <template v-for='tab in routeTabs'>
                         <q-route-tab
                             v-if='tab.name === "vehicles" ? contact.vehicles.length > 0 : true'
-                            :to='{ name: "ViewContact", params: { code: contact.code }, query: tab.query ? { view: tab.query } : undefined}'
+                            :to='{ name: "ViewContact", params: { code: contact.code, view: tab.view ? tab.view : undefined }}'
                             :label='$t(tab.label)'
                             :icon='tab.icon'
                         />
@@ -41,172 +50,10 @@
                 animated
             >
                 <q-tab-panel name='overview' class='q-pa-none'>
-                    <div class='row q-col-gutter-sm'>
-                        <div class='col-xs-12 col-sm-6'>
-                            <div class='q-gutter-sm'>
-                                <q-card v-if='$q.screen.lt.sm' bordered flat>
-                                    <q-card-section>
-                                        <div class='text-h6 text-bold q-mb-xs'>{{ $t('contacts.balance') }}</div>
-                                        <div class='text-body1'>
-                                            <template v-if='contact.balance'>&euro; {{ contact.balance }}</template>
-                                            <span v-else>&euro; 0</span>
-                                        </div>
-                                    </q-card-section>
-                                </q-card>
-                                <q-card bordered flat>
-                                    <q-card-section class='text-h6 text-bold'>
-                                        {{ $t('contacts.contact_phone_numbers') }}
-                                    </q-card-section>
-                                    <q-separator />
-                                    <q-card-section class='q-pa-none'>
-                                        <q-list separator>
-                                            <q-item :href='`tel:${contact.phoneNumber}`' class='q-py-md' clickable>
-                                                <q-item-section avatar>
-                                                    <q-icon name='call' color='primary' />
-                                                </q-item-section>
-                                                <q-item-section>
-                                                    <q-item-label class='text-body1'>{{ contact.phoneNumber }}</q-item-label>
-                                                    <q-item-label caption>{{ $t('contacts.main_phone_number') }}</q-item-label>
-                                                </q-item-section>
-                                            </q-item>
-                                            <q-item v-for='phoneNumber in phoneNumbers' :href='`tel:${phoneNumber.value}`' class='q-py-md' clickable>
-                                                <q-item-section avatar>
-                                                    <q-icon name='call' color='secondary' />
-                                                </q-item-section>
-                                                <q-item-section>
-                                                    <q-item-label class='text-body1'>{{ phoneNumber.value }}</q-item-label>
-                                                    <q-item-label caption>{{ phoneNumber.description }}</q-item-label>
-                                                </q-item-section>
-                                            </q-item>
-                                        </q-list>
-                                    </q-card-section>
-                                </q-card>
-                                <q-card bordered flat>
-                                    <q-card-section class='text-h6 text-bold'>
-                                        {{ $t('contacts.email_addresses') }}
-                                    </q-card-section>
-                                    <q-separator />
-                                    <q-card-section class='q-pa-none'>
-                                        <q-list separator>
-                                            <q-item v-for='email in emails' :href='`mailto:${email.value}`' class='q-py-md' clickable>
-                                                <q-item-section avatar>
-                                                    <q-icon name='email' color='secondary' />
-                                                </q-item-section>
-                                                <q-item-section>
-                                                    <q-item-label class='text-body1'>{{ email.value }}</q-item-label>
-                                                    <q-item-label caption>{{ email.description }}</q-item-label>
-                                                </q-item-section>
-                                            </q-item>
-                                            <q-item v-if='emails.length === 0' class='q-py-md'>
-                                                <q-item-section>
-                                                    <q-item-label class='text-body1 text-italic text-grey'>{{ $t('core.none_1') }}</q-item-label>
-                                                </q-item-section>
-                                            </q-item>
-                                        </q-list>
-                                    </q-card-section>
-                                </q-card>
-                            </div>
-                        </div>
-                        <div class='col-xs-12 col-sm-6'>
-                            <div class='q-gutter-sm'>
-                                <q-card v-if='$q.screen.gt.xs' bordered flat>
-                                    <q-card-section>
-                                        <div class='text-h6 text-bold q-mb-xs'>{{ $t('contacts.balance') }}</div>
-                                        <div class='text-body1'>
-                                            <template v-if='contact.balance'>&euro; {{ contact.balance }}</template>
-                                            <span v-else>&euro; 0</span>
-                                        </div>
-                                    </q-card-section>
-                                </q-card>
-                                <q-card bordered flat>
-                                    <q-card-section>
-                                        <div class='text-h6 text-bold q-mb-xs'>{{ $t('contacts.billing_address') }}</div>
-                                        <div class='text-body1'>
-                                            <template v-if='billingAddress'>{{ billingAddress }}</template>
-                                            <span v-else class='text-italic text-grey'>{{ $t('core.not_set') }}</span>
-                                        </div>
-                                    </q-card-section>
-                                    <template v-if='deliveryAddress'>
-                                        <q-separator />
-                                        <q-card-section>
-                                            <div class='text-h6 text-bold q-mb-xs'>{{ $t('contacts.delivery_address') }}</div>
-                                            <div class='text-body1'>{{ deliveryAddress }}</div>
-                                        </q-card-section>
-                                    </template>
-                                </q-card>
-                                <q-card bordered flat>
-                                    <q-card-section>
-                                        <div class='text-h6 text-bold q-mb-xs'>{{ $t('core.tags') }}</div>
-                                        <div class='text-body1'>
-                                            <q-chip
-                                                v-if='contact.tags && contact.tags.length > 0'
-                                                v-for='tag in contact.tags'
-                                                class='q-ml-none'
-                                                square
-                                            >
-                                                {{ tag }}
-                                            </q-chip>
-                                            <span v-else class='text-italic text-grey'>{{ $t('core.none_1') }}</span>
-                                        </div>
-                                    </q-card-section>
-                                </q-card>
-                                <q-card v-if='faxNumbers.length > 0' bordered flat>
-                                    <q-card-section class='text-h6 text-bold'>
-                                        {{ $t('contacts.fax') }}
-                                    </q-card-section>
-                                    <q-separator />
-                                    <q-card-section class='q-pa-none'>
-                                        <q-list separator>
-                                            <q-item v-for='fax in faxNumbers' :href='`tel:${fax.value}`' class='q-py-md' clickable>
-                                                <q-item-section avatar>
-                                                    <q-icon name='fax' color='secondary' />
-                                                </q-item-section>
-                                                <q-item-section>
-                                                    <q-item-label class='text-body1'>{{ fax.value }}</q-item-label>
-                                                    <q-item-label caption>{{ fax.description }}</q-item-label>
-                                                </q-item-section>
-                                            </q-item>
-                                        </q-list>
-                                    </q-card-section>
-                                </q-card>
-                                <q-card v-if='websites.length > 0' bordered flat>
-                                    <q-card-section class='text-h6 text-bold'>
-                                        {{ $t('contacts.websites') }}
-                                    </q-card-section>
-                                    <q-separator />
-                                    <q-card-section class='q-pa-none'>
-                                        <q-list separator>
-                                            <q-item v-for='website in websites' :href='website.value' target='_blank' class='q-py-md' clickable>
-                                                <q-item-section avatar>
-                                                    <q-icon name='travel_explore' color='secondary' />
-                                                </q-item-section>
-                                                <q-item-section>
-                                                    <q-item-label class='text-body1'>{{ website.value }}</q-item-label>
-                                                    <q-item-label caption>{{ website.description }}</q-item-label>
-                                                </q-item-section>
-                                            </q-item>
-                                        </q-list>
-                                    </q-card-section>
-                                </q-card>
-                            </div>
-                        </div>
-                    </div>
+                    <overview-tab-panel :contact='contact' />
                 </q-tab-panel>
                 <q-tab-panel name='vehicles' class='q-pa-none'>
-                    <q-table
-                        :columns='vehiclesTableColumns'
-                        :rows='contact.vehicles'
-                        :rows-per-page-options='[0]'
-                        hide-pagination
-                        bordered
-                        flat
-                    >
-                        <template #header-cell='props'>
-                            <q-th :props='props'>
-                                {{ props.col.label ? $t(props.col.label) : '' }}
-                            </q-th>
-                        </template>
-                    </q-table>
+                    <vehicles-tab-panel :contact='contact' />
                 </q-tab-panel>
                 <q-tab-panel name='notes' class='q-pa-none'>
                     <notes-tab-panel :id='contact._id' :notes='contact.notes' type='contacts' />
@@ -217,45 +64,51 @@
             </q-tab-panels>
         </template>
         <loading-card v-else :loading='loading' :message='$t("contacts.loading_one")' />
+        <edit-contact-dialog ref='editDialogRef' />
     </q-page>
 </template>
 
 <script>
 import { Tracker } from 'meteor/tracker'
-import { ref, computed, watch, onUnmounted } from 'vue'
+import { ref, watch, onUnmounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useMeta } from '../../quasar'
 import { useContactAPI, useContactFunctions } from '../composables'
 
 import LoadingCard from '../../core/components/LoadingCard.vue'
+import OverviewTabPanel from '../components/OverviewTabPanel.vue'
 import NotesTabPanel from '../../core/components/NotesTabPanel.vue'
 import HistoryTabPanel from '../../history-log/components/HistoryTabPanel.vue'
+import VehiclesTabPanel from '../components/VehiclesTabPanel.vue'
+import EditContactDialog from '../components/EditContactDialog.vue'
 
 export default {
     components: {
         LoadingCard,
+        OverviewTabPanel,
         NotesTabPanel,
-        HistoryTabPanel
+        HistoryTabPanel,
+        VehiclesTabPanel,
+        EditContactDialog
     },
     setup() {
         const router = useRouter()
         const route = useRoute()
         const { t: $t } = useI18n()
-        
+        const { getContact } = useContactAPI()
         const { isCompany } = useContactFunctions()
 
-        const {
-            ContactMethodsEnum,
-            getContact
-        } = useContactAPI()
-
-        const vueReactiveDependencies = new Tracker.Dependency        
+        const vueReactiveDependencies = new Tracker.Dependency       
+        const editDialogRef = ref(null) 
         const getContactQuery = getContact.clone()
         const title = ref($t('contacts.view'))
-        const loading = ref(false)
+        const loading = ref(true)
         const activeTab = ref('overview')
         const contact = ref(null)
+        const availableViews = ['vehicles', 'notes', 'history']
+
+        let subscription
 
         const routeTabs = [
             {
@@ -267,84 +120,21 @@ export default {
                 name: 'vehicles',
                 label: 'vehicles.many',
                 icon: 'commute',
-                query: 'vehicles'
+                view: 'vehicles'
             },
             {
                 name: 'notes',
                 label: 'core.notes',
                 icon: 'notes',
-                query: 'notes'
+                view: 'notes'
             },
             {
                 name: 'history',
                 label: 'core.history',
                 icon: 'history',
-                query: 'history'
+                view: 'history'
             }
         ]
-
-        const vehiclesTableColumns = [
-            {
-                name: 'regNumber',
-                field: 'regNumber',
-                label: 'vehicles.reg_number',
-                sortable: true,
-                align: 'left'
-            },
-            {
-                name: 'make',
-                field: 'make',
-                label: 'vehicles.make',
-                sortable: true,
-                align: 'left'
-            },
-            {
-                name: 'model',
-                field: 'model',
-                label: 'vehicles.model',
-                sortable: true,
-                align: 'left'
-            },
-            {
-                name: 'code',
-                field: 'code',
-                label: 'core.code',
-                sortable: true,
-                align: 'left'
-            },
-            {
-                name: 'operations',
-                align: 'right'
-            },
-        ]
-
-        const phoneNumbers = computed(() => {
-            return contact.value.contactMethods.filter(method => method.type === ContactMethodsEnum.PHONE)
-        })
-
-        const faxNumbers = computed(() => {
-            return contact.value.contactMethods.filter(method => method.type === ContactMethodsEnum.FAX)
-        })
-
-        const emails = computed(() => {
-            return contact.value.contactMethods.filter(method => method.type === ContactMethodsEnum.EMAIL)
-        })
-
-        const websites = computed(() => {
-            return contact.value.contactMethods.filter(method => method.type === ContactMethodsEnum.WEBSITE)
-        })
-
-        const billingAddress = computed(() => {
-            return contact.value.billingAddress
-                ? Object.values(contact.value.billingAddress).join(', ')
-                : null
-        })
-
-        const deliveryAddress = computed(() => {
-            return contact.value.deliveryAddress
-                ? Object.values(contact.value.deliveryAddress).join(', ')
-                : null
-        })
 
         const handleSwipeRight = () => router.push({ name: 'ContactList' })
 
@@ -354,9 +144,8 @@ export default {
                     vueReactiveDependencies.changed()
                 }
 
-                const availableViews = ['vehicles', 'notes', 'history']
-                if (route.query.view && availableViews.includes(route.query.view)) {
-                    activeTab.value = route.query.view
+                if (route.params.view && availableViews.includes(route.params.view)) {
+                    activeTab.value = route.params.view
                 } else {
                     activeTab.value = 'overview'
                     router.replace({ name: 'ViewContact', params: { code: route.params.code }})
@@ -369,22 +158,25 @@ export default {
             loading.value = true
             
             getContactQuery.setParams({ code: route.params.code })
-            const subscription = getContactQuery.subscribe()
+            subscription = getContactQuery.subscribe()
 
             if (subscription.ready()) {
                 contact.value = getContactQuery.fetchOne()
                 
                 if (!contact.value) {
-                    router.push({ name: 'NotFound' })
+                    router.replace({ name: 'NotFound' })
                     return
                 }
 
-                title.value = `${contact.value.name} (${$t('contacts.one')})`
+                title.value = `${contact.value.name} - ${$t('contacts.one')}`
                 loading.value = false
             }
         })
 
-        onUnmounted(() => tracker.stop())
+        onUnmounted(() => {
+            subscription.stop()
+            tracker.stop()
+        })
 
         useMeta(() => {
             return {
@@ -393,17 +185,11 @@ export default {
         })
 
         return {
+            editDialogRef,
             loading,
             activeTab,
             contact,
             routeTabs,
-            vehiclesTableColumns,
-            billingAddress,
-            deliveryAddress,
-            phoneNumbers,
-            faxNumbers,
-            emails,
-            websites,
             isCompany,
             handleSwipeRight
         }

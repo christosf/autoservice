@@ -15,6 +15,10 @@ export default new SimpleSchema({
         type: String,
         optional: true
     },
+    vehicleId: {
+        type: String,
+        optional: true
+    },
     createdAt: {
         type: Date,
         denyUpdate: true,

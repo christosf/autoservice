@@ -4,24 +4,25 @@ import ViewContact from './pages/ViewContact.vue'
 
 export default [
     {
-        path: '/contacts',
-        children: [
-            {
-                name: 'ContactList',
-                path: '',
-                components: {
-                    default: ContactList,
-                    leftSidebar: LeftSidebar
-                }
-            },
-            {
-                name: 'ViewContact',
-                path: ':code',
-                components: {
-                    default: ViewContact,
-                    leftSidebar: LeftSidebar
-                }
-            }
-        ]
+        name: 'ContactList',
+        path: '/contacts/:view?',
+        components: {
+            default: ContactList,
+            leftSidebar: LeftSidebar
+        },
+        meta: {
+            group: 'Contacts'
+        }
+    },
+    {
+        name: 'ViewContact',
+        path: '/contact/:code/:view?',
+        components: {
+            default: ViewContact,
+            leftSidebar: LeftSidebar
+        },
+        meta: {
+            group: 'Contacts'
+        }
     }
 ]

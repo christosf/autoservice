@@ -38,6 +38,8 @@ export default Contacts.createQuery('getContact', {
         code: 1,
         make: 1,
         model: 1,
-        regNumber: 1
+        regNumber: 1,
+        tags: 1,
+        updatedAt: 1
     }
 })

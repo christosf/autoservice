@@ -1,15 +1,15 @@
 <template>
     <q-dialog
-        v-model='dialogOpen'
+        v-model='isDialogOpen'
         @hide='resetForm'
-        :maximized='$q.platform.is.mobile'
+        :maximized='$q.screen.lt.sm'
         id='edit-vehicle-dialog'
         no-backdrop-dismiss
     >
         <q-card>
-            <q-card-section class='q-pa-sm'>
+            <q-card-section class='q-pa-xs'>
                 <q-toolbar>
-                    <div class='text-h6'>{{ title }}</div>
+                    <div class='text-h4 text-bold'>{{ title }}</div>
                     <q-space />
                     <q-btn icon='close' flat round dense v-close-popup />
                 </q-toolbar>
@@ -22,6 +22,7 @@
                     ref='stepperRef'
                     color='primary'
                     keep-alive
+                    swipeable
                     header-nav
                     animated
                     flat
@@ -35,7 +36,7 @@
                     >
                         <q-form
                             @submit='submitForm("basicDetails")'
-                            @validation-error='validationError("basicDetails")'
+                            @validation-error='atValidationError("basicDetails")'
                             ref='basicDetailsFormRef'
                             class='q-gutter-md'
                         >
@@ -47,7 +48,6 @@
                                 :options='contactsOptionList'
                                 :autofocus='$q.platform.is.desktop'
                                 lazy-rules='ondemand'
-                                input-class='text-uppercase'
                                 class='q-mt-none'
                                 input-debounce='400'
                                 hide-dropdown-icon
@@ -66,25 +66,21 @@
                                     <span class='text-red-8 q-pl-xs'>*</span>
                                 </template>
                                 <template v-slot:option='{ itemProps, opt }'>
-                                    <q-item v-bind='itemProps'>
+                                    <q-item v-bind='itemProps' class='add-relation-item'>
                                         <q-item-section>
                                             <q-item-label>
-                                                <span class='text-weight-medium'>{{ opt.name }}</span>
-                                                <q-chip size='xs' icon='tag'>{{ opt.code }}</q-chip>
+                                                <span class='text-bold'>{{ opt.name }}&nbsp;</span>
+                                                <q-chip size='sm' icon='tag' class='q-ma-none' square>{{ opt.code }}</q-chip>
                                             </q-item-label>
-                                            <q-item-label v-if='isCompany(opt.type)' caption>
-                                                {{ opt.landlinePhone }}
-                                                <template v-if='opt.mobilePhone'>/ {{ opt.mobilePhone }}</template>
-                                            </q-item-label>
-                                            <q-item-label v-else caption>
-                                                {{ opt.mobilePhone }}
-                                                <template v-if='opt.landlinePhone'>/ {{ opt.landlinePhone }}</template>
+                                            <q-item-label caption>
+                                                {{ opt.phoneNumber }}
                                             </q-item-label>
                                         </q-item-section>
                                     </q-item>
                                 </template>
                                 <template v-slot:selected-item='{ opt }'>
-                                    {{ opt.name }} <q-chip size='xs' icon='tag'>{{ opt.code }}</q-chip>
+                                    <span>{{ opt.name }}&nbsp;</span>
+                                    <q-chip size='sm' icon='tag' class='q-ma-none' square>{{ opt.code }}</q-chip>
                                 </template>
                             </q-select>
                             <q-select
@@ -95,7 +91,6 @@
                                 :rules='rules.make'
                                 :options='makesOptionList'
                                 lazy-rules='ondemand'
-                                input-class='text-uppercase'
                                 input-debounce='400'
                                 maxlength='50'
                                 hide-dropdown-icon
@@ -125,7 +120,6 @@
                                 :rules='rules.model'
                                 :options='modelsOptionList'
                                 lazy-rules='ondemand'
-                                input-class='text-uppercase'
                                 input-debounce='400'
                                 maxlength='50'
                                 hide-dropdown-icon
@@ -182,15 +176,15 @@
                                 <q-btn
                                     type='submit'
                                     :label='$t("core.save")'
-                                    :loading='formSubmitted'
+                                    :loading='isFormSubmitted'
                                     color='primary'
                                     icon='add'
                                     no-caps
                                 />
                                 <q-btn
                                     @click='steps.current = "extraDetails"'
-                                    :label='$t("core.extra_details")'
-                                    color='blue-grey-10'
+                                    :label='$q.screen.gt.xs ? $t("core.extra_details") : ""'
+                                    color='secondary'
                                     icon='chevron_right'
                                     outline
                                     no-caps
@@ -207,8 +201,7 @@
                     >
                         <q-form
                             @submit='submitForm("extraDetails")'
-                            @validation-error='validationError("extraDetails")'
-                            :autofocus='$q.platform.is.desktop'
+                            @validation-error='atValidationError("extraDetails")'
                             ref='extraDetailsFormRef'
                         >
                             <div class='row q-col-gutter-md q-mb-md'>
@@ -220,7 +213,7 @@
                                         @update:model-value='resetFormValidation("extraDetails", extraDetailsFormRef)'
                                         :label='$t("core.tags")'
                                         :options='tagsOptionList'
-                                        input-class='text-uppercase'
+                                        :autofocus='$q.platform.is.desktop'
                                         class='q-pt-none'
                                         multiple
                                         use-chips
@@ -245,7 +238,6 @@
                                         @input-value='value => addNewValue(value, "bodyType")'
                                         :label='$t("vehicles.body_type")'
                                         :options='bodyTypesOptionList'
-                                        input-class='text-uppercase'
                                         input-debounce='400'
                                         maxlength='50'
                                         hide-dropdown-icon
@@ -268,7 +260,6 @@
                                         @input-value='value => addNewValue(value, "fuelType")'
                                         :label='$t("vehicles.fuel_type")'
                                         :options='fuelTypesOptionList'
-                                        input-class='text-uppercase'
                                         input-debounce='400'
                                         maxlength='50'
                                         hide-dropdown-icon
@@ -293,7 +284,6 @@
                                         @input-value='value => addNewValue(value, "drivetrain")'
                                         :label='$t("vehicles.drivetrain")'
                                         :options='drivetrainsOptionList'
-                                        input-class='text-uppercase'
                                         input-debounce='400'
                                         maxlength='50'
                                         hide-dropdown-icon
@@ -316,7 +306,6 @@
                                         @input-value='value => addNewValue(value, "gearbox")'
                                         :label='$t("vehicles.gearbox")'
                                         :options='gearboxesOptionList'
-                                        input-class='text-uppercase'
                                         input-debounce='400'
                                         maxlength='50'
                                         hide-dropdown-icon
@@ -341,7 +330,6 @@
                                         @input-value='value => addNewValue(value, "engine")'
                                         :label='$t("vehicles.engine")'
                                         :options='enginesOptionList'
-                                        input-class='text-uppercase'
                                         input-debounce='400'
                                         maxlength='50'
                                         hide-dropdown-icon
@@ -361,7 +349,6 @@
                                     <q-input
                                         v-model='form.modelYear'
                                         :label='$t("vehicles.model_year")'
-                                        maxlength='4'
                                         mask='####'
                                         bottom-slots
                                         outlined
@@ -375,14 +362,14 @@
                             <div class='q-gutter-sm q-mt-sm'>
                                 <q-btn
                                     @click='steps.current = "basicDetails"'
-                                    color='blue-grey-10'
+                                    color='secondary'
                                     icon='chevron_left'
                                     outline
                                 />
                                 <q-btn
                                     type='submit'
                                     :label='$t("core.save")'
-                                    :loading='formSubmitted'
+                                    :loading='isFormSubmitted'
                                     color='primary'
                                     icon='add'
                                     no-caps
@@ -391,6 +378,9 @@
                         </q-form>
                     </q-step>
                 </q-stepper>
+                <q-inner-loading :showing='loading'>
+                    <q-spinner-ball size='50px' color='primary'  />
+                </q-inner-loading>
             </q-card-section>
         </q-card>
     </q-dialog>
@@ -398,35 +388,45 @@
 
 <script>
 import { ref, reactive, toRaw, watchEffect } from 'vue'
+import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useQuasar } from '../../quasar'
+import { useVehicleAPI, useVehicleRules } from '../../vehicles/composables'
 import { useContactAPI } from '../../contacts/composables'
-import { useVehiclesApi } from '../../vehicles/composables'
+import { useCoreRules } from '../../core/composables'
+import { useErrorLogAPI } from '../../error-log/composables'
 
 export default {
     setup() {
         const $q = useQuasar()
+        const router = useRouter()
         const { t: $t } = useI18n()
 
         const {
-            ContactTypesEnum,
-            filterContacts: filterContactsFn
-        } = useContactAPI()
-
-        const {
             getVehicleEditableFields,
-            fieldValueExists,
             getDistinctFieldValues,
             updateVehicle,
-        } = useVehiclesApi()
+        } = useVehicleAPI()
+
+        const {
+            regNumber,
+            chassisNumber,
+            fieldValueExists
+        } = useVehicleRules()
+
+        const { required } = useCoreRules()
+        const { insertErrorLog } = useErrorLogAPI()
+        const { filterContacts: filterContactsFn } = useContactAPI()
 
         const stepperRef = ref(null)
         const basicDetailsFormRef = ref(null)
         const extraDetailsFormRef = ref(null)
 
-        const dialogOpen = ref(false)
+        const getVehicleEditableFieldsQuery = getVehicleEditableFields.clone()
+        const loading = ref(false)
+        const isDialogOpen = ref(false)
+        const isFormSubmitted = ref(false)
         const title = ref($t('vehicles.edit'))
-        const formSubmitted = ref(false)
         const vehicleId = ref(null)
         const vehicleCode = ref(null)
 
@@ -446,13 +446,12 @@ export default {
                 hasError: false,
                 chassisError: false
             },
-            extraDetails: {
-                hasError: false
-            }
+            extraDetails: { hasError: false }
         })
 
         const form = reactive({
             owner: null,
+            ownerId: '',
             make: '',
             model: '',
             regNumber: '',
@@ -468,41 +467,33 @@ export default {
 
         const rules = {
             owner: [
-                val => !!val || $t('core.field_required')
+                v => required(v, $t('core.field_required')),
             ],
             make: [
-                val => !!val || $t('core.field_required')
+                v => required(v, $t('core.field_required')),
             ],
             model: [
-                val => !!val || $t('core.field_required')
+                v => required(v, $t('core.field_required')),
             ],
             regNumber: [
-                val => {
-                    if (!val && !form.chassisNumber) {
+                v => {
+                    if (!v && !form.chassisNumber) {
                         steps.basicDetails.chassisError = true
-                        return $t('vehicles.reg_or_chassis_required')
+                        return $t('vehicles.msg_reg_or_chassis_required')
                     }
                     return true
                 },
-                val => /^$|^[a-zA-Z0-9]{3,10}$/.test(val) || $t('vehicles.reg_number_invalid'),
-                val => new Promise(resolve => {
-                    fieldValueExists({ field: 'regNumber', value: val, excludeId: vehicleId.value }).then(exists => {
-                        resolve(!exists || $t('vehicles.reg_number_exists'))
-                    })
-                })
+                v => regNumber(v, $t('vehicles.msg_reg_number_invalid')),
+                v => fieldValueExists(v, 'regNumber', $t('vehicles.msg_reg_number_exists'), vehicleId.value)
             ],
             chassisNumber: [
-                val => /^$|^[a-zA-Z0-9]{17}$/.test(val) || $t('vehicles.chassis_number_invalid'),
-                val => new Promise(resolve => {
-                    fieldValueExists({ field: 'chassisNumber', value: val, excludeId: vehicleId.value }).then(exists => {
-                        resolve(!exists || $t('vehicles.chassis_number_exists'))
-                    })
-                })
+                v => chassisNumber(v, $t('vehicles.msg_chassis_number_invalid')),
+                v => fieldValueExists(v, 'chassisNumber', $t('vehicles.msg_chassis_number_exists'), vehicleId.value)
             ]
         }
 
         const open = (id, code) => {
-            dialogOpen.value = true
+            isDialogOpen.value = true
             vehicleId.value = id
             vehicleCode.value = code
             fetchVehicle()
@@ -510,95 +501,7 @@ export default {
 
         const close = () => {
             resetForm()
-            dialogOpen.value = false
-        }
-
-        const isCompany = type => {
-            return type === ContactTypesEnum.COMPANY
-        }
-
-        const submitForm = async(type) => {
-            let basicDetailsFormVal = true
-            let extraDetailsFormVal = true
-
-            if (type !== 'basicDetails' && basicDetailsFormRef.value) {
-                basicDetailsFormVal = await basicDetailsFormRef.value.validate()
-            }
-            if (type !== 'extraDetails' && extraDetailsFormRef.value) {
-                extraDetailsFormVal = await extraDetailsFormRef.value.validate()
-            }
-
-            if (basicDetailsFormVal && extraDetailsFormVal) {
-                formSubmitted.value = true
-                const vehicle = structuredClone(toRaw(form))
-                vehicle._id = vehicleId.value
-                
-                // Get only the _id of the owner.
-                vehicle.ownerId = vehicle.owner._id
-                delete vehicle.owner
-
-                updateVehicle(vehicle).then(response => {
-                    const { updated } = response
-
-                    if (updated) {
-                        $q.notify({
-                            type: 'positive',
-                            message: $t('vehicles.update_successful')
-                        })
-                        close()
-                    } else {
-                        $q.notify({
-                            type: 'negative',
-                            message: $t('core.error_occured')
-                        })
-                    }
-                    formSubmitted.value = false
-                }).catch(error => {
-                    $q.notify({
-                        type: 'negative',
-                        message: $t('core.error_occured')
-                    })
-                    formSubmitted.value = false
-                    console.log(error)
-                })
-            }
-        }
-
-        const resetForm = () => {
-            vehicleId.value = null
-            vehicleCode.value = null
-
-            form.owner = null
-            form.make = ''
-            form.model = ''
-            form.regNumber = ''
-            form.chassisNumber = ''
-            form.tags.splice(0)
-            form.bodyType = ''
-            form.fuelType = ''
-            form.engine = ''
-            form.gearbox = ''
-            form.drivetrain = ''
-            form.modelYear = ''
-
-            steps.current = 'basicDetails'
-            steps.basicDetails.hasError = false
-            steps.basicDetails.chassisError = false
-            steps.extraDetails.hasError = false
-        }
-
-        const resetFormValidation = (step, formRef) => {
-            steps[step].hasError = false
-            formRef.resetValidation()
-
-            if (step === 'basicDetails') {
-                steps.basicDetails.chassisError = false
-            }
-        }
-
-        const validationError = step => {
-            steps.current = step
-            steps[step].hasError = true
+            isDialogOpen.value = false
         }
 
         const filterContacts = (filter, update) => {
@@ -656,25 +559,134 @@ export default {
 
         const addNewValue = (value, field) => form[field] = value
 
-        const addNewTag = (value, done) => done(value.toUpperCase(), 'add-unique')
+        const addNewTag = (value, done) => done(value, 'add-unique')
+
+        const atValidationError = step => {
+            steps.current = step
+            steps[step].hasError = true
+        }
+
+        const resetFormValidation = (step, formRef) => {
+            formRef.resetValidation()
+            steps[step].hasError = false
+
+            if (step === 'basicDetails') {
+                steps.basicDetails.chassisError = false
+            }
+        }
+
+        const resetForm = () => {
+            isFormSubmitted.value = false
+            title.value = $t('vehicles.edit')
+            vehicleId.value = null
+            vehicleCode.value = null
+
+            form.owner = null
+            form.ownerId = ''
+            form.make = ''
+            form.model = ''
+            form.regNumber = ''
+            form.chassisNumber = ''
+            form.tags.splice(0)
+            form.bodyType = ''
+            form.fuelType = ''
+            form.engine = ''
+            form.gearbox = ''
+            form.drivetrain = ''
+            form.modelYear = ''
+
+            steps.current = 'basicDetails'
+            steps.basicDetails.hasError = false
+            steps.basicDetails.chassisError = false
+            steps.extraDetails.hasError = false
+        }
+
+        const submitForm = async(type) => {
+            isFormSubmitted.value = true
+
+            let basicDetailsFormVal = true
+            let extraDetailsFormVal = true
+
+            if (type !== 'basicDetails' && basicDetailsFormRef.value) {
+                basicDetailsFormVal = await basicDetailsFormRef.value.validate()
+            }
+            if (type !== 'extraDetails' && extraDetailsFormRef.value) {
+                extraDetailsFormVal = await extraDetailsFormRef.value.validate()
+            }
+
+            if (basicDetailsFormVal && extraDetailsFormVal) {
+                const vehicle = structuredClone(toRaw(form))
+                
+                // Get only the _id of the owner.
+                vehicle.ownerId = vehicle.owner._id
+                delete vehicle.owner
+
+                updateVehicle({ _id: vehicleId.value, vehicle }).then(response => {
+                    const { updated } = response
+
+                    if (updated) {
+                        $q.notify({
+                            type: 'positive',
+                            message: $t('vehicles.msg_update_successful')
+                        })
+                        close()
+                    } else {
+                        $q.notify({
+                            type: 'negative',
+                            message: $t('core.error_occured')
+                        })
+                        isFormSubmitted.value = false
+                    }
+                }).catch(error => {
+                    if (error.error === 'no-updated-fields') {
+                        close()
+                    } else {
+                        $q.notify({
+                            type: 'negative',
+                            message: $t('core.error_occured')
+                        })
+                        isFormSubmitted.value = false
+                        insertErrorLog({
+                            location: 'updateContactDialog',
+                            path: router.currentRoute.value.fullPath,
+                            metadata: error
+                        })
+                    }
+                })
+            } else {
+                isFormSubmitted.value = false
+            }
+        }
 
         const fetchVehicle = () => {
-            const query = getVehicleEditableFields.clone({ id: vehicleId.value })
-            query.fetchOne((error, vehicle) => {
+            loading.value = true
+            getVehicleEditableFieldsQuery.setParams({ id: vehicleId.value })
+            getVehicleEditableFieldsQuery.fetchOne((error, vehicle) => {
                 if (error) {
-                    console.log(error)
+                    insertErrorLog({
+                        location: 'getVehicleEditableFieldsQuery',
+                        path: router.currentRoute.value.fullPath,
+                        metadata: error
+                    })
                     return
                 }
-
                 Object.keys(vehicle).forEach(field => {
                     if (field in form) {
-                        form[field] = vehicle[field]
+                        if (Array.isArray(vehicle[field])) {
+                            vehicle[field].forEach(item => {
+                                form[field].push(item)
+                            })
+                        } else {
+                            form[field] = vehicle[field]
+                        }
                     }
                 })
 
                 title.value = vehicle.regNumber
                     ? `${$t('core.edit')}: ${vehicle.regNumber} - ${vehicle.make} ${vehicle.model}`
                     : `${$t('core.edit')}: ${vehicleCode.value} - ${vehicle.make} ${vehicle.model}`
+                
+                loading.value = false
             })
         }
 
@@ -686,9 +698,10 @@ export default {
             stepperRef,
             basicDetailsFormRef,
             extraDetailsFormRef,
-            dialogOpen,
+            loading,
+            isDialogOpen,
+            isFormSubmitted,
             title,
-            formSubmitted,
             contactsOptionList,
             makesOptionList,
             modelsOptionList,
@@ -703,16 +716,15 @@ export default {
             rules,
             open,
             close,
-            isCompany,
-            submitForm,
-            resetForm,
-            resetFormValidation,
-            validationError,
             filterContacts,
             filterDistinctFieldValuesNoInitial,
             filterDistinctFieldValues,
             addNewValue,
-            addNewTag
+            addNewTag,
+            atValidationError,
+            resetFormValidation,
+            resetForm,
+            submitForm
         }
     }
 }

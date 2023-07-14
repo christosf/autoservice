@@ -36,7 +36,15 @@ if (Meteor.isServer) {
 
     Contacts.createIndex({ vehicleCount: 1 }, { name: 'vehicleCountIndex' })
 
-    Contacts.createIndex({ 'contactMethods.searchableValue': 1 }, { name: 'contactMethodsSearchableValueIndex' })
+    Contacts.createIndex({ searchableTags: 1 }, {
+        name: 'searchableTagsIndex',
+        sparse: true
+    })
+
+    Contacts.createIndex({ 'contactMethods.searchableValue': 1 }, {
+        name: 'contactMethodsSearchableValueIndex',
+        sparse: true
+    })
 
     Contacts.createIndex({ updatedAt: 1 }, { name: 'updatedAtIndex' })
 }

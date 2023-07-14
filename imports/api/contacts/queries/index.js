@@ -7,5 +7,5 @@ export {
     getContact,
     getContactList,
     getContactExport,
-    getContactEditableFields,
+    getContactEditableFields
 }

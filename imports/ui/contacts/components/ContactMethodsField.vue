@@ -105,7 +105,7 @@
                     no-caps
                 />
                 <q-banner v-else class='text-negative'>
-                    {{ $t('contacts.add_phone_number_msg') }}
+                    {{ $t('contacts.msg_add_phone_number') }}
                 </q-banner>
             </template>
         </draggable>
@@ -254,18 +254,18 @@ export default {
         const rules = {
             phone: [
                 v => required(v, $t('core.field_required')),
-                v => phoneNumber(v, $t('contacts.phone_number_invalid')),
-                v => valueAlreadyExists(v, $t('contacts.phone_number_exists'), ContactMethodsEnum.PHONE)
+                v => phoneNumber(v, $t('contacts.msg_phone_number_invalid')),
+                v => valueAlreadyExists(v, $t('contacts.msg_phone_number_exists'), ContactMethodsEnum.PHONE)
             ],
             email: [
                 v => required(v, $t('core.field_required')),
-                v => email(v, $t('contacts.email_invalid')),
-                v => valueAlreadyExists(v, $t('contacts.email_exists'))
+                v => email(v, $t('contacts.msg_email_invalid')),
+                v => valueAlreadyExists(v, $t('contacts.msg_email_exists'))
             ],
             website: [
                 v => required(v, $t('core.field_required')),
-                v => url(v, $t('contacts.website_invalid')),
-                v => valueAlreadyExists(v, $t('contacts.website_exists'))
+                v => url(v, $t('contacts.msg_website_invalid')),
+                v => valueAlreadyExists(v, $t('contacts.msg_website_exists'))
             ]
         }
 

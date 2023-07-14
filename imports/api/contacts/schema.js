@@ -101,14 +101,6 @@ export default new SimpleSchema({
         max: 20,
         optional: true
     },
-    notes: {
-        type: String,
-        optional: true,
-    },
-    vehicleCount: {
-        type: Number,
-        defaultValue: 0
-    },
     contactMethods: Array,
     'contactMethods.$': Object,
     'contactMethods.$.type': {
@@ -132,5 +124,13 @@ export default new SimpleSchema({
         type: String,
         max: 80,
         optional: true
+    },
+    notes: {
+        type: String,
+        optional: true,
+    },
+    vehicleCount: {
+        type: Number,
+        defaultValue: 0
     }
 })

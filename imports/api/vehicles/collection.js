@@ -1,10 +1,17 @@
 import { Meteor } from 'meteor/meteor'
 import { Mongo } from 'meteor/mongo'
-import schema from './schema'
+import { Queue } from 'queue-system'
+
+import baseSchema from '../core/schemas/base-schema'
+import vehicleSchema from './schema'
+import tagsSchema from '../core/schemas/tags-schema'
 
 const Vehicles = new Mongo.Collection('vehicles')
+const VehiclesQueue = new Queue()
 
-Vehicles.attachSchema(schema)
+Vehicles.attachSchema(baseSchema)
+Vehicles.attachSchema(vehicleSchema)
+Vehicles.attachSchema(tagsSchema)
 
 Vehicles.deny({
     insert: () => true,
@@ -30,13 +37,28 @@ if (Meteor.isServer) {
         sparse: true
     })
 
-    Vehicles.createIndex({ make: 1 }, { name: 'makeIndex' })
+    Vehicles.createIndex({ searchableMake: 1 }, { name: 'searchableMakeIndex' })
 
-    Vehicles.createIndex({ model: 1 }, { name: 'modelIndex' })
+    Vehicles.createIndex({ searchableModel: 1 }, { name: 'searchableModelIndex' })
 
-    Vehicles.createIndex({ makeModel: 1 }, { name: 'makeModelIndex' })
+    Vehicles.createIndex({ searchableMakeModel: 1 }, { name: 'searchableMakeModelIndex' })
+
+    Vehicles.createIndex({ searchableTags: 1 }, {
+        name: 'searchableTagsIndex',
+        sparse: true
+    })
+
+    Vehicles.createIndex({ searchableBodyType: 1 }, { name: 'searchableBodyTypeIndex' })
+
+    Vehicles.createIndex({ searchableFuelType: 1 }, { name: 'searchableFuelTypeIndex' })
+    
+    Vehicles.createIndex({ searchableEngine: 1 }, { name: 'searchableEngineIndex' })
+    
+    Vehicles.createIndex({ searchableGearbox: 1 }, { name: 'searchableGearboxIndex' })
+    
+    Vehicles.createIndex({ searchableDrivetrain: 1 }, { name: 'searchableDrivetrainIndex' })
 
     Vehicles.createIndex({ updatedAt: 1 }, { name: 'updatedAtIndex' })
 }
 
-export default Vehicles
+export { Vehicles as default, VehiclesQueue }

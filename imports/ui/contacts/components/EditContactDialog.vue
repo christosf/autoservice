@@ -150,7 +150,7 @@
                             class='q-gutter-md'
                         >
                         <div class='q-mt-none'>
-                            <div class='text-h6 text-bold q-mb-md'>{{ $t('contacts.billing_address') }}</div>
+                            <div class='text-h6 text-bold q-mb-md'>{{ $t('contacts.address_billing') }}</div>
                             <div class='row q-col-gutter-sm'>
                                 <div class='col-xs-9 col-sm-12'>
                                     <q-input
@@ -222,7 +222,7 @@
                                         <q-toggle
                                             v-model='isDeliveryAddressDifferent'
                                             @update:model-value='focusDeliveryAddressField'
-                                            :label='$t("contacts.different_delivery_address")'
+                                            :label='$t("contacts.address_delivery_different")'
                                             class='text-black'
                                         />
                                     </q-field>
@@ -232,7 +232,7 @@
                         <div v-show='isDeliveryAddressDifferent'>
                             <q-separator />
                             <div class='q-mt-md'>
-                                <div class='text-h6 text-bold q-mb-md'>{{ $t('contacts.delivery_address') }}</div>
+                                <div class='text-h6 text-bold q-mb-md'>{{ $t('contacts.address_delivery') }}</div>
                                 <div class='row q-col-gutter-sm'>
                                     <div class='col-xs-9 col-sm-12'>
                                         <q-input
@@ -469,11 +469,11 @@ export default {
             name: [
                 v => required(v, $t('core.field_required')),
                 v => minLength(v, 3, $t('core.field_minlength', { count: 3 })),
-                v => contactExists(v, form.phoneNumber, $t('contacts.already_exists'), contactId.value)
+                v => contactExists(v, form.phoneNumber, $t('contacts.msg_already_exists'), contactId.value)
             ],
             phoneNumber: [
                 v => required(v, $t('core.field_required')),
-                v => phoneNumber(v, $t('contacts.phone_number_invalid'))
+                v => phoneNumber(v, $t('contacts.msg_phone_number_invalid'))
             ],
             billingAddressStreet: [
                 v => minLength(v, 3, $t('core.field_minlength', { count: 3 }))
@@ -579,7 +579,6 @@ export default {
             title.value = $t('contacts.edit')
             contactId.value = null
             contactCode.value = null
-            tagsOptionList.value = []
 
             form.type = ContactTypesEnum.INDIVIDUAL
             form.name = ''
@@ -626,7 +625,7 @@ export default {
                     if (updated) {
                         $q.notify({
                             type: 'positive',
-                            message: $t('contacts.update_successful')
+                            message: $t('contacts.msg_update_successful')
                         })
                         close()
                     } else {

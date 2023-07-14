@@ -1,4 +1,20 @@
+import { Meteor } from 'meteor/meteor'
+import { Tracker } from 'meteor/tracker'
 import { isEmail, isURL } from 'validator'
+import { ref } from 'vue'
+
+export function useCoreAPI() {
+    const connectionStatus = ref('waiting')
+
+    const reconnectToServer = () => Meteor.reconnect()
+
+    Tracker.autorun(() => connectionStatus.value = Meteor.status().status)
+
+    return {
+        connectionStatus,
+        reconnectToServer
+    }
+}
 
 export function useCoreFunctions() {
     const phoneNumberRegex = /^$|^[0-9]{8,20}$/

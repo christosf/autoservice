@@ -1,20 +1,20 @@
-import { Meteor } from 'meteor/meteor'
 import { diff } from 'just-diff'
 import objectPath from 'object-path'
 
 import { Contacts } from '../database'
+import { insertHistoryLog } from '../history-log/functions'
 import { HistoryLogTypesEnum } from '../history-log/enums'
 
-const allowedFields = [
-    'type',
-    'name',
-    'phoneNumber',
-    'billingAddress',
-    'deliveryAddress',
-    'taxRegNumber',
-    'tags',
-    'contactMethods',
-    'notes'
+const notAllowedFields = [
+    '_id',
+    'code',
+    'createdById',
+    'createdAt',
+    'updatedAt',
+    'vehicleCount',
+    'searchableName',
+    'searchableTags',
+    'searchableValue'
 ]
 
 const addInsertToHistory = (_userId, contact) => {
@@ -25,8 +25,14 @@ const addInsertToHistory = (_userId, contact) => {
     rawChanges.forEach(change => {
         const { op, path, value } = change
 
-        if (allowedFields.includes(path[0])) {
-            changeList.push({ op, path, value })   
+        let isAllowed = true
+        path.forEach(item => {
+            if (notAllowedFields.includes(item) || item === 'isActive') {
+                isAllowed = false
+            }
+        })
+        if (isAllowed) {
+            changeList.push({ op, path, value })
         }
     })
 
@@ -34,12 +40,12 @@ const addInsertToHistory = (_userId, contact) => {
         return
     }
     
-    Meteor.call('history_log.insert', {
+    insertHistoryLog({
         type: HistoryLogTypesEnum.INSERT,
         metadata: { changeList },
         contactId: contact._id,
         createdById: contact.createdById,
-        createdAt: contact.createdAt
+        createdAt: contact.updatedAt
     })
 }
 
@@ -52,7 +58,13 @@ const addUpdateToHistory = function(userId, contact) {
         const { op, path, value } = change
         const oldValue = objectPath.get(prev, path.join('.'))
 
-        if (allowedFields.includes(path[0]) || path[0] === 'isActive') {
+        let isAllowed = true
+        path.forEach(item => {
+            if (notAllowedFields.includes(item)) {
+                isAllowed = false
+            }
+        })
+        if (isAllowed) {
             changeList.push({ op, path, value, oldValue })
         }
     })
@@ -62,21 +74,21 @@ const addUpdateToHistory = function(userId, contact) {
     }
 
     if (changeList.length === 1 && changeList[0].path[0] === 'isActive' && changeList[0].value) {
-        Meteor.call('history_log.insert', {
+        insertHistoryLog({
             type: HistoryLogTypesEnum.ACTIVATION,
             contactId: contact._id,
             createdById: userId,
             createdAt: new Date()
         })
     } else if (changeList.length === 1 && changeList[0].path[0] === 'isActive' && !changeList[0].value) {
-        Meteor.call('history_log.insert', {
+        insertHistoryLog({
             type: HistoryLogTypesEnum.DEACTIVATION,
             contactId: contact._id,
             createdById: userId,
             createdAt: new Date()
         })
     } else if (changeList.length === 1 && changeList[0].path[0] === 'notes') {
-        Meteor.call('history_log.insert', {
+        insertHistoryLog({
             type: HistoryLogTypesEnum.NOTES_UPDATE,
             metadata: { changeList },
             contactId: contact._id,
@@ -84,7 +96,7 @@ const addUpdateToHistory = function(userId, contact) {
             createdAt: contact.updatedAt
         })
     } else {
-        Meteor.call('history_log.insert', {
+        insertHistoryLog({
             type: HistoryLogTypesEnum.UPDATE,
             metadata: { changeList },
             contactId: contact._id,

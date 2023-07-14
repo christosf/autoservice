@@ -30,6 +30,7 @@ import { ref, toRefs, computed, watchEffect } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useQuasar } from '../../quasar'
 import { useContactAPI } from '../../contacts/composables'
+import { useVehicleAPI } from '../../vehicles/composables'
 
 export default {
     props: {
@@ -40,7 +41,8 @@ export default {
     setup(props) {
         const $q = useQuasar()
         const { t: $t } = useI18n()
-        const { updateContactNotes } = useContactAPI()
+        const { updateNotes: updateContactNotes } = useContactAPI()
+        const { updateNotes: updateVehicleNotes } = useVehicleAPI()
         const { id, type, notes } = toRefs(props)
 
         const notesFieldRef = ref(null)
@@ -64,6 +66,9 @@ export default {
             switch(type.value) {
                 case 'contacts':
                     response = await updateContactNotes({ _id: id.value, notes: notesField.value })
+                    break
+                case 'vehicles':
+                    response = await updateVehicleNotes({ _id: id.value, notes: notesField.value })
                     break
                 default:
                     console.log('No type specified in notes tab panel.')

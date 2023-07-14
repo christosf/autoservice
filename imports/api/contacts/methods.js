@@ -6,12 +6,12 @@ import { ContactsQueue } from './collection'
 import { CounterNamesEnum } from '../counters/enums'
 import { contactHasUpdates } from './functions'
 import { convertToSearchableRegex, convertToSearchableString } from '../core/functions'
-import contactsSchema from './schema'
 
 Meteor.methods({
     async 'contacts.insert'(params) {
         return await ContactsQueue.add(() => {
             const contact = { ...params }
+        
             contact.code = 'C' + Meteor.call('counters.increaseCounter', { name: CounterNamesEnum.CONTACTS })
 
             contact.contactMethods.forEach((method, index) => {
@@ -129,7 +129,7 @@ Meteor.methods({
 
         return { activated: Contacts.update(_id, { $set: { isActive: true }}) === 1 }
     },
-    'contacts.updateContactNotes'(params) {
+    'contacts.updateNotes'(params) {
         const schema = new SimpleSchema({
             _id: String,
             notes: {
@@ -216,13 +216,35 @@ Meteor.methods({
         schema.validate(schema.clean(params))
 
         const { field } = params
+
+        const searchableField = () => {
+            switch(field) {
+                case 'name': return 'searchableName'
+                case 'tags': return 'searchableTags'
+                case 'contactMethods.value': return 'contactMethods.searchableValue'
+                default: return field
+            }
+        }
+
         const filter = convertToSearchableRegex(params.filter)
         const query = {}
 
-        query[field] = { $regex: filter }
+        query[searchableField()] = { $regex: filter }
 
         const response = await Contacts.rawCollection().distinct(field, query)
 
-        return response.filter(item => new RegExp(filter).test(item))
+        return response.filter(item => {
+            return new RegExp(filter).test(convertToSearchableString(item))
+        })
+    },
+    'contacts.getBasicDetails'(params) {
+        const schema = new SimpleSchema({
+            _id: String
+        })
+        schema.validate(schema.clean(params))
+        
+        const { _id } = params
+
+        return Contacts.findOne(_id, { fields: { code: 1, name: 1 }})
     }
 })

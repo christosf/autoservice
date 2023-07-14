@@ -4,8 +4,9 @@ export default HistoryLog.createQuery('getHistoryLog', {
     $filter({ filters, options, params }) {
         options.sort = {}
 
-        if (params.type === 'contacts') {
-            filters.contactId = params.id
+        switch(params.type) {
+            case 'contacts': filters.contactId = params.id; break
+            case 'vehicles': filters.vehicleId = params.id; break
         }
 
         options.sort[params.sortBy] = params.descending ? 1 : -1

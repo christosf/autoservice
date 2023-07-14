@@ -16,34 +16,14 @@
             flat
         >
             <template #top-left>
-                <div class='text-h3'>{{ $t('contacts.many') }}</div>
+                <div class='text-h4 text-bold'>{{ tableTitle }}</div>
             </template>
             <template #top-right>
                 <div class='row q-gutter-sm'>
-                    <q-btn-dropdown
-                        :label='$t(`contacts.${statusFilter}`)'
-                        padding='sm'
-                        color='primary'
-                        auto-close
-                        no-caps
-                        flat
-                    >
-                        <q-list :dense='$q.platform.is.desktop' separator>
-                            <q-item
-                                v-for='status in statusFilterItems'
-                                @click='$router.push({ name: "ContactList", query: { view: status }})'
-                                :active='statusFilter === status'
-                                clickable
-                            >
-                                <q-item-section>
-                                    <q-item-label>{{ $t(`contacts.${status}`) }}</q-item-label>
-                                </q-item-section>
-                            </q-item>
-                        </q-list>
-                    </q-btn-dropdown>
                     <q-input
                         v-model='filter'
                         :placeholder='`${$t("core.search")}...`'
+                        :clearable='$q.screen.gt.sm'
                         :autofocus='$q.platform.is.desktop'
                         :borderless='$q.screen.lt.md'
                         :outlined='$q.screen.gt.sm'
@@ -154,7 +134,7 @@
                                 outline
                                 dense
                             >
-                                <q-tooltip anchor='top middle' self='bottom middle'>{{ $t('core.permanent_delete') }}</q-tooltip>
+                                <q-tooltip anchor='top middle' self='bottom middle'>{{ $t('core.delete') }}</q-tooltip>
                             </q-btn>
                         </template>
                     </div>
@@ -167,7 +147,7 @@
 
 <script>
 import { Tracker } from 'meteor/tracker'
-import { ref, watch, nextTick, onMounted, onUnmounted } from 'vue'
+import { ref, computed, watch, nextTick, onMounted, onUnmounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 
@@ -202,8 +182,7 @@ export default {
         const contacts = ref([])
         const visibleColumns = ref([])
         const filter = ref('')
-        const statusFilter = ref('all')
-        const statusFilterItems = ['all', 'customers', 'suppliers', 'deactivated']
+        const availableViews = ['customers', 'suppliers', 'deactivated']
 
         let subscription
         let countSubscription
@@ -277,6 +256,15 @@ export default {
             }
         ]
 
+        const tableTitle = computed(() => {
+            switch(route.params.view) {
+                case 'customers': return $t('contacts.customers')
+                case 'suppliers': return $t('contacts.suppliers')
+                case 'deactivated': return $t('contacts.deactivated_contacts')
+                default: return $t('contacts.many')
+            }
+        })
+
         const addTagFilter = tag => {
             filter.value = tag
             if ($q.platform.is.desktop) {
@@ -300,29 +288,25 @@ export default {
             })
         }
 
-        watch(statusFilter, () => {
-            if (statusFilter.value === 'customers') {
-                visibleColumns.value = ['vehicleCount']
-            } else {
-                visibleColumns.value = []
-
-                if (pagination.value.sortBy === 'vehicleCount') {
-                    pagination.value.sortBy = 'updatedAt'
-                }
-            }
-            vueReactiveDependencies.changed()
-        })
-
         watch(route, () => {
             if (route.name === 'ContactList') {
-                const availableViews = ['customers', 'suppliers', 'deactivated']
-                if (route.query.view && availableViews.includes(route.query.view)) {
-                    statusFilter.value = route.query.view
-                } else {
-                    statusFilter.value = 'all'
+                if (route.params.view && !availableViews.includes(route.params.view)) {
                     router.replace({ name: 'ContactList' })
+                    return
                 }
-            }
+                
+                if (route.params.view === 'customers') {
+                    visibleColumns.value = ['vehicleCount']
+                } else {
+                    visibleColumns.value = []
+
+                    if (pagination.value.sortBy === 'vehicleCount') {
+                        pagination.value.sortBy = 'updatedAt'
+                    }
+                }
+                
+                vueReactiveDependencies.changed()
+            }            
         }, { immediate: true })
 
         const tracker = Tracker.autorun(() => {
@@ -330,8 +314,8 @@ export default {
             loading.value = true
 
             getContactListQuery.setParams({
-                filter: filter.value,
-                statusFilter: statusFilter.value,
+                filter: filter.value ? filter.value : '',
+                statusFilter: route.params.view,
                 sortBy: pagination.value.sortBy,
                 descending: pagination.value.descending,
                 limit: pagination.value.rowsPerPage,
@@ -377,10 +361,9 @@ export default {
             contacts,
             visibleColumns,
             filter,
-            statusFilter,
-            statusFilterItems,
             pagination,
             columns,
+            tableTitle,
             isCompany,
             deleteContact,
             activateContact,
