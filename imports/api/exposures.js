@@ -1,3 +1,4 @@
+import './settings/queries/exposures'
 import './history-log/queries/exposures'
 import './contacts/queries/exposures'
 import './vehicles/queries/exposures'

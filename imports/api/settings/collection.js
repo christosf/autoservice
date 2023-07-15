@@ -1,3 +1,4 @@
+import { Meteor } from 'meteor/meteor'
 import { Mongo } from 'meteor/mongo'
 import schema from './schema'
 
@@ -10,5 +11,13 @@ Settings.deny({
     update: () => true,
     remove: () => true,
 })
+
+if (Meteor.isServer) {
+    Settings.createIndex({ 'contactTags.value': 1 }, {
+        name: 'contactTagsValueIndex',
+        unique: true
+    })
+}
+
 
 export default Settings

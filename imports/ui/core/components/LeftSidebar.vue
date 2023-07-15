@@ -21,7 +21,7 @@
                         <q-item-label>{{ $t('contacts.customers') }}</q-item-label>
                     </q-item-section>
                 </q-item>
-                <q-item :to='{ name: "ContactList", params: { view: "suppliers" }}'>
+                <q-item :to='{ name: "ContactList", params: { view: "suppliers" }}' disable>
                     <q-item-section>
                         <q-item-label>{{ $t('contacts.suppliers') }}</q-item-label>
                     </q-item-section>
@@ -53,7 +53,7 @@
                 <q-icon name='build_circle' />
             </q-item-section>
             <q-item-section>
-                {{ $t('jobcards.many' )}}
+                {{ $t('job_cards.many' )}}
             </q-item-section>
         </q-item>
         <q-item :to='{ name: "PartList" }'>
@@ -88,22 +88,26 @@
                 {{ $t('core.reports' )}}
             </q-item-section>
         </q-item>
-        <q-item :to='{ name: "UserList" }'>
-            <q-item-section avatar>
-                <q-icon name='manage_accounts' />
-            </q-item-section>
-            <q-item-section>
-                {{ $t('core.users' )}}
-            </q-item-section>
-        </q-item>
-        <q-item :to='{ name: "SettingsPage" }'>
-            <q-item-section avatar>
-                <q-icon name='settings' />
-            </q-item-section>
-            <q-item-section>
-                {{ $t('core.settings' )}}
-            </q-item-section>
-        </q-item>
+        <q-expansion-item
+            :model-value='$route.meta.group === "Settings"'
+            :header-class='{"q-router-link--active": $route.meta.group === "Settings"}'
+            :to='{ name: "SettingsPage" }'
+            :label='$t("core.settings")'
+            icon='commute'
+        >
+            <q-list class='sub-menu q-mb-sm' dense>
+                <q-item :to='{ name: "ContactSettings"}'>
+                    <q-item-section>
+                        <q-item-label>{{ $t('contacts.many') }}</q-item-label>
+                    </q-item-section>
+                </q-item>
+                <q-item :to='{ name: "UserSettings"}'>
+                    <q-item-section>
+                        <q-item-label>{{ $t('core.users') }}</q-item-label>
+                    </q-item-section>
+                </q-item>
+            </q-list>
+        </q-expansion-item>
     </q-list>
 </template>
 

@@ -21,11 +21,11 @@ export default Vehicles.createQuery('getVehicleList', {
         ]
 
         if (params.sortBy === 'make') {
-            options.sort['searchableMake'] = params.descending ? 1 : -1
+            options.sort['searchableMake'] = params.descending ? -1 : 1
         } else if (params.sortBy === 'model') {
-            options.sort['searchableModel'] = params.descending ? 1 : -1
+            options.sort['searchableModel'] = params.descending ? -1 : 1
         } else {
-            options.sort[params.sortBy] = params.descending ? 1 : -1
+            options.sort[params.sortBy] = params.descending ? -1 : 1
         }
     },
     $postFilter(results) {

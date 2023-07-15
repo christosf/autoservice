@@ -88,3 +88,7 @@
 .q-select__dialog > label.q-field--with-bottom {
     padding-bottom: 0;
 }
+
+.q-table td, .q-table th {
+    padding: 7px 12px;
+}

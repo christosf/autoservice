@@ -35,7 +35,7 @@
                 >
                     <template v-for='tab in routeTabs'>
                         <q-route-tab
-                            v-if='tab.name === "vehicles" ? contact.vehicles.length > 0 : true'
+                            v-if='["vehicles", "job-cards"].includes(tab.name) ? contact.vehicles.length > 0 : true'
                             :to='{ name: "ViewContact", params: { code: contact.code, view: tab.view ? tab.view : undefined }}'
                             :label='$t(tab.label)'
                             :icon='tab.icon'
@@ -55,8 +55,12 @@
                 <q-tab-panel name='vehicles' class='q-pa-none'>
                     <vehicles-tab-panel :contact='contact' />
                 </q-tab-panel>
-                <q-tab-panel name='notes' class='q-pa-none'>
-                    <notes-tab-panel :id='contact._id' :notes='contact.notes' type='contacts' />
+                <q-tab-panel name='job-cards' class='q-pa-none'>
+                    <q-card bordered flat>
+                        <q-card-section>
+                            Not yet available.
+                        </q-card-section>
+                    </q-card>
                 </q-tab-panel>
                 <q-tab-panel name='history' class='q-pa-none'>
                     <history-tab-panel :id='contact._id' type='contacts' />
@@ -78,7 +82,6 @@ import { useContactAPI, useContactFunctions } from '../composables'
 
 import LoadingCard from '../../core/components/LoadingCard.vue'
 import OverviewTabPanel from '../components/OverviewTabPanel.vue'
-import NotesTabPanel from '../../core/components/NotesTabPanel.vue'
 import HistoryTabPanel from '../../history-log/components/HistoryTabPanel.vue'
 import VehiclesTabPanel from '../components/VehiclesTabPanel.vue'
 import EditContactDialog from '../components/EditContactDialog.vue'
@@ -87,7 +90,6 @@ export default {
     components: {
         LoadingCard,
         OverviewTabPanel,
-        NotesTabPanel,
         HistoryTabPanel,
         VehiclesTabPanel,
         EditContactDialog
@@ -106,7 +108,7 @@ export default {
         const loading = ref(true)
         const activeTab = ref('overview')
         const contact = ref(null)
-        const availableViews = ['vehicles', 'notes', 'history']
+        const availableViews = ['vehicles', 'job-cards', 'history']
 
         let subscription
 
@@ -123,10 +125,10 @@ export default {
                 view: 'vehicles'
             },
             {
-                name: 'notes',
-                label: 'core.notes',
-                icon: 'notes',
-                view: 'notes'
+                name: 'job-cards',
+                label: 'job_cards.many',
+                icon: 'build_circle',
+                view: 'job-cards'
             },
             {
                 name: 'history',

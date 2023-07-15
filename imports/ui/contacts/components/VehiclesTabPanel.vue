@@ -5,6 +5,7 @@
         :rows='vehicles'
         :columns='columns'
         :rows-per-page-options='[10,20,30,50]'
+        column-sort-order='da'
         ref='tableRef'
         bordered
         flat

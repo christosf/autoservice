@@ -9,7 +9,7 @@
         <q-card>
             <q-card-section class='q-pa-sm'>
                 <q-toolbar>
-                    <div class='text-h6'>{{ $t('jobcards.add') }}</div>
+                    <div class='text-h6'>{{ $t('job_cards.add') }}</div>
                     <q-space />
                     <q-btn icon='close' flat round dense v-close-popup />
                 </q-toolbar>

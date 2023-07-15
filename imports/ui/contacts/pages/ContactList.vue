@@ -189,7 +189,7 @@ export default {
 
         const pagination = ref({
             sortBy: 'updatedAt',
-            descending: false,
+            descending: true,
             page: 1,
             rowsPerPage: 10,
             rowsNumber: 0
@@ -222,7 +222,7 @@ export default {
                 label: 'vehicles.many',
                 field: 'vehicleCount',
                 sortable: true,
-                align: 'center'
+                align: 'left'
             },
             {
                 name: 'tags',

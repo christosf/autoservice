@@ -1,5 +1,5 @@
 import { Accounts } from 'meteor/accounts-base'
-import { Users, Counters } from '../../api/database'
+import { Users, Counters, Settings } from '../../api/database'
 import { CounterNamesEnum } from '../../api/counters/enums'
 
 if (Users.find().count() === 0) {
@@ -8,6 +8,12 @@ if (Users.find().count() === 0) {
         password: 'admin'
     })
     console.log('Administrator account created.')
+}
+
+if (Settings.find().count() === 0) {
+    Settings.insert({
+        contactTags: []
+    })
 }
 
 if (Counters.find({ name: CounterNamesEnum.CONTACTS }).count() === 0) {

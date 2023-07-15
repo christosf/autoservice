@@ -31,10 +31,10 @@ if (Meteor.isServer) {
     })
 
     Contacts.createIndex({ searchableName: 1 }, { name: 'searchableNameIndex' })
-
     Contacts.createIndex({ phoneNumber: 1 }, { name: 'phoneNumberIndex' })
-
     Contacts.createIndex({ vehicleCount: 1 }, { name: 'vehicleCountIndex' })
+    Contacts.createIndex({ createdAt: 1 }, { name: 'createdAtIndex' })
+    Contacts.createIndex({ updatedAt: 1 }, { name: 'updatedAtIndex' })
 
     Contacts.createIndex({ searchableTags: 1 }, {
         name: 'searchableTagsIndex',
@@ -45,8 +45,6 @@ if (Meteor.isServer) {
         name: 'contactMethodsSearchableValueIndex',
         sparse: true
     })
-
-    Contacts.createIndex({ updatedAt: 1 }, { name: 'updatedAtIndex' })
 }
 
 export { Contacts as default, ContactsQueue }

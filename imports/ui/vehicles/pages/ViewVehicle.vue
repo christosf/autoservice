@@ -51,8 +51,12 @@
                 <q-tab-panel name='overview' class='q-pa-none'>
                     <overview-tab-panel :vehicle='vehicle' />
                 </q-tab-panel>
-                <q-tab-panel name='notes' class='q-pa-none'>
-                    <notes-tab-panel :id='vehicle._id' :notes='vehicle.notes' type='vehicles' />
+                <q-tab-panel name='job-cards' class='q-pa-none'>
+                    <q-card bordered flat>
+                        <q-card-section>
+                            Not yet available.
+                        </q-card-section>
+                    </q-card>
                 </q-tab-panel>
                 <q-tab-panel name='history' class='q-pa-none'>
                     <history-tab-panel :id='vehicle._id' type='vehicles' />
@@ -74,7 +78,6 @@ import { useVehicleAPI } from '../composables'
 
 import LoadingCard from '../../core/components/LoadingCard.vue'
 import OverviewTabPanel from '../components/OverviewTabPanel.vue'
-import NotesTabPanel from '../../core/components/NotesTabPanel.vue'
 import HistoryTabPanel from '../../history-log/components/HistoryTabPanel.vue'
 import EditVehicleDialog from '../components/EditVehicleDialog.vue'
 
@@ -82,7 +85,6 @@ export default {
     components: {
         LoadingCard,
         OverviewTabPanel,
-        NotesTabPanel,
         HistoryTabPanel,
         EditVehicleDialog
     },
@@ -99,7 +101,7 @@ export default {
         const loading = ref(true)
         const activeTab = ref('overview')
         const vehicle = ref(null)
-        const availableViews = ['notes', 'history']
+        const availableViews = ['job-cards', 'history']
 
         let subscription
 
@@ -110,10 +112,10 @@ export default {
                 icon: 'dataset'
             },
             {
-                name: 'notes',
-                label: 'core.notes',
-                icon: 'notes',
-                view: 'notes'
+                name: 'job-cards',
+                label: 'job_cards.many',
+                icon: 'build_circle',
+                view: 'job-cards'
             },
             {
                 name: 'history',

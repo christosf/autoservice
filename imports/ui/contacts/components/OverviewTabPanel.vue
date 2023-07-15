@@ -1,8 +1,8 @@
 <template>
     <div class='row q-col-gutter-sm'>
-        <div class='col-xs-12 col-sm-6'>
+        <div class='col-xs-12 col-sm-12 col-md-7'>
             <div class='q-gutter-sm'>
-                <q-card v-if='$q.screen.lt.sm' bordered flat>
+                <q-card v-if='$q.screen.lt.md' bordered flat>
                     <q-card-section class='text-h6 text-bold q-pb-sm'>
                         {{ $t('contacts.balance') }}
                     </q-card-section>
@@ -84,17 +84,34 @@
                         </q-list>
                     </q-card-section>
                 </q-card>
+                <notes-card :id='contact._id' :notes='contact.notes' type='contacts' />
             </div>
         </div>
-        <div class='col-xs-12 col-sm-6'>
+        <div class='col-xs-12 col-sm-12 col-md-5'>
             <div class='q-gutter-sm'>
-                <q-card v-if='$q.screen.gt.xs' bordered flat>
+                <q-card v-if='$q.screen.gt.sm' bordered flat>
                     <q-card-section class='text-h6 text-bold q-pb-sm'>
                         {{ $t('contacts.balance') }}
                     </q-card-section>
                     <q-card-section class='text-body1 q-pt-none'>
                         <span v-if='contact.balance'>&euro; {{ contact.balance }}</span>
                         <span v-else>&euro; 0</span>
+                    </q-card-section>
+                </q-card>
+                <q-card bordered flat>
+                    <q-card-section class='text-h6 text-bold q-pb-sm'>
+                        {{ $t('core.tags') }}
+                    </q-card-section>
+                    <q-card-section class='text-body1 q-pt-none'>
+                        <q-chip
+                            v-if='contact.tags && contact.tags.length > 0'
+                            v-for='tag in contact.tags'
+                            class='q-ml-none'
+                            square
+                        >
+                            {{ tag }}
+                        </q-chip>
+                        <span v-else class='text-italic text-grey'>{{ $t('core.none_1') }}</span>
                     </q-card-section>
                 </q-card>
                 <q-card bordered flat>
@@ -114,22 +131,6 @@
                             {{ deliveryAddress }}
                         </q-card-section>
                     </template>
-                </q-card>
-                <q-card bordered flat>
-                    <q-card-section class='text-h6 text-bold q-pb-sm'>
-                        {{ $t('core.tags') }}
-                    </q-card-section>
-                    <q-card-section class='text-body1 q-pt-none'>
-                        <q-chip
-                            v-if='contact.tags && contact.tags.length > 0'
-                            v-for='tag in contact.tags'
-                            class='q-ml-none'
-                            square
-                        >
-                            {{ tag }}
-                        </q-chip>
-                        <span v-else class='text-italic text-grey'>{{ $t('core.none_1') }}</span>
-                    </q-card-section>
                 </q-card>
                 <q-card v-if='contact.taxRegNumber' bordered flat>
                     <q-card-section class='text-h6 text-bold q-pb-sm'>
@@ -167,8 +168,12 @@
 import { computed, toRefs } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useContactAPI } from '../composables'
+import NotesCard from '../../core/components/NotesCard.vue'
 
 export default {
+    components: {
+        NotesCard
+    },
     props: {
         contact: Object
     },

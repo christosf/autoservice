@@ -25,9 +25,9 @@ export default Contacts.createQuery('getContactList', {
         ]
 
         if (params.sortBy === 'name') {
-            options.sort['searchableName'] = params.descending ? 1 : -1
+            options.sort['searchableName'] = params.descending ? -1 : 1
         } else {
-            options.sort[params.sortBy] = params.descending ? 1 : -1
+            options.sort[params.sortBy] = params.descending ? -1 : 1
         }
     },
     $postFilter(results) {

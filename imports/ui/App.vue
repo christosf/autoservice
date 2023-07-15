@@ -42,7 +42,7 @@
                             </q-item>
                             <q-item clickable @click='addJobCardDialogRef.open()'>
                                 <q-item-section>
-                                    <q-item-label>{{ $t('jobcards.one') }}</q-item-label>
+                                    <q-item-label>{{ $t('job_cards.one') }}</q-item-label>
                                 </q-item-section>
                             </q-item>
                             <q-item clickable @click='addServiceDialogRef.open()'>
@@ -82,6 +82,7 @@
             v-model='leftSidebarVisible'
             @click='leftSidebarOpen = false'
             :overlay='leftSidebarOpen'
+            :width='250'
             behavior='desktop'
             side='left'
             bordered

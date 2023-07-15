@@ -24,15 +24,9 @@ export default Vehicles.createQuery('getVehicle', {
     modelYear: 1,
     notes: 1,
     isActive: 1,
-    createdAt: 1,
-    updatedAt: 1,
     owner: {
         code: 1,
         name: 1,
-        mobilePhone: 1,
-        landlinePhone: 1
-    },
-    createdBy: {
-        username: 1
+        phoneNumber: 1
     }
 })

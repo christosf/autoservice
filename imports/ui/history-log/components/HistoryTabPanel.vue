@@ -87,7 +87,7 @@
                                         <router-link v-if='isValueUrl(change)' :to='getValueUrl(change)' class='text-secondary'>
                                             {{ getValue(change) }}
                                         </router-link>
-                                        <span v-else>{{ getValue(change) }}</span>
+                                        <span v-else v-html='getValue(change)' />
                                     </div>
                                 </div>
                                 <div v-if='change.op === "remove"' class='col-12'>
@@ -95,7 +95,7 @@
                                         <router-link v-if='isOldValueUrl(change)' :to='getOldValueUrl(change)' class='text-secondary'>
                                             {{ getOldValue(change) }}
                                         </router-link>
-                                        <span v-else>{{ getOldValue(change) }}</span>
+                                        <span v-else v-html='getOldValue(change)' />
                                     </div>
                                 </div>
                                 <template v-if='change.op === "replace"'>
@@ -105,7 +105,7 @@
                                             <router-link v-if='isOldValueUrl(change)' :to='getOldValueUrl(change)' class='text-secondary'>
                                                 {{ getOldValue(change) }}
                                             </router-link>
-                                            <span v-else>{{ getOldValue(change) }}</span>
+                                            <span v-else v-html='getOldValue(change)' />
                                         </div>
                                     </div>
                                     <div class='col-xs-12 col-sm-6'>
@@ -114,7 +114,7 @@
                                             <router-link v-if='isValueUrl(change)' :to='getValueUrl(change)' class='text-secondary'>
                                                 {{ getValue(change) }}
                                             </router-link>
-                                            <span v-else>{{ getValue(change) }}</span>
+                                            <span v-else v-html='getValue(change)' />
                                         </div>
                                     </div>
                                 </template>
@@ -129,7 +129,7 @@
 
 <script>
 import { Tracker } from 'meteor/tracker'
-import { ref, toRefs, onUnmounted, watch } from 'vue'
+import { ref, toRefs, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { date } from '../../quasar'
 import { useHistoryLogAPI } from '../composables'
@@ -409,6 +409,49 @@ export default {
                 historyLog.value = getHistoryLogQuery.fetch()
                 pagination.value.rowsNumber = getHistoryLogQuery.getCount()
 
+                historyLog.value.forEach(log => {
+                    if (log.metadata && log.metadata.linkType === 'vehicle') {
+                        getVehicleBasicDetails({ _id: log.metadata.vehicle._id }).then(response => {
+                            if (response) {
+                                const { makeModel, regNumber } = response
+                                log.metadata.vehicle.makeModel = makeModel
+                                log.metadata.vehicle.regNumber = regNumber
+                            } else {
+                                log.metadata.vehicle.deleted = true
+                            }
+                        })
+                    }
+
+                    if (type.value === 'vehicles' && log.metadata && log.metadata.changeList) {
+                        log.metadata.changeList.forEach(item => {
+                            if (item.path.includes('ownerId')) {
+                                if (item.value) {
+                                    getContactBasicDetails({ _id: item.value }).then(response => {
+                                        if (response) {
+                                            const { name, code } = response
+                                            item.name = name
+                                            item.code = code
+                                        } else {
+                                            item.deleted = true
+                                        }
+                                    })
+                                }
+                                if (item.oldValue) {
+                                    getContactBasicDetails({ _id: item.oldValue }).then(response => {
+                                        if (response) {
+                                            const { name, code } = response
+                                            item.oldName = name
+                                            item.oldCode = code
+                                        } else {
+                                            item.oldDeleted = true
+                                        }
+                                    })
+                                }
+                            }
+                        })
+                    }
+                })
+
                 loading.value = false
             }
         })
@@ -417,51 +460,6 @@ export default {
             subscription.stop()
             countSubscription.stop()
             tracker.stop()
-        })
-
-        watch(historyLog, () => {
-            historyLog.value.forEach(log => {
-                if (log.metadata && log.metadata.linkType === 'vehicle') {
-                    getVehicleBasicDetails({ _id: log.metadata.vehicle._id }).then(response => {
-                        if (response) {
-                            const { makeModel, regNumber } = response
-                            log.metadata.vehicle.makeModel = makeModel
-                            log.metadata.vehicle.regNumber = regNumber
-                        } else {
-                            log.metadata.vehicle.deleted = true
-                        }
-                    })
-                }
-
-                if (type.value === 'vehicles' && log.metadata && log.metadata.changeList) {
-                    log.metadata.changeList.forEach(item => {
-                        if (item.path.includes('ownerId')) {
-                            if (item.value) {
-                                getContactBasicDetails({ _id: item.value }).then(response => {
-                                    if (response) {
-                                        const { name, code } = response
-                                        item.name = name
-                                        item.code = code
-                                    } else {
-                                        item.deleted = true
-                                    }
-                                })
-                            }
-                            if (item.oldValue) {
-                                getContactBasicDetails({ _id: item.oldValue }).then(response => {
-                                    if (response) {
-                                        const { name, code } = response
-                                        item.oldName = name
-                                        item.oldCode = code
-                                    } else {
-                                        item.oldDeleted = true
-                                    }
-                                })
-                            }
-                        }
-                    })
-                }
-            })
         })
 
         return {
