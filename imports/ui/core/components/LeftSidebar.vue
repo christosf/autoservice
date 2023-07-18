@@ -2,7 +2,7 @@
     <q-list separator>
         <q-item :to='{ name: "IndexPage" }'>
             <q-item-section avatar>
-                <q-icon name='dashboard' />
+                <q-icon name='sym_o_dashboard' />
             </q-item-section>
             <q-item-section>
                 {{ $t('core.homepage' )}}
@@ -13,7 +13,7 @@
             :header-class='{"q-router-link--active": $route.meta.group === "Contacts"}'
             :to='{ name: "ContactList" }'
             :label='$t("contacts.many")'
-            icon='people'
+            icon='sym_o_group'
         >
             <q-list class='sub-menu q-mb-sm' dense>
                 <q-item :to='{ name: "ContactList", params: { view: "customers" }}'>
@@ -38,7 +38,7 @@
             :header-class='{"q-router-link--active": $route.meta.group === "Vehicles"}'
             :to='{ name: "VehicleList" }'
             :label='$t("vehicles.many")'
-            icon='commute'
+            icon='sym_o_commute'
         >
             <q-list class='sub-menu q-mb-sm' dense>
                 <q-item :to='{ name: "VehicleList", params: { view: "deactivated" }}'>
@@ -50,7 +50,7 @@
         </q-expansion-item>
         <q-item :to='{ name: "JobcardList" }'>
             <q-item-section avatar>
-                <q-icon name='build_circle' />
+                <q-icon name='sym_o_build_circle' />
             </q-item-section>
             <q-item-section>
                 {{ $t('job_cards.many' )}}
@@ -58,7 +58,7 @@
         </q-item>
         <q-item :to='{ name: "PartList" }'>
             <q-item-section avatar>
-                <q-icon name='category' />
+                <q-icon name='sym_o_category' />
             </q-item-section>
             <q-item-section>
                 {{ $t('core.parts' )}}
@@ -112,12 +112,10 @@
 </template>
 
 <script>
-
 export default {
-    setup() {
-        
-    }
+  setup() {
 
+  }
 }
 </script>
 

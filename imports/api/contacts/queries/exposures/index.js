@@ -1,4 +1,4 @@
 import './getContact.expose'
 import './getContactList.expose'
-import './getContactExport.expose'
+import './getContactPositions.expose'
 import './getContactEditableFields.expose'

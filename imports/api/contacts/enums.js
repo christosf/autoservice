@@ -1,13 +1,13 @@
 const ContactTypesEnum = {
-    INDIVIDUAL: 'individual',
-    COMPANY: 'company'
+  INDIVIDUAL: 'individual',
+  COMPANY: 'company'
 }
 
 const ContactMethodsEnum = {
-    PHONE: 'phone',
-    EMAIL: 'email',
-    FAX: 'fax',
-    WEBSITE: 'website'
+  PHONE: 'phone',
+  EMAIL: 'email',
+  FAX: 'fax',
+  WEBSITE: 'website'
 }
 
 Object.freeze(ContactTypesEnum)

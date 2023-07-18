@@ -23,6 +23,7 @@
                     color='primary'
                     icon='save'
                     class='q-ma-sm'
+                    padding='xs sm'
                     outline
                     no-caps
                 />
@@ -71,7 +72,10 @@ export default {
 
             switch(type.value) {
                 case 'contacts':
-                    response = await updateContactNotes({ _id: id.value, notes: notesField.value })
+                    response = await updateContactNotes({
+                        contactId: id.value,
+                        notes: notesField.value
+                    })
                     break
                 case 'vehicles':
                     response = await updateVehicleNotes({ _id: id.value, notes: notesField.value })

@@ -14,13 +14,13 @@ import './contacts/links'
 import './vehicles/links'
 
 export {
-    ErrorLog,
-    HistoryLog,
-    Counters,
-    Settings,
-    Users,
-    Contacts,
-    Vehicles,
-    Services,
-    Parts
+  ErrorLog,
+  HistoryLog,
+  Counters,
+  Settings,
+  Users,
+  Contacts,
+  Vehicles,
+  Services,
+  Parts
 }

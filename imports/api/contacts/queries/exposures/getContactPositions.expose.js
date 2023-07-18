@@ -1,7 +1,7 @@
 import { Meteor } from 'meteor/meteor'
-import { getContactList } from '../index'
+import { getContactPositions } from '../index'
 
-getContactList.expose({
+getContactPositions.expose({
   firewall(userId) {
     if (!userId) {
       throw new Meteor.Error('not-allowed')

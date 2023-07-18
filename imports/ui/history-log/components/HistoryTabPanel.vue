@@ -426,7 +426,7 @@ export default {
                         log.metadata.changeList.forEach(item => {
                             if (item.path.includes('ownerId')) {
                                 if (item.value) {
-                                    getContactBasicDetails({ _id: item.value }).then(response => {
+                                    getContactBasicDetails({ contactId: item.value }).then(response => {
                                         if (response) {
                                             const { name, code } = response
                                             item.name = name
@@ -437,7 +437,7 @@ export default {
                                     })
                                 }
                                 if (item.oldValue) {
-                                    getContactBasicDetails({ _id: item.oldValue }).then(response => {
+                                    getContactBasicDetails({ contactId: item.oldValue }).then(response => {
                                         if (response) {
                                             const { name, code } = response
                                             item.oldName = name
