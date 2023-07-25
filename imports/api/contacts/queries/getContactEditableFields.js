@@ -12,4 +12,8 @@ export default Contacts.createQuery('getContactEditableFields', {
   deliveryAddress: 1,
   taxRegNumber: 1,
   contactMethods: 1
+}, {
+  validateParams: {
+    contactId: String
+  }
 })

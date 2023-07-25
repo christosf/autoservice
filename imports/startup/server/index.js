@@ -7,5 +7,5 @@ import './observers'
 import './fixtures'
 
 Meteor.startup(() => {
-    
+
 })

@@ -46,10 +46,7 @@
       </template>
       <template #body-cell='props'>
         <q-td :props='props' auto-width>
-          <router-link
-            :to='{ name: "ViewContact", params: { code: props.row.code }}'
-            class='text-black'
-          >
+          <router-link :to='{ name: "ViewContact", params: { code: props.row.code }}' class='text-black'>
             {{ props.value }}
           </router-link>
         </q-td>
@@ -108,53 +105,45 @@
             <template v-if='props.row.isActive'>
               <q-btn
                 @click='editDialogRef.open(props.row._id, props.row.code)'
-                icon='edit'
+                icon='sym_o_edit'
                 color='secondary'
                 size='sm'
                 outline
                 dense
               >
-                <q-tooltip anchor='top middle' self='bottom middle'>
-                  {{ $t('core.edit') }}
-                </q-tooltip>
+                <q-tooltip anchor='top middle' self='bottom middle'>{{ $t('core.edit') }}</q-tooltip>
               </q-btn>
               <q-btn
                 @click='deactivateContact(props.row._id)'
-                icon='visibility_off'
+                icon='sym_o_visibility_off'
                 color='negative'
                 size='sm'
                 outline
                 dense
               >
-                <q-tooltip anchor='top middle' self='bottom middle'>
-                  {{ $t('core.deactivate') }}
-                </q-tooltip>
+                <q-tooltip anchor='top middle' self='bottom middle'>{{ $t('core.deactivate') }}</q-tooltip>
               </q-btn>
             </template>
             <template v-else>
               <q-btn
                 @click='activateContact(props.row._id)'
-                icon='visibility'
+                icon='sym_o_visibility'
                 color='positive'
                 size='sm'
                 outline
                 dense
               >
-                <q-tooltip anchor='top middle' self='bottom middle'>
-                  {{ $t('core.activate') }}
-                </q-tooltip>
+                <q-tooltip anchor='top middle' self='bottom middle'>{{ $t('core.activate') }}</q-tooltip>
               </q-btn>
               <q-btn
                 @click='deleteContact(props.row._id)'
-                icon='delete'
+                icon='sym_o_delete'
                 color='negative'
                 size='sm'
                 outline
                 dense
               >
-                <q-tooltip anchor='top middle' self='bottom middle'>
-                  {{ $t('core.delete') }}
-                </q-tooltip>
+                <q-tooltip anchor='top middle' self='bottom middle'>{{ $t('core.delete') }}</q-tooltip>
               </q-btn>
             </template>
           </div>
@@ -319,8 +308,16 @@ export default {
         } else {
           visibleColumns.value = []
 
-          if (pagination.value.sortBy === 'vehicleCount') {
-            pagination.value.sortBy = 'updatedAt'
+          if ($q.localStorage.has('contactListPagination')) {
+            const localStoragePagination = $q.localStorage.getItem('contactListPagination')
+
+            if (
+              localStoragePagination.sortBy === 'vehicleCount'
+              || pagination.value.sortBy === 'vehicleCount'
+            ) {
+              pagination.value.sortBy = 'updatedAt'
+              setLocalStorage()
+            }
           }
         }
 
@@ -334,7 +331,7 @@ export default {
 
       getContactListQuery.setParams({
         filter: filter.value ? filter.value : '',
-        statusFilter: route.params.view,
+        statusFilter: route.params.view ? route.params.view : '',
         sortBy: pagination.value.sortBy,
         descending: pagination.value.descending,
         limit: pagination.value.rowsPerPage,
@@ -351,8 +348,8 @@ export default {
     })
 
     onUnmounted(() => {
-      subscription.stop()
       countSubscription.stop()
+      subscription.stop()
       tracker.stop()
     })
 

@@ -1,11 +1,11 @@
 export default {
-    config: {
-        brand: {
-            primary: '#e64a19',
-            secondary: '#607d8b'
-        },
-        loadingBar: {
-            skipHijack: true
-        }
+  config: {
+    brand: {
+      primary: '#e64a19',
+      secondary: '#607d8b'
+    },
+    loadingBar: {
+      skipHijack: true
     }
+  }
 }

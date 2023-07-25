@@ -21,7 +21,7 @@
                     :loading='isFormSubmitted'
                     type='submit'
                     color='primary'
-                    icon='save'
+                    icon='sym_o_save'
                     class='q-ma-sm'
                     padding='xs sm'
                     outline

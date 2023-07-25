@@ -1,5 +1,5 @@
 <template>
-  <q-page :class='{"flex flex-center": $q.screen.gt.xs}' padding>
+  <q-page class='flex flex-center' padding>
     <q-card id='login-form' bordered flat>
       <q-card-section class='text-h4 text-bold'>
         {{ $t('users.login') }}
@@ -7,63 +7,7 @@
       <q-separator />
       <q-card-section>
         <q-form ref='formRef' class='q-gutter-md'>
-          <q-input
-            v-model='form.username'
-            @update:model-value='resetFormValidation'
-            @keyup.enter='submitForm'
-            :label='$t("users.username")'
-            :error='usernameHasError'
-            :rules='rules.username'
-            lazy-rules='ondemand'
-            ref='usernameFieldRef'
-            bottom-slots
-            autofocus
-            outlined
-          >
-            <template #prepend>
-              <q-icon name='sym_o_person' />
-            </template>
-            <template #error>
-              {{
-                usernameHasError
-                  ? $t(`users.incorrect_credentials${$q.screen.lt.sm ? '_short' : ''}`)
-                  : usernameFieldRef.errorMessage
-              }}
-            </template>
-          </q-input>
-          <q-input
-            v-model='form.password'
-            @update:model-value='resetFormValidation'
-            @keyup.enter='submitForm'
-            :type='isPasswordHidden ? "password" : "text"'
-            :label='$t("users.password")'
-            :error='passwordHasError'
-            :rules='rules.password'
-            lazy-rules='ondemand'
-            ref='passwordFieldRef'
-            bottom-slots
-            outlined
-          >
-            <template #prepend>
-              <q-icon name='sym_o_key' />
-            </template>
-            <template #append>
-              <q-icon
-                @click='isPasswordHidden = !isPasswordHidden'
-                :name='isPasswordHidden ? "sym_o_visibility" : "sym_o_visibility_off"'
-                class='cursor-pointer'
-              />
-            </template>
-          </q-input>
-          <q-btn
-            @click='submitForm'
-            :label='$t("users.login")'
-            :loading='isFormSubmitted'
-            :disable='isSubmitBtnDisabled'
-            color='primary'
-            icon='sym_o_login'
-            no-caps
-          />
+
         </q-form>
       </q-card-section>
     </q-card>
@@ -89,12 +33,10 @@ export default {
     const { required } = useCoreRules()
 
     const formRef = ref(null)
-    const usernameFieldRef = ref(null)
     const passwordFieldRef = ref(null)
 
     const isFormSubmitted = ref(false)
     const isPasswordHidden = ref(true)
-    const isSubmitBtnDisabled = ref(false)
     const usernameHasError = ref(false)
     const passwordHasError = ref(false)
 
@@ -113,12 +55,9 @@ export default {
     }
 
     const submitForm = async() => {
-      if (isFormSubmitted.value || isSubmitBtnDisabled.value) {
-        return
-      }
       isFormSubmitted.value = true
-
       const isValid = await formRef.value.validate()
+
       if (isValid) {
         const credentials = toRaw(form)
 
@@ -133,11 +72,6 @@ export default {
             usernameHasError.value = true
             passwordHasError.value = true
             passwordFieldRef.value.focus()
-          } else if (error.error === 'too-many-requests') {
-            isSubmitBtnDisabled.value = true
-            setTimeout(() => {
-              isSubmitBtnDisabled.value = false
-            }, error.details.timeToReset)
           } else {
             $q.notify({
               type: 'negative',
@@ -168,11 +102,9 @@ export default {
 
     return {
       formRef,
-      usernameFieldRef,
       passwordFieldRef,
       isFormSubmitted,
       isPasswordHidden,
-      isSubmitBtnDisabled,
       usernameHasError,
       passwordHasError,
       form,

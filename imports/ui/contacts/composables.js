@@ -1,14 +1,13 @@
 import { Meteor } from 'meteor/meteor'
 import { useI18n } from 'vue-i18n'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useQuasar } from '../quasar'
-import { ContactTypesEnum, ContactMethodsEnum } from '../../api/contacts/enums'
 import { useErrorLogAPI } from '../error-log/composables'
+import { ContactTypesEnum, ContactMethodsEnum } from '../../api/contacts/enums'
 
 import {
   getContact,
   getContactList,
-  getContactPositions,
   getContactEditableFields
 } from '../../api/contacts/queries'
 
@@ -32,7 +31,6 @@ export function useContactAPI() {
     // Queries
     getContact,
     getContactList,
-    getContactPositions,
     getContactEditableFields,
     // Methods
     addContact,
@@ -50,6 +48,7 @@ export function useContactAPI() {
 }
 
 export function useContactFunctions() {
+  const router = useRouter()
   const route = useRoute()
   const $q = useQuasar()
   const { t: $t } = useI18n()
@@ -71,12 +70,12 @@ export function useContactFunctions() {
       ok: {
         label: $t('core.delete'),
         color: 'negative',
-        icon: 'delete',
+        icon: 'sym_o_delete',
         noCaps: true
       },
       cancel: {
         color: 'black',
-        icon: 'cancel',
+        icon: 'sym_o_cancel',
         flat: true,
         noCaps: true
       }
@@ -89,6 +88,9 @@ export function useContactFunctions() {
             type: 'positive',
             message: $t('contacts.msg_delete_successful')
           })
+          if (route.name === 'ViewContact') {
+            router.push({ name: 'ContactList' })
+          }
         } else {
           $q.notify({
             type: 'negative',
@@ -104,7 +106,7 @@ export function useContactFunctions() {
         } else {
           insertErrorLog({
             location: 'deleteContact',
-            path: route.value.fullPath,
+            path: route.fullPath,
             metadata: error
           })
         }
@@ -130,7 +132,7 @@ export function useContactFunctions() {
     }).catch((error) => {
       insertErrorLog({
         location: 'activateContact',
-        path: route.value.fullPath,
+        path: route.fullPath,
         metadata: error
       })
     })
@@ -144,12 +146,12 @@ export function useContactFunctions() {
       ok: {
         label: $t('core.deactivate'),
         color: 'negative',
-        icon: 'visibility_off',
+        icon: 'sym_o_visibility_off',
         noCaps: true
       },
       cancel: {
         color: 'black',
-        icon: 'cancel',
+        icon: 'sym_o_cancel',
         flat: true,
         noCaps: true
       }
@@ -171,7 +173,7 @@ export function useContactFunctions() {
       }).catch((error) => {
         insertErrorLog({
           location: 'deactivateContact',
-          path: route.value.fullPath,
+          path: route.fullPath,
           metadata: error
         })
       })

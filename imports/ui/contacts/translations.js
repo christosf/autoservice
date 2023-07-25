@@ -2,6 +2,7 @@ export default {
   el: {
     contacts: {
       add_new: 'Προσθήκη νέας',
+      add_new_contact: 'Προσθήκη νέας επαφής',
       address_billing: 'Διεύθυνση τιμολόγησης',
       address_city: 'Πόλη',
       address_country: 'Χώρα',
@@ -19,6 +20,7 @@ export default {
       contact_phone_numbers: 'Τηλέφωνα επικοινωνίας',
       customers: 'Πελάτες',
       deactivate: 'Απενεργοποίηση επαφής',
+      deactivated_contact: 'Απενεργοποιημένη επαφή',
       deactivated_contacts: 'Απενεργοποιημένες επαφές',
       deactivated: 'Απενεργοποιημένες',
       delete: 'Διαγραφή επαφής',
@@ -40,6 +42,9 @@ export default {
       msg_already_exists: 'Υπάρχει ήδη μια επαφή με αυτό το όνομα και αριθμό τηλεφώνου.',
       msg_deactivate_prompt: 'Είστε σίγουροι ότι θέλετε να απενεργοποιήσετε αυτή την επαφή;',
       msg_deactivate_successful: 'Η επαφή έχει απενεργοποιηθεί επιτυχώς!',
+      msg_deactivated_contact: 'Η επαφή είναι απενεργοποιημένη και δεν μπορεί να συσχετιστεί '
+      + 'με άλλο περιεχόμενο. Ενεργοποιήστε την επαφή για να μπορέσετε να την επεξεργαστείτε '
+      + 'και να δημιουργήσετε νέες συσχετίσεις.',
       msg_delete_prompt: 'Είστε σίγουροι ότι θέλετε να διαγράψετε οριστικά αυτή την επαφή;',
       msg_delete_successful: 'Η επαφή έχει διαγραφεί επιτυχώς!',
       msg_email_exists: 'Αυτή η διεύθυνση e-mail έχει προστεθεί ήδη.',
@@ -56,9 +61,11 @@ export default {
       new_contact_method: 'Νέα μέθοδος επικοινωνίας',
       new_method: 'Νέα μέθοδος',
       new: 'Νέα επαφή',
+      next: 'Επόμενη επαφή',
       one: 'Επαφή',
       phone_number: 'Αριθμός τηλεφώνου',
       phone: 'Τηλέφωνο',
+      previous: 'Προηγούμενη επαφή',
       settings: 'Ρυθμίσεις επαφών',
       suppliers: 'Προμηθευτές',
       tax_reg_number: 'Αριθμός εγγραφής ΦΠΑ',
@@ -71,6 +78,7 @@ export default {
   en: {
     contacts: {
       add_new: 'Add new',
+      add_new_contact: 'Add new contact',
       address_billing: 'Billing address',
       address_city: 'City',
       address_country: 'Country',
@@ -88,6 +96,8 @@ export default {
       contact_phone_numbers: 'Contact phone numbers',
       customers: 'Customers',
       deactivate: 'Deactivate contact',
+      deactivated_contact: 'Deactivated contact',
+      deactivated_contacts: 'Deactivated contacts',
       deactivated: 'Deactivated',
       delete: 'Delete contact',
       edit_contact_method: 'Edit contact method',
@@ -107,6 +117,8 @@ export default {
       msg_already_exists: 'There is already a contact with this name and phone number.',
       msg_deactivate_prompt: 'Are you sure that you want to deactivate this contact?',
       msg_deactivate_successful: 'This contact has been deactivated successfully!',
+      msg_deactivated_contact: 'The contact is deactivated and can not be associated with other content. '
+      + 'Activate the contact to be able to edit or create new associations.',
       msg_delete_prompt: 'Are you sure that you want to permanently delete this contact?',
       msg_delete_successful: 'The contact has been deleted successfully!',
       msg_email_exists: 'This e-mail address is already added.',
@@ -123,9 +135,11 @@ export default {
       new_contact_method: 'New contact method',
       new_method: 'New method',
       new: 'New contact',
+      next: 'Next contact',
       one: 'Contact',
       phone_number: 'Phone number',
       phone: 'Phone',
+      previous: 'Previous contact',
       settings: 'Contact settings',
       suppliers: 'Suppliers',
       tax_reg_number: 'Tax registration number',

@@ -11,7 +11,7 @@
         <q-toolbar>
           <div class='text-h4 text-bold'>{{ title }}</div>
           <q-space />
-          <q-btn icon='close' flat round dense v-close-popup />
+          <q-btn icon='sym_o_close' flat round dense v-close-popup />
         </q-toolbar>
       </q-card-section>
       <q-separator />
@@ -32,11 +32,11 @@
             @transition='basicDetailsFormRef.focus()'
             :title='$t("core.basic_details")'
             :error='steps.basicDetails.hasError'
-            icon='person'
+            icon='sym_o_person'
           >
             <q-form
-              @submit='submitForm("basicDetails")'
-              @validation-error='atValidationError("basicDetails")'
+              @validation-error='atValidationError("basicDetails", basicDetailsFormRef)'
+              @submit.prevent
               ref='basicDetailsFormRef'
               class='q-gutter-md'
             >
@@ -115,21 +115,43 @@
                 <template #prepend>
                   <q-icon name='sym_o_sell' />
                 </template>
+                <template #no-option>
+                  <div class='after-options-slot'>
+                    <q-item dense>
+                      <q-item-section>
+                        <q-item-label class='text-caption text-italic'>
+                          {{ $t('core.msg_add_new_tag') }}
+                        </q-item-label>
+                      </q-item-section>
+                    </q-item>
+                  </div>
+                </template>
+                <template #after-options>
+                  <div class='after-options-slot'>
+                    <q-item dense>
+                      <q-item-section>
+                        <q-item-label class='text-caption text-italic'>
+                          {{ $t('core.msg_add_new_tag') }}
+                        </q-item-label>
+                      </q-item-section>
+                    </q-item>
+                  </div>
+                </template>
               </q-select>
               <div class='q-gutter-sm q-ml-sm'>
                 <q-btn
-                  type='submit'
+                  @click='submitForm'
                   :label='$t("core.save")'
                   :loading='isFormSubmitted'
                   color='primary'
-                  icon='save'
+                  icon='sym_o_save'
                   no-caps
                 />
                 <q-btn
                   @click='steps.current = "addresses"'
                   :label='$t("contacts.addresses")'
                   color='secondary'
-                  icon='chevron_right'
+                  icon='sym_o_chevron_right'
                   outline
                   no-caps
                 />
@@ -141,11 +163,11 @@
             @transition='addressesFormRef.focus()'
             :title='$t("contacts.addresses")'
             :error='steps.addresses.hasError'
-            icon='person_pin_circle'
+            icon='sym_o_person_pin_circle'
           >
             <q-form
-              @submit='submitForm("addresses")'
-              @validation-error='atValidationError("addresses")'
+              @validation-error='atValidationError("addresses", addressesFormRef)'
+              @submit.prevent
               ref='addressesFormRef'
               class='q-gutter-md'
             >
@@ -306,22 +328,22 @@
                 <q-btn
                   @click='steps.current = "basicDetails"'
                   color='secondary'
-                  icon='chevron_left'
+                  icon='sym_o_chevron_left'
                   outline
                 />
                 <q-btn
-                  type='submit'
+                  @click='submitForm'
                   :label='$t("core.save")'
                   :loading='isFormSubmitted'
                   color='primary'
-                  icon='save'
+                  icon='sym_o_save'
                   no-caps
                 />
                 <q-btn
                   @click='steps.current = "extraDetails"'
                   :label='$q.screen.gt.xs ? $t("core.extra_details") : ""'
                   color='secondary'
-                  icon='chevron_right'
+                  icon='sym_o_chevron_right'
                   outline
                   no-caps
                 />
@@ -333,11 +355,11 @@
             @transition='extraDetailsFormRef.focus()'
             :title='$t("core.extra_details")'
             :error='steps.extraDetails.hasError'
-            icon='manage_accounts'
+            icon='sym_o_manage_accounts'
           >
             <q-form
-              @submit='submitForm("extraDetails")'
-              @validation-error='atValidationError("extraDetails")'
+              @validation-error='atValidationError("extraDetails", extraDetailsFormRef)'
+              @submit.prevent
               ref='extraDetailsFormRef'
               class='q-gutter-md'
             >
@@ -366,15 +388,15 @@
                 <q-btn
                   @click='steps.current = "addresses"'
                   color='secondary'
-                  icon='chevron_left'
+                  icon='sym_o_chevron_left'
                   outline
                 />
                 <q-btn
-                  type='submit'
+                  @click='submitForm'
                   :label='$t("core.save")'
                   :loading='isFormSubmitted'
                   color='primary'
-                  icon='save'
+                  icon='sym_o_save'
                   no-caps
                 />
               </div>
@@ -517,9 +539,15 @@ export default {
 
     const addNewTag = (value, done) => done(value, 'add-unique')
 
-    const atValidationError = (step) => {
+    const atValidationError = (step, formRef) => {
       steps.current = step
       steps[step].hasError = true
+
+      nextTick(() => {
+        const components = formRef.getValidationComponents()
+        const component = components.find((c) => !!c.hasError)
+        component.focus()
+      })
     }
 
     const resetFormValidation = (step, formRef) => {
@@ -625,24 +653,23 @@ export default {
     }
 
     const close = () => {
-      resetForm()
       isDialogOpen.value = false
     }
 
-    const submitForm = async(type) => {
+    const submitForm = async() => {
       isFormSubmitted.value = true
 
       let basicDetailsFormVal = true
       let addressesFormVal = true
       let extraDetailsFormVal = true
 
-      if (type !== 'basicDetails' && basicDetailsFormRef.value) {
+      if (basicDetailsFormRef.value) {
         basicDetailsFormVal = await basicDetailsFormRef.value.validate()
       }
-      if (type !== 'addresses' && addressesFormRef.value) {
+      if (addressesFormRef.value) {
         addressesFormVal = await addressesFormRef.value.validate()
       }
-      if (type !== 'extraDetails' && extraDetailsFormRef.value) {
+      if (extraDetailsFormRef.value) {
         extraDetailsFormVal = await extraDetailsFormRef.value.validate()
       }
 
@@ -738,6 +765,10 @@ export default {
 #edit-contact-dialog .q-card {
     width: 100%;
     max-width: 800px;
+}
+
+.after-options-slot .q-item {
+  border-top: 1px solid rgba(0,0,0,0.1)
 }
 
 </style>

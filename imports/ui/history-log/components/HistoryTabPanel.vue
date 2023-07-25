@@ -43,8 +43,8 @@
                         </router-link>
                     </div>
                 </q-td>
-                <q-td auto-width>{{ formatDate(props.row.createdAt, 'DD.MM.YYYY - HH:mm') }}</q-td>
-                <q-td auto-width>
+                <q-td>{{ formatDate(props.row.createdAt, 'DD.MM.YYYY - HH:mm') }}</q-td>
+                <q-td>
                     <router-link
                         :to='{ name: "ViewUser", params: { username: props.row.createdBy.username }}'
                         class='text-secondary'
@@ -411,7 +411,7 @@ export default {
 
                 historyLog.value.forEach(log => {
                     if (log.metadata && log.metadata.linkType === 'vehicle') {
-                        getVehicleBasicDetails({ _id: log.metadata.vehicle._id }).then(response => {
+                        getVehicleBasicDetails({ vehicleId: log.metadata.vehicle._id }).then(response => {
                             if (response) {
                                 const { makeModel, regNumber } = response
                                 log.metadata.vehicle.makeModel = makeModel

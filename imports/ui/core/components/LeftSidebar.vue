@@ -66,7 +66,7 @@
         </q-item>
         <q-item :to='{ name: "ServiceList" }'>
             <q-item-section avatar>
-                <q-icon name='design_services' />
+                <q-icon name='sym_o_design_services' />
             </q-item-section>
             <q-item-section>
                 {{ $t('services.many' )}}
@@ -74,7 +74,7 @@
         </q-item>
         <q-item :to='{ name: "InvoiceList" }'>
             <q-item-section avatar>
-                <q-icon name='description' />
+                <q-icon name='sym_o_description' />
             </q-item-section>
             <q-item-section>
                 {{ $t('core.invoices' )}}
@@ -82,7 +82,7 @@
         </q-item>
         <q-item :to='{ name: "ReportList" }'>
             <q-item-section avatar>
-                <q-icon name='summarize' />
+                <q-icon name='sym_o_summarize' />
             </q-item-section>
             <q-item-section>
                 {{ $t('core.reports' )}}
@@ -93,7 +93,7 @@
             :header-class='{"q-router-link--active": $route.meta.group === "Settings"}'
             :to='{ name: "SettingsPage" }'
             :label='$t("core.settings")'
-            icon='commute'
+            icon='sym_o_settings'
         >
             <q-list class='sub-menu q-mb-sm' dense>
                 <q-item :to='{ name: "ContactSettings"}'>

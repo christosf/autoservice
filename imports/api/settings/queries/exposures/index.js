@@ -1,1 +1,1 @@
-import './getContactSettings.expose'
+import './getGeneralSettings.expose'

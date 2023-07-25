@@ -193,7 +193,10 @@ Meteor.methods({
     check(params, Object)
 
     const schema = new SimpleSchema({
-      filter: String
+      filter: {
+        type: String,
+        optional: true
+      }
     })
     schema.validate(schema.clean(params))
 
@@ -210,7 +213,6 @@ Meteor.methods({
     }, {
       fields: {
         code: 1,
-        type: 1,
         name: 1,
         phoneNumber: 1,
         searchableName: 1,
@@ -218,7 +220,8 @@ Meteor.methods({
           searchableValue: 1
         }
       },
-      limit: 8
+      sort: { updatedAt: -1 },
+      limit: 4
     })
 
     return cursor.fetch()
@@ -255,7 +258,7 @@ Meteor.methods({
 
     return response.filter((item) => new RegExp(filter).test(convertToSearchableString(item)))
   },
-  'contacts.getPrevNextContactCode'(params) {
+  async 'contacts.getPrevNextContactCode'(params) {
     check(params, Object)
 
     const schema = new SimpleSchema({
@@ -263,44 +266,74 @@ Meteor.methods({
         type: String,
         allowedValues: ['prev', 'next']
       },
-      value: String,
+      contactId: String,
       sortBy: String,
       descending: Boolean
     })
     schema.validate(schema.clean(params))
 
-    const { type, value, sortBy, descending } = params
+    const { type, contactId, sortBy, descending } = params
 
-    const query = {}
-    query[sortBy] = descending ? { $lt: value } : { $gt: value }
-    if (type === 'prev') {
-      query[sortBy] = descending ? { $gt: value } : { $lt: value }
-    }
-
+    const sortOrder = descending ? -1 : 1
+    const reversedSortOrder = descending ? 1 : -1
     const sort = {}
-    if (sortBy === 'name') {
-      sort.searchableName = descending ? -1 : 1
-    } else {
-      sort[sortBy] = descending ? -1 : 1
+    const reversedSort = {}
+    switch (sortBy) {
+      case 'name':
+        sort.searchableName = sortOrder
+        sort.updatedAt = -1
+        reversedSort.searchableName = reversedSortOrder
+        reversedSort.updatedAt = -1
+        break
+      default:
+        sort[sortBy] = sortOrder
+        reversedSort[sortBy] = reversedSortOrder
     }
-    if (type === 'prev') {
-      if (sortBy === 'name') {
-        sort.searchableName = descending ? 1 : -1
-      } else {
-        sort[sortBy] = descending ? 1 : -1
+
+    const cursor = Contacts.rawCollection().aggregate([
+      {
+        $setWindowFields: {
+          sortBy: sort,
+          output: {
+            prevCode: {
+              $first: '$code',
+              window: {
+                documents: [-1, 0]
+              }
+            },
+            nextCode: {
+              $last: '$code',
+              window: {
+                documents: [0, 1]
+              }
+            }
+          }
+        }
+      },
+      {
+        $match: {
+          _id: contactId
+        }
+      },
+      {
+        $project: {
+          code: 1,
+          prevCode: 1,
+          nextCode: 1
+        }
       }
+    ])
+
+    const result = await cursor.next()
+    cursor.close()
+
+    if (type === 'prev' && result.code === result.prevCode) {
+      result.prevCode = Contacts.findOne({}, { fields: { code: 1 }, sort: reversedSort }).code
+    } else if (type === 'next' && result.code === result.nextCode) {
+      result.nextCode = Contacts.findOne({}, { fields: { code: 1 }, sort }).code
     }
 
-    const contact = Contacts.findOne(
-      query,
-      { fields: { code: 1 }, sort }
-    )
-
-    if (!contact) {
-      return Contacts.findOne({}, { fields: { code: 1 }, sort }).code
-    }
-
-    return contact.code
+    return type === 'prev' ? result.prevCode : result.nextCode
   },
   'contacts.getBasicDetails'(params) {
     check(params, Object)

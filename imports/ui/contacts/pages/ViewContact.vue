@@ -5,7 +5,7 @@
         <q-card-section class='q-pa-none'>
           <q-toolbar>
             <q-icon
-              :name='isCompany(contact.type) ? "domain" : "person"'
+              :name='isCompany(contact.type) ? "sym_o_domain" : "sym_o_person"'
               class='q-mr-md q-ml-xs'
               color='primary'
               size='36px'
@@ -15,32 +15,80 @@
               <div class='text-caption'>{{ `${$t('core.code')}: ${contact.code}` }}</div>
             </div>
             <q-space />
-            <div class='q-gutter-sm'>
+            <div class='q-gutter-sm text-right'>
               <q-btn
+                v-if='contact.isActive'
                 @click='editDialogRef.open(contact._id, contact.code)'
                 :label='$q.screen.gt.xs ? $t("core.edit") : ""'
-                :dense='$q.screen.lt.sm'
                 padding='xs sm'
                 color='primary'
-                icon='edit'
+                icon='sym_o_edit'
                 outline
                 no-caps
               />
+              <template v-else>
+                <q-btn
+                  @click='activateContact(contact._id)'
+                  :label='$q.screen.gt.xs ? $t("core.activate") : ""'
+                  padding='xs sm'
+                  color='positive'
+                  icon='sym_o_visibility'
+                  outline
+                  no-caps
+                >
+                  <q-tooltip v-if='$q.screen.lt.sm'>{{ $t('core.activate') }}</q-tooltip>
+                </q-btn>
+                <q-btn
+                  @click='deleteContact(contact._id)'
+                  padding='xs sm'
+                  color='negative'
+                  icon='sym_o_delete'
+                  outline
+                  no-caps
+                >
+                  <q-tooltip>{{ $t('core.delete') }}</q-tooltip>
+                </q-btn>
+              </template>
+              <q-btn-dropdown
+                v-if='contact.isActive'
+                :menu-offset='[0,5]'
+                dropdown-icon='sym_o_more_vert'
+                content-class='custom-dropdown-menu'
+                color='secondary'
+                padding='xs'
+                outline
+                no-caps
+              >
+                <q-list :dense='$q.platform.is.desktop' separator v-close-popup>
+                  <q-item @click='deactivateContact(contact._id)' clickable>
+                    <q-item-section avatar>
+                      <q-icon name='sym_o_visibility_off' />
+                    </q-item-section>
+                    <q-item-section>
+                      <q-item-label>{{ $t('core.deactivate') }}</q-item-label>
+                    </q-item-section>
+                  </q-item>
+                </q-list>
+              </q-btn-dropdown>
               <q-btn-group outline>
                 <q-btn
                   @click='goToContactCode("prev")'
                   color='secondary'
-                  icon='chevron_left'
+                  icon='sym_o_chevron_left'
                   padding='xs'
                   outline
-                />
+                >
+                  <q-tooltip>{{ $t('contacts.previous') }}</q-tooltip>
+                </q-btn>
                 <q-btn
                   @click='goToContactCode("next")'
                   color='secondary'
-                  icon='chevron_right'
+                  icon='sym_o_chevron_right'
                   padding='xs'
                   outline
-                />
+                >
+                  <q-tooltip>{{ $t('contacts.next') }}</q-tooltip>
+                </q-btn>
               </q-btn-group>
             </div>
           </q-toolbar>
@@ -54,28 +102,36 @@
           inline-label
           no-caps
         >
-          <template v-for='tab in routeTabs'>
+          <template v-for='tab in routeTabs' :key='tab.name'>
             <q-route-tab
-                v-if='["vehicles", "job-cards"].includes(tab.name)
-                  ? contact.vehicles.length > 0
-                  : true
-                '
-                :to='{ name: "ViewContact", params: {
-                  code: contact.code,
-                  view: tab.view ? tab.view : undefined }
-                }'
-                :key='tab.name'
-                :label='$t(tab.label)'
-                :icon='tab.icon'
+              v-if='["vehicles", "job-cards"].includes(tab.name)
+                ? contact.vehicles.length > 0
+                : true
+              '
+              :to='{ name: "ViewContact", params: {
+                code: contact.code,
+                view: tab.view ? tab.view : undefined }
+              }'
+              :label='$t(tab.label)'
+              :icon='tab.icon'
             />
           </template>
         </q-tabs>
       </q-card>
+      <q-banner v-if='!contact.isActive' class='bg-amber-3' rounded>
+        <template #avatar>
+          <q-icon name='sym_o_warning' />
+        </template>
+        <template #default>
+          <div class='text-h6 text-bold q-mb-xs'>{{ $t('contacts.deactivated_contact') }}</div>
+          <div class='text-caption'>{{ $t('contacts.msg_deactivated_contact') }}</div>
+        </template>
+      </q-banner>
       <q-tab-panels
-          v-model='activeTab'
-          transition-prev='fade'
-          transition-next='fade'
-          animated
+        v-model='activeTab'
+        transition-prev='fade'
+        transition-next='fade'
+        animated
       >
           <q-tab-panel name='overview' class='q-pa-none'>
               <overview-tab-panel :contact='contact' />
@@ -128,7 +184,7 @@ export default {
     const $q = useQuasar()
     const { t: $t } = useI18n()
     const { getContact, getPrevNextContactCode } = useContactAPI()
-    const { isCompany } = useContactFunctions()
+    const { isCompany, deactivateContact, activateContact, deleteContact } = useContactFunctions()
 
     const vueReactiveDependencies = new Tracker.Dependency()
     const editDialogRef = ref(null)
@@ -144,24 +200,24 @@ export default {
       {
         name: 'overview',
         label: 'core.overview',
-        icon: 'dataset'
+        icon: 'sym_o_dataset'
       },
       {
         name: 'vehicles',
         label: 'vehicles.many',
-        icon: 'commute',
+        icon: 'sym_o_commute',
         view: 'vehicles'
       },
       {
         name: 'job-cards',
         label: 'job_cards.many',
-        icon: 'build_circle',
+        icon: 'sym_o_build_circle',
         view: 'job-cards'
       },
       {
         name: 'history',
         label: 'core.history',
-        icon: 'history',
+        icon: 'sym_o_history',
         view: 'history'
       }
     ]
@@ -169,27 +225,17 @@ export default {
     const handleSwipeRight = () => router.push({ name: 'ContactList' })
 
     const goToContactCode = (type) => {
-      let value = route.params.code
       let sortBy = 'code'
       let descending = true
 
       if ($q.localStorage.has('contactListPagination')) {
         const localStoragePagination = $q.localStorage.getItem('contactListPagination')
 
-        if (localStoragePagination.sortBy !== 'vehicleCount') {
-          sortBy = localStoragePagination.sortBy
-          descending = localStoragePagination.descending
-
-          if (sortBy === 'name') {
-            sortBy = 'searchableName'
-            value = contact.value.searchableName
-          } else {
-            value = contact.value[sortBy]
-          }
-        }
+        sortBy = localStoragePagination.sortBy
+        descending = localStoragePagination.descending
       }
 
-      getPrevNextContactCode({ type, value, sortBy, descending }).then((response) => {
+      getPrevNextContactCode({ type, contactId: contact.value._id, sortBy, descending }).then((response) => {
         router.push({ name: 'ViewContact', params: { code: response } })
       })
     }
@@ -245,6 +291,9 @@ export default {
       contact,
       routeTabs,
       isCompany,
+      activateContact,
+      deactivateContact,
+      deleteContact,
       handleSwipeRight,
       goToContactCode
     }

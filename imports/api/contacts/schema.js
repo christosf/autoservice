@@ -26,7 +26,7 @@ export default new SimpleSchema({
     type: String,
     min: 8,
     max: 20,
-    regEx: /^$|^[0-9]{8,20}$/
+    regEx: /^[0-9]{8,20}$/
   },
   billingAddress: {
     type: Object,

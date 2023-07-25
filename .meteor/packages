@@ -24,3 +24,4 @@ accounts-base
 accounts-password
 aldeed:schema-deny
 matb33:collection-hooks
+logging

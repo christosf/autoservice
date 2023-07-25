@@ -1,8 +1,8 @@
 <template>
   <div class='q-mb-lg'>
     <draggable
-      v-model='contactForm.contactMethods'
-      @change='$emit("orderUpdate")'
+      v-model='contactMethods'
+      @change='$emit("orderUpdate", contactMethods)'
       item-key='value'
       tag='q-list'
       handle='.handle'
@@ -41,7 +41,7 @@
             <div class='q-gutter-sm'>
               <q-btn
                 @click='$emit("editPhoneNumber")'
-                icon='edit'
+                icon='sym_o_edit'
                 color='secondary'
                 size='sm'
                 outline
@@ -71,7 +71,7 @@
             <div class='q-gutter-sm'>
               <q-btn
                 @click='edit(method, index)'
-                icon='edit'
+                icon='sym_o_edit'
                 color='secondary'
                 size='sm'
                 outline
@@ -83,7 +83,7 @@
               </q-btn>
               <q-btn
                 @click='$emit("remove", index)'
-                icon='cancel'
+                icon='sym_o_remove'
                 color='negative'
                 size='sm'
                 outline
@@ -105,7 +105,7 @@
           :label='$t("contacts.new_method")'
           class='q-ma-md'
           color='primary'
-          icon='playlist_add'
+          icon='sym_o_playlist_add'
           outline
           dense
           no-caps
@@ -123,12 +123,12 @@
               {{ $t(`contacts.${editIndex === null ? 'new' : 'edit'}_contact_method`) }}
             </div>
             <q-space />
-            <q-btn icon='close' flat round dense v-close-popup />
+            <q-btn icon='sym_o_close' flat round dense v-close-popup />
           </q-toolbar>
         </q-card-section>
         <q-separator />
         <q-card-section>
-          <q-form @submit='submitForm' ref='formRef' class='q-gutter-md'>
+          <q-form @submit.prevent ref='formRef' class='q-gutter-md'>
             <q-select
               v-model='form.type'
               @update:model-value='atTypeFieldModelUpdate'
@@ -184,17 +184,17 @@
             </q-input>
             <div class='q-gutter-sm q-ml-sm'>
               <q-btn
-                type='submit'
+                @click='submitForm'
                 :label='$t("core.add")'
                 color='primary'
-                icon='playlist_add'
+                icon='sym_o_playlist_add'
                 no-caps
               />
               <q-btn
                 @click='close'
                 :label='$t("core.cancel")'
                 color='secondary'
-                icon='cancel'
+                icon='sym_o_cancel'
                 outline
                 no-caps
               />
@@ -207,7 +207,7 @@
 </template>
 
 <script>
-import { reactive, ref, toRefs, computed, toRaw, onBeforeMount } from 'vue'
+import { reactive, ref, toRefs, computed, toRaw, onBeforeMount, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import draggable from 'vuedraggable'
 
@@ -250,6 +250,7 @@ export default {
     const isDialogOpen = ref(false)
     const editIndex = ref(null)
     const contactMethodTypesOptionList = []
+    const contactMethods = ref([])
 
     const form = reactive({
       type: ContactMethodsEnum.PHONE,
@@ -395,6 +396,10 @@ export default {
       })
     })
 
+    watch(contactForm.value.contactMethods, () => {
+      contactMethods.value = contactForm.value.contactMethods
+    }, { immediate: true })
+
     return {
       contactForm,
       formRef,
@@ -404,6 +409,7 @@ export default {
       form,
       rules,
       contactMethodTypesOptionList,
+      contactMethods,
       valueFieldLabel,
       valueFieldRules,
       valueFieldIcon,

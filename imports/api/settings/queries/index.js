@@ -1,5 +1,5 @@
-import getContactSettings from './getContactSettings'
+import getGeneralSettings from './getGeneralSettings'
 
 export {
-    getContactSettings
+  getGeneralSettings
 }

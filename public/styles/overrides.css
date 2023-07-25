@@ -91,6 +91,19 @@ body {
   padding: 7px 12px;
 }
 
-.q-table th {
+.q-table th,
+.q-dialog__title {
   font-weight: 600;
+}
+
+/*
+body.desktop .q-focusable:focus>.q-focus-helper,
+body.desktop .q-hoverable:hover>.q-focus-helper,
+body.desktop .q-manual-focusable--focused>.q-focus-helper {
+  opacity: 0.05;
+}
+*/
+body.desktop .q-btn.q-focusable:focus>.q-focus-helper,
+body.desktop .q-btn.q-hoverable:focus>.q-focus-helper {
+  opacity: 0.2;
 }

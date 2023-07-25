@@ -5,14 +5,16 @@ export default Contacts.createQuery('getContactList', {
   $filter({ filters, options, params }) {
     options.sort = {}
 
+    const { statusFilter, sortBy } = params
     const filter = convertToSearchableRegex(params.filter)
+    const sortOrder = params.descending ? -1 : 1
 
     filters.isActive = true
-    if (params.statusFilter === 'deactivated') {
+    if (statusFilter === 'deactivated') {
       filters.isActive = false
-    } else if (params.statusFilter === 'customers') {
+    } else if (statusFilter === 'customers') {
       filters.vehicleCount = { $gt: 0 }
-    } else if (params.statusFilter === 'suppliers') {
+    } else if (statusFilter === 'suppliers') {
       // TODO: Filter contacts if they have PartSupplies.
     }
 
@@ -24,10 +26,11 @@ export default Contacts.createQuery('getContactList', {
       { 'contactMethods.searchableValue': { $regex: filter } }
     ]
 
-    if (params.sortBy === 'name') {
-      options.sort.searchableName = params.descending ? -1 : 1
+    if (sortBy === 'name') {
+      options.sort.searchableName = sortOrder
+      options.sort.updatedAt = -1
     } else {
-      options.sort[params.sortBy] = params.descending ? -1 : 1
+      options.sort[sortBy] = sortOrder
     }
   },
   $postFilter(results) {
@@ -52,4 +55,13 @@ export default Contacts.createQuery('getContactList', {
   },
   searchableName: 1,
   searchableTags: 1
+}, {
+  validateParams: {
+    filter: String,
+    statusFilter: String,
+    sortBy: String,
+    descending: Boolean,
+    limit: Number,
+    skip: Number
+  }
 })

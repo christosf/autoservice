@@ -30,6 +30,7 @@ module.exports = {
     'meteor',
     'vue'
   ],
+  ignorePatterns: ['quasar.js'],
   rules: {
     curly: ['error', 'all'],
     semi: ['error', 'never'],
@@ -41,7 +42,7 @@ module.exports = {
     }],
     'object-curly-newline': ['error', {
       multiline: true,
-      minProperties: 7,
+      minProperties: 8,
       consistent: true
     }],
     'max-len': ['error', { code: 110 }],

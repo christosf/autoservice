@@ -1,11 +1,13 @@
 import { Meteor } from 'meteor/meteor'
-import { getContactSettings } from '../../api/settings/queries'
+import { getGeneralSettings } from '../../api/settings/queries'
 
 export function useSettingAPI() {
-    const getExportedContacts = () => Meteor.callAsync('settings.exportContacts')
+  const updateGeneralSettings = (params) => Meteor.callAsync('settings.updateGeneral', params)
+  const getExportedContacts = () => Meteor.callAsync('settings.exportContacts')
 
-    return {
-        getContactSettings,
-        getExportedContacts
-    }
+  return {
+    getGeneralSettings,
+    updateGeneralSettings,
+    getExportedContacts
+  }
 }

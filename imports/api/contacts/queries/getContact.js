@@ -1,12 +1,13 @@
+import { Match } from 'meteor/check'
 import { Contacts } from '../../database'
 
 export default Contacts.createQuery('getContact', {
   $filter({ filters, params }) {
+    if (params.contactId) {
+      filters._id = params.contactId
+    }
     if (params.code) {
       filters.code = params.code.toUpperCase()
-    }
-    if (params.id) {
-      filters._id = params.id
     }
   },
   code: 1,
@@ -24,9 +25,6 @@ export default Contacts.createQuery('getContact', {
   },
   notes: 1,
   balance: 1,
-  isActive: 1,
-  updatedAt: 1,
-  searchableName: 1,
   vehicles: {
     $filters: {
       isActive: true
@@ -37,5 +35,13 @@ export default Contacts.createQuery('getContact', {
     regNumber: 1,
     tags: 1,
     updatedAt: 1
+  },
+  isActive: 1,
+  updatedAt: 1,
+  searchableName: 1
+}, {
+  validateParams: {
+    contactId: Match.Maybe(String),
+    code: Match.Maybe(String)
   }
 })

@@ -70,6 +70,10 @@ a {
 	padding-left: 32px;
 }
 
+.q-banner {
+	border: 1px solid rgba(0,0,0,0.1)
+}
+
 .q-table th {
     font-size: 13px;
 }
@@ -82,7 +86,6 @@ a {
     padding: 7px;
 }
 
-
 .q-table tbody td.operations {
 	padding-left: 6px;
     padding-right: 10px;
@@ -92,6 +95,33 @@ a {
 .q-table tbody td.operations {
     background-color: #ffffff;
     position: sticky;
-    right: 0;
+    right: -1px;
     z-index: 1;
+}
+
+.custom-dropdown-menu {
+	border: 1px solid rgba(0,0,0,0.1);
+	box-shadow: 0 1px 1px rgba(0,0,0,.2), 0 2px 1px 1px rgba(0,0,0,.14), 0 3px 1px -2px rgba(0,0,0,.12);
+}
+
+.custom-dropdown-menu .q-item {
+	min-height: 40px;
+	padding: 6px 12px;
+}
+
+.custom-dropdown-menu .q-item--dense, .q-list--dense>.q-item {
+	min-height: 32px;
+	padding: 2px 10px;
+}
+
+.custom-dropdown-menu .q-item__section--avatar {
+	min-width: 30px;
+}
+
+.custom-dropdown-menu .q-item__section--side {
+	padding-right: 10px;
+}
+
+.custom-dropdown-menu .q-item__section--side>.q-icon {
+	font-size: 20px;
 }

@@ -9,24 +9,25 @@ import settings from '../../ui/settings/routes'
 import core from '../../ui/core/routes'
 
 const routes = [
-    ...contacts,
-    ...vehicles,
-    ...services,
-    ...jobcards,
-    ...users,
-    ...settings,
-    ...core
+  ...contacts,
+  ...vehicles,
+  ...services,
+  ...jobcards,
+  ...users,
+  ...settings,
+  ...core
 ]
 
 const router = createRouter({
-    history: createWebHistory(),
-    routes
+  history: createWebHistory(),
+  routes
 })
 
-router.beforeEach(to => {
-    if (!Meteor.userId() && to.name !== 'LoginPage') {
-        return { name: 'LoginPage' }
-    }
+router.beforeEach((to) => {
+  if (!Meteor.userId() && to.meta.access !== 'guests-only') {
+    return { name: 'LoginPage' }
+  }
+  return true
 })
 
 export default router
