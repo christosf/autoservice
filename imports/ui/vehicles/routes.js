@@ -1,4 +1,4 @@
-import LeftSidebar from '../core/components/LeftSidebar.vue'
+import MainSidebar from '../core/components/MainSidebar.vue'
 import VehicleList from './pages/VehicleList.vue'
 import ViewVehicle from './pages/ViewVehicle.vue'
 
@@ -8,7 +8,7 @@ export default [
     path: '/vehicles/:view?',
     components: {
       default: VehicleList,
-      leftSidebar: LeftSidebar
+      sidebar: MainSidebar
     },
     meta: {
       group: 'Vehicles'
@@ -19,7 +19,7 @@ export default [
     path: '/vehicle/:code/:view?',
     components: {
       default: ViewVehicle,
-      leftSidebar: LeftSidebar
+      sidebar: MainSidebar
     },
     meta: {
       group: 'Vehicles'

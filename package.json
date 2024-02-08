@@ -1,48 +1,48 @@
 {
-  "name": "autoservice",
+  "name": "autoservice-2.0",
   "private": true,
   "scripts": {
-    "start": "cross-env MONGO_URL=mongodb://admin:1a2a3b4b@localhost:27017/autoservice meteor run --port 80",
-    "test": "meteor test --once --driver-package meteortesting:mocha",
-    "test-app": "TEST_WATCH=1 meteor test --full-app --driver-package meteortesting:mocha",
-    "visualize": "meteor --production --extra-packages bundle-visualizer"
+    "start": "cross-env MONGO_URL=mongodb://admin:1a2a3b4b@localhost:27017/autoservice meteor run --port 80"
   },
   "dependencies": {
-    "@babel/runtime": "^7.22.6",
-    "deepmerge": "^4.3.1",
+    "@babel/runtime": "^7.23.9",
+    "date-fns": "^2.30.0",
     "just-diff": "^6.0.2",
-    "meteor-node-stubs": "^1.2.1",
+    "meteor-node-stubs": "^1.2.7",
     "object-path": "^0.11.8",
-    "papaparse": "^5.4.1",
-    "pinia": "^2.1.4",
+    "passive-events-support": "^1.1.0",
+    "pinia": "^2.1.7",
     "queue-system": "^4.1.1",
-    "simpl-schema": "^3.4.1",
-    "ua-parser-js": "^1.0.35",
-    "validator": "^13.9.0",
-    "vue": "^3.3.4",
-    "vue-i18n": "^9.2.2",
-    "vue-router": "^4.2.4",
+    "simpl-schema": "1.12.3",
+    "slug": "^8.2.3",
+    "validator": "^13.11.0",
+    "vue": "^3.4.15",
+    "vue-i18n": "^9.9.1",
+    "vue-router": "^4.2.5",
     "vuedraggable": "^4.1.0"
+  },
+  "devDependencies": {
+    "@meteorjs/eslint-config-meteor": "^1.0.5",
+    "@types/meteor": "^2.9.8",
+    "@types/simpl-schema": "^1.12.7",
+    "@vitejs/plugin-vue": "^4.6.2",
+    "babel-eslint": "^10.1.0",
+    "cross-env": "^7.0.3",
+    "eslint": "^8.56.0",
+    "eslint-config-airbnb": "^19.0.4",
+    "eslint-import-resolver-meteor": "^0.4.0",
+    "eslint-plugin-import": "^2.29.1",
+    "eslint-plugin-jsx-a11y": "^6.8.0",
+    "eslint-plugin-meteor": "^7.3.0",
+    "eslint-plugin-react": "^7.33.2",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-vue": "^9.21.1",
+    "vite": "^4.5.2"
   },
   "meteor": {
     "mainModule": {
       "client": "client/main.js",
       "server": "server/main.js"
-    },
-    "testModule": "tests/main.js"
-  },
-  "devDependencies": {
-    "@meteorjs/eslint-config-meteor": "^1.0.5",
-    "babel-eslint": "^10.1.0",
-    "cross-env": "^7.0.3",
-    "eslint": "^8.45.0",
-    "eslint-config-airbnb": "^19.0.4",
-    "eslint-import-resolver-meteor": "^0.4.0",
-    "eslint-plugin-import": "^2.27.5",
-    "eslint-plugin-jsx-a11y": "^6.7.1",
-    "eslint-plugin-meteor": "^7.3.0",
-    "eslint-plugin-react": "^7.32.2",
-    "eslint-plugin-react-hooks": "^4.6.0",
-    "eslint-plugin-vue": "^9.15.1"
+    }
   }
 }

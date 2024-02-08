@@ -3,7 +3,7 @@ const ContactTypesEnum = {
   COMPANY: 'company'
 }
 
-const ContactMethodsEnum = {
+const ContactMethodTypesEnum = {
   PHONE: 'phone',
   EMAIL: 'email',
   FAX: 'fax',
@@ -11,6 +11,6 @@ const ContactMethodsEnum = {
 }
 
 Object.freeze(ContactTypesEnum)
-Object.freeze(ContactMethodsEnum)
+Object.freeze(ContactMethodTypesEnum)
 
-export { ContactTypesEnum, ContactMethodsEnum }
+export { ContactTypesEnum, ContactMethodTypesEnum }

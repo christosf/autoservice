@@ -1,8 +1,8 @@
 import SimpleSchema from 'simpl-schema'
-import { ContactTypesEnum } from './enums'
-import { convertToSearchableString } from '../core/functions'
+import { ContactTypesEnum, ContactMethodTypesEnum } from './enums'
+import { phoneNumberRegex, convertToSearchableString } from '../core/utilities'
 
-export default new SimpleSchema({
+const contactSchema = new SimpleSchema({
   type: {
     type: String,
     allowedValues: Object.values(ContactTypesEnum),
@@ -17,20 +17,23 @@ export default new SimpleSchema({
     type: String,
     autoValue() {
       const nameField = this.field('name')
-      return nameField.isSet
-        ? convertToSearchableString(nameField.value)
-        : this.unset()
+      return nameField.isSet ? convertToSearchableString({ value: nameField.value }) : this.unset()
     }
   },
   phoneNumber: {
     type: String,
     min: 8,
     max: 20,
-    regEx: /^[0-9]{8,20}$/
+    regEx: phoneNumberRegex
   },
   billingAddress: {
     type: Object,
-    optional: true
+    optional: true,
+    autoValue() {
+      if (this.value && typeof this.value === 'object' && Object.keys(this.value).length === 0) {
+        this.unset()
+      }
+    }
   },
   'billingAddress.street': {
     type: String,
@@ -48,7 +51,6 @@ export default new SimpleSchema({
   },
   'billingAddress.city': {
     type: String,
-    min: 2,
     max: 30,
     optional() {
       return !this.field('billingAddress.postCode').isSet
@@ -64,7 +66,12 @@ export default new SimpleSchema({
   },
   deliveryAddress: {
     type: Object,
-    optional: true
+    optional: true,
+    autoValue() {
+      if (this.value && typeof this.value === 'object' && Object.keys(this.value).length === 0) {
+        this.unset()
+      }
+    }
   },
   'deliveryAddress.street': {
     type: String,
@@ -82,7 +89,6 @@ export default new SimpleSchema({
   },
   'deliveryAddress.city': {
     type: String,
-    min: 2,
     max: 30,
     optional() {
       return !this.field('deliveryAddress.postCode').isSet
@@ -105,19 +111,17 @@ export default new SimpleSchema({
   'contactMethods.$': Object,
   'contactMethods.$.type': {
     type: String,
-    allowedValues: ['email', 'phone', 'fax', 'website']
+    allowedValues: Object.values(ContactMethodTypesEnum)
   },
   'contactMethods.$.value': {
     type: String,
-    max: 100
+    max: 60
   },
   'contactMethods.$.searchableValue': {
     type: String,
     autoValue() {
       const valueField = this.siblingField('value')
-      return valueField.isSet
-        ? convertToSearchableString(valueField.value)
-        : this.unset()
+      return valueField.isSet ? convertToSearchableString({ value: valueField.value }) : this.unset()
     }
   },
   'contactMethods.$.description': {
@@ -125,12 +129,22 @@ export default new SimpleSchema({
     max: 80,
     optional: true
   },
-  notes: {
-    type: String,
-    optional: true
-  },
   vehicleCount: {
     type: Number,
     defaultValue: 0
+  },
+  vehiclesCache: {
+    type: Array,
+    optional: true
+  },
+  'vehiclesCache.$': {
+    type: Object,
+    blackbox: true
+  },
+  notes: {
+    type: String,
+    optional: true
   }
 })
+
+export default contactSchema

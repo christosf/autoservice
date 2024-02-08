@@ -1,11 +1,5 @@
-import { Meteor } from 'meteor/meteor'
 import '../../api/database'
-import '../../api/exposures'
+import '../../api/exposure'
 import './methods'
 import './hooks'
-import './observers'
 import './fixtures'
-
-Meteor.startup(() => {
-
-})

@@ -32,8 +32,10 @@ module.exports = {
   ],
   ignorePatterns: ['quasar.js'],
   rules: {
+    'no-console': 'off',
     curly: ['error', 'all'],
     semi: ['error', 'never'],
+    'function-paren-newline': ['error', 'multiline'],
     'comma-dangle': ['error', 'never'],
     'no-restricted-exports': ['error', {
       restrictDefaultExports: {
@@ -49,9 +51,6 @@ module.exports = {
     'import/prefer-default-export': 'off',
     'import/no-cycle': 'off',
     'vue/no-dupe-keys': 'off',
-    'no-param-reassign': [
-      'error',
-      { props: true, ignorePropertyModificationsFor: ['filters', 'options', 'result'] }
-    ]
+    'no-param-reassign': 'off'
   }
 }

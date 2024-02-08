@@ -2,21 +2,21 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 
 export const useContactStore = defineStore('contacts', () => {
-  const addedContact = ref(null)
+  const contactToProvide = ref(null)
 
-  const getAddedContact = computed(() => addedContact.value)
+  const providedContact = computed(() => contactToProvide.value)
 
-  const resetAddedContact = () => {
-    addedContact.value = null
+  const setProvidedContact = ({ contact }) => {
+    contactToProvide.value = contact
   }
 
-  const setAddedContact = (contact) => {
-    addedContact.value = contact
+  const clearProvidedContact = () => {
+    contactToProvide.value = null
   }
 
   return {
-    getAddedContact,
-    resetAddedContact,
-    setAddedContact
+    providedContact,
+    setProvidedContact,
+    clearProvidedContact
   }
 })

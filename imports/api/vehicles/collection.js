@@ -2,55 +2,52 @@ import { Meteor } from 'meteor/meteor'
 import { Mongo } from 'meteor/mongo'
 import { Queue } from 'queue-system'
 
-import baseSchema from '../core/schemas/base-schema'
-import tagsSchema from '../core/schemas/tags-schema'
+import codeSchema from '../core/schemas/code'
+import timestampSchema from '../core/schemas/timestamp'
+import isActiveSchema from '../core/schemas/is_active'
+import tagsSchema from '../core/schemas/tags'
 import vehicleSchema from './schema'
 
-const Vehicles = new Mongo.Collection('vehicles')
+const Vehicles = new Mongo.Collection('vehicles', { defineMutationMethods: false })
 const VehiclesQueue = new Queue()
 
-Vehicles.attachSchema(baseSchema)
+Vehicles.attachSchema(codeSchema)
+Vehicles.attachSchema(timestampSchema)
+Vehicles.attachSchema(isActiveSchema)
 Vehicles.attachSchema(tagsSchema)
 Vehicles.attachSchema(vehicleSchema)
 
-Vehicles.deny({
-  insert: () => true,
-  update: () => true,
-  remove: () => true
-})
-
 if (Meteor.isServer) {
-  Vehicles.createIndex({ code: 1 }, {
+  Vehicles.createIndexAsync({ code: 1 }, {
     name: 'codeIndex',
     unique: true
   })
 
-  Vehicles.createIndex({ regNumber: 1 }, {
+  Vehicles.createIndexAsync({ regNumber: 1 }, {
     name: 'regNumberIndex',
     unique: true,
     sparse: true
   })
 
-  Vehicles.createIndex({ chassisNumber: 1 }, {
+  Vehicles.createIndexAsync({ chassisNumber: 1 }, {
     name: 'chassisNumberIndex',
     unique: true,
     sparse: true
   })
 
-  Vehicles.createIndex({ searchableMake: 1 }, { name: 'searchableMakeIndex' })
-  Vehicles.createIndex({ searchableModel: 1 }, { name: 'searchableModelIndex' })
-  Vehicles.createIndex({ searchableMakeModel: 1 }, { name: 'searchableMakeModelIndex' })
-  Vehicles.createIndex({ searchableBodyType: 1 }, { name: 'searchableBodyTypeIndex' })
-  Vehicles.createIndex({ searchableFuelType: 1 }, { name: 'searchableFuelTypeIndex' })
-  Vehicles.createIndex({ searchableEngine: 1 }, { name: 'searchableEngineIndex' })
-  Vehicles.createIndex({ searchableGearbox: 1 }, { name: 'searchableGearboxIndex' })
-  Vehicles.createIndex({ searchableDrivetrain: 1 }, { name: 'searchableDrivetrainIndex' })
-  Vehicles.createIndex({ updatedAt: 1 }, { name: 'updatedAtIndex' })
+  Vehicles.createIndexAsync({ searchableMake: 1 }, { name: 'searchableMakeIndex' })
+  Vehicles.createIndexAsync({ searchableModel: 1 }, { name: 'searchableModelIndex' })
+  Vehicles.createIndexAsync({ searchableMakeModel: 1 }, { name: 'searchableMakeModelIndex' })
+  Vehicles.createIndexAsync({ searchableBodyType: 1 }, { name: 'searchableBodyTypeIndex' })
+  Vehicles.createIndexAsync({ searchableFuelType: 1 }, { name: 'searchableFuelTypeIndex' })
+  Vehicles.createIndexAsync({ searchableEngine: 1 }, { name: 'searchableEngineIndex' })
+  Vehicles.createIndexAsync({ searchableGearbox: 1 }, { name: 'searchableGearboxIndex' })
+  Vehicles.createIndexAsync({ searchableDrivetrain: 1 }, { name: 'searchableDrivetrainIndex' })
 
-  Vehicles.createIndex({ searchableTags: 1 }, {
-    name: 'searchableTagsIndex',
-    sparse: true
-  })
+  Vehicles.createIndexAsync({ createdById: 1 }, { name: 'createdByIdIndex' })
+  Vehicles.createIndexAsync({ createdAt: 1 }, { name: 'createdAtIndex' })
+  Vehicles.createIndexAsync({ updatedAt: 1 }, { name: 'updatedAtIndex' })
+  Vehicles.createIndexAsync({ isActive: 1 }, { name: 'isActiveIndex' })
 }
 
 export { Vehicles as default, VehiclesQueue }

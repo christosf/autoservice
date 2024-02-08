@@ -1,8 +1,16 @@
 import SimpleSchema from 'simpl-schema'
-import { convertToSearchableString } from '../core/functions'
+import { regNumberRegex, chassisNumberRegex, modelYearRegex } from './utilities'
+import { convertToSearchableString } from '../core/utilities'
 
-export default new SimpleSchema({
-  ownerId: String,
+const vehicleSchema = new SimpleSchema({
+  ownerId: {
+    type: String
+  },
+  ownerCache: {
+    type: Object,
+    blackbox: true,
+    optional: true
+  },
   make: {
     type: String,
     max: 50
@@ -12,7 +20,7 @@ export default new SimpleSchema({
     autoValue() {
       const makeField = this.field('make')
       return makeField.isSet
-        ? convertToSearchableString(makeField.value)
+        ? convertToSearchableString({ value: makeField.value })
         : this.unset()
     }
   },
@@ -25,7 +33,7 @@ export default new SimpleSchema({
     autoValue() {
       const modelField = this.field('model')
       return modelField.isSet
-        ? convertToSearchableString(modelField.value)
+        ? convertToSearchableString({ value: modelField.value })
         : this.unset()
     }
   },
@@ -38,7 +46,7 @@ export default new SimpleSchema({
     autoValue() {
       const makeModelField = this.field('makeModel')
       return makeModelField.isSet
-        ? convertToSearchableString(makeModelField.value)
+        ? convertToSearchableString({ value: makeModelField.value })
         : this.unset()
     }
   },
@@ -46,7 +54,7 @@ export default new SimpleSchema({
     type: String,
     min: 4,
     max: 10,
-    regEx: /^$|^[a-zA-Z0-9]{4,10}$/,
+    regEx: regNumberRegex,
     autoValue() {
       return this.isSet ? this.value.toUpperCase() : this.unset()
     },
@@ -58,7 +66,7 @@ export default new SimpleSchema({
     type: String,
     min: 17,
     max: 17,
-    regEx: /^$|^[a-zA-Z0-9]{17}$/,
+    regEx: chassisNumberRegex,
     autoValue() {
       return this.isSet ? this.value.toUpperCase() : this.unset()
     },
@@ -77,7 +85,7 @@ export default new SimpleSchema({
     autoValue() {
       const bodyTypeField = this.field('bodyType')
       return bodyTypeField.isSet
-        ? convertToSearchableString(bodyTypeField.value)
+        ? convertToSearchableString({ value: bodyTypeField.value })
         : this.unset()
     }
   },
@@ -92,7 +100,7 @@ export default new SimpleSchema({
     autoValue() {
       const fuelTypeField = this.field('fuelType')
       return fuelTypeField.isSet
-        ? convertToSearchableString(fuelTypeField.value)
+        ? convertToSearchableString({ value: fuelTypeField.value })
         : this.unset()
     }
   },
@@ -107,7 +115,7 @@ export default new SimpleSchema({
     autoValue() {
       const engineField = this.field('engine')
       return engineField.isSet
-        ? convertToSearchableString(engineField.value)
+        ? convertToSearchableString({ value: engineField.value })
         : this.unset()
     }
   },
@@ -122,7 +130,7 @@ export default new SimpleSchema({
     autoValue() {
       const gearboxField = this.field('gearbox')
       return gearboxField.isSet
-        ? convertToSearchableString(gearboxField.value)
+        ? convertToSearchableString({ value: gearboxField.value })
         : this.unset()
     }
   },
@@ -137,7 +145,7 @@ export default new SimpleSchema({
     autoValue() {
       const drivetrainField = this.field('drivetrain')
       return drivetrainField.isSet
-        ? convertToSearchableString(drivetrainField.value)
+        ? convertToSearchableString({ value: drivetrainField.value })
         : this.unset()
     }
   },
@@ -145,7 +153,7 @@ export default new SimpleSchema({
     type: String,
     min: 4,
     max: 4,
-    regEx: /^[0-9]{4}$/,
+    regEx: modelYearRegex,
     optional: true
   },
   notes: {
@@ -153,3 +161,5 @@ export default new SimpleSchema({
     optional: true
   }
 })
+
+export default vehicleSchema

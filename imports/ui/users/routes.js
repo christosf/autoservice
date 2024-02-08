@@ -1,31 +1,28 @@
-import LeftSidebar from '../core/components/LeftSidebar.vue'
-import LoginPage from './pages/LoginPage.vue'
-import ForgotPassword from './pages/ForgotPassword.vue'
-import IndexPage from '../core/pages/IndexPage.vue'
-
 export default [
   {
     name: 'LoginPage',
     path: '/login',
-    component: LoginPage,
+    components: {
+      default: () => import('./pages/LoginPage.vue')
+    },
     meta: {
       access: 'guests-only'
     }
   },
   {
-    name: 'ForgotPassword',
-    path: '/forgot-password',
-    component: ForgotPassword,
-    meta: {
-      access: 'guests-only'
+    name: 'UserAccount',
+    path: '/account',
+    components: {
+      default: () => import('./pages/UserAccount.vue'),
+      sidebar: () => import('../core/components/MainSidebar.vue')
     }
   },
   {
     name: 'ViewUser',
     path: '/users/:username',
     components: {
-      default: IndexPage,
-      leftSidebar: LeftSidebar
+      default: () => import('./pages/UserAccount.vue'),
+      sidebar: () => import('../core/components/MainSidebar.vue')
     }
   }
 ]

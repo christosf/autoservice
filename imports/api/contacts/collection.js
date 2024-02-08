@@ -2,49 +2,51 @@ import { Meteor } from 'meteor/meteor'
 import { Mongo } from 'meteor/mongo'
 import { Queue } from 'queue-system'
 
-import baseSchema from '../core/schemas/base-schema'
-import tagsSchema from '../core/schemas/tags-schema'
+import codeSchema from '../core/schemas/code'
+import timestampSchema from '../core/schemas/timestamp'
+import isActiveSchema from '../core/schemas/is_active'
+import tagsSchema from '../core/schemas/tags'
 import contactSchema from './schema'
 
-const Contacts = new Mongo.Collection('contacts')
+const Contacts = new Mongo.Collection('contacts', { defineMutationMethods: false })
 const ContactsQueue = new Queue()
 
-Contacts.attachSchema(baseSchema)
+Contacts.attachSchema(codeSchema)
+Contacts.attachSchema(timestampSchema)
+Contacts.attachSchema(isActiveSchema)
 Contacts.attachSchema(tagsSchema)
 Contacts.attachSchema(contactSchema)
 
-Contacts.deny({
-  insert: () => true,
-  update: () => true,
-  remove: () => true
-})
-
 if (Meteor.isServer) {
-  Contacts.createIndex({ code: 1 }, {
+  Contacts.createIndexAsync({ code: 1 }, {
     name: 'codeIndex',
     unique: true
   })
 
-  Contacts.createIndex({ searchableName: 1, phoneNumber: 1 }, {
+  Contacts.createIndexAsync({ searchableName: 1, phoneNumber: 1 }, {
     name: 'searchableNamePhoneNumberIndex',
     unique: true
   })
 
-  Contacts.createIndex({ searchableName: 1 }, { name: 'searchableNameIndex' })
-  Contacts.createIndex({ phoneNumber: 1 }, { name: 'phoneNumberIndex' })
-  Contacts.createIndex({ vehicleCount: 1 }, { name: 'vehicleCountIndex' })
-  Contacts.createIndex({ createdAt: 1 }, { name: 'createdAtIndex' })
-  Contacts.createIndex({ updatedAt: 1 }, { name: 'updatedAtIndex' })
-
-  Contacts.createIndex({ searchableTags: 1 }, {
+  Contacts.createIndexAsync({ searchableTags: 1 }, {
     name: 'searchableTagsIndex',
     sparse: true
   })
 
-  Contacts.createIndex({ 'contactMethods.searchableValue': 1 }, {
+  Contacts.createIndexAsync({ 'contactMethods.searchableValue': 1 }, {
     name: 'contactMethodsSearchableValueIndex',
     sparse: true
   })
+
+  Contacts.createIndexAsync({ type: 1 }, { name: 'typeIndex' })
+  Contacts.createIndexAsync({ phoneNumber: 1 }, { name: 'phoneNumberIndex' })
+  Contacts.createIndexAsync({ searchableName: 1 }, { name: 'searchableNameIndex' })
+  Contacts.createIndexAsync({ vehicleCount: 1 }, { name: 'vehicleCountIndex' })
+
+  Contacts.createIndexAsync({ createdById: 1 }, { name: 'createdByIdIndex' })
+  Contacts.createIndexAsync({ createdAt: 1 }, { name: 'createdAtIndex' })
+  Contacts.createIndexAsync({ updatedAt: 1 }, { name: 'updatedAtIndex' })
+  Contacts.createIndexAsync({ isActive: 1 }, { name: 'isActiveIndex' })
 }
 
 export { Contacts as default, ContactsQueue }

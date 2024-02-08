@@ -1,0 +1,9 @@
+{
+  "login": "Σύνδεση",
+  "msg_incorrect_credentials_short": "Λανθασμένα στοιχεία σύνδεσης.",
+  "msg_incorrect_credentials": "Το όνομα χρήστη ή ο κωδικός πρόσβασης είναι λανθασμένος.",
+  "msg_login_successful": "Έχετε συνδεθεί επιτυχώς!",
+  "msg_logout_successful": "Έχετε αποσυνδεθεί επιτυχώς!",
+  "password": "Κωδικός πρόσβασης",
+  "username": "Όνομα χρήστη"
+}

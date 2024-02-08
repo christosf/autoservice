@@ -1,33 +1,22 @@
-import { Meteor } from 'meteor/meteor'
 import { createRouter, createWebHistory } from 'vue-router'
+
+import core from '../../ui/core/routes'
+import users from '../../ui/users/routes'
 import contacts from '../../ui/contacts/routes'
 import vehicles from '../../ui/vehicles/routes'
-import services from '../../ui/services/routes'
-import jobcards from '../../ui/job-cards/routes'
-import users from '../../ui/users/routes'
-import settings from '../../ui/settings/routes'
-import core from '../../ui/core/routes'
+import jobCards from '../../ui/job_cards/routes'
 
 const routes = [
+  ...core,
+  ...users,
   ...contacts,
   ...vehicles,
-  ...services,
-  ...jobcards,
-  ...users,
-  ...settings,
-  ...core
+  ...jobCards
 ]
 
 const router = createRouter({
   history: createWebHistory(),
   routes
-})
-
-router.beforeEach((to) => {
-  if (!Meteor.userId() && to.meta.access !== 'guests-only') {
-    return { name: 'LoginPage' }
-  }
-  return true
 })
 
 export default router

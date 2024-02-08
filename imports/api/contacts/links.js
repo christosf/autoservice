@@ -1,3 +1,4 @@
+import { Meteor } from 'meteor/meteor'
 import { Contacts, Users, HistoryLog, Vehicles } from '../database'
 
 Contacts.addLinks({
@@ -5,14 +6,26 @@ Contacts.addLinks({
     collection: Users,
     type: 'one',
     field: 'createdById'
-  },
-  history: {
-    collection: HistoryLog,
-    inversedBy: 'contact',
-    autoremove: true
-  },
-  vehicles: {
-    collection: Vehicles,
-    inversedBy: 'owner'
   }
+})
+
+Meteor.startup(() => {
+  Contacts.addLinks({
+    vehicles: {
+      collection: Vehicles,
+      inversedBy: 'owner',
+      denormalize: {
+        body: {
+          _id: 1,
+          regNumber: 1
+        },
+        field: 'vehiclesCache'
+      }
+    },
+    history: {
+      collection: HistoryLog,
+      inversedBy: 'contact',
+      autoremove: true
+    }
+  })
 })

@@ -1,0 +1,6 @@
+import './settings/queries/exposure'
+import './history_log/queries/exposure'
+import './users/queries/exposure'
+import './contacts/queries/exposure'
+import './vehicles/queries/exposure'
+import './job_cards/queries/exposure'

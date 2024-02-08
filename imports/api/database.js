@@ -1,26 +1,25 @@
-import ErrorLog from './error-log/collection'
-import HistoryLog from './history-log/collection'
-import Counters from './counters/collection'
 import Settings from './settings/collection'
+import Counters from './counters/collection'
+import Files from './files/collection'
+import HistoryLog from './history_log/collection'
 import Users from './users/collection'
 import Contacts from './contacts/collection'
 import Vehicles from './vehicles/collection'
-import Services from './services/collection'
-import Parts from './parts/collection'
+import JobCards from './job_cards/collection'
 
-import './history-log/links'
+import './history_log/links'
 import './users/links'
 import './contacts/links'
 import './vehicles/links'
+import './job_cards/links'
 
 export {
-  ErrorLog,
-  HistoryLog,
-  Counters,
   Settings,
+  Counters,
+  Files,
+  HistoryLog,
   Users,
   Contacts,
   Vehicles,
-  Services,
-  Parts
+  JobCards
 }

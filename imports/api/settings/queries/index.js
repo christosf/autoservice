@@ -1,5 +1,3 @@
-import getGeneralSettings from './getGeneralSettings'
+import getSettingsQuery from './get_settings'
 
-export {
-  getGeneralSettings
-}
+export { getSettingsQuery }

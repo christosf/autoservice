@@ -1,29 +1,42 @@
 import { createI18n } from 'vue-i18n'
-import merge from 'deepmerge'
 
-import core from '../../ui/core/translations'
-import settings from '../../ui/settings/translations'
-import historyLog from '../../ui/history-log/translations'
-import users from '../../ui/users/translations'
-import contacts from '../../ui/contacts/translations'
-import vehicles from '../../ui/vehicles/translations'
-import services from '../../ui/services/translations'
-import jobcards from '../../ui/job-cards/translations'
+import coreEL from '../../locales/el/core.json'
+import coreEN from '../../locales/en/core.json'
+import historyLogEL from '../../locales/el/history_log.json'
+import historyLogEN from '../../locales/en/history_log.json'
+import usersEL from '../../locales/el/users.json'
+import usersEN from '../../locales/en/users.json'
+import contactsEL from '../../locales/el/contacts.json'
+import contactsEN from '../../locales/en/contacts.json'
+import vehiclesEL from '../../locales/el/vehicles.json'
+import vehiclesEN from '../../locales/en/vehicles.json'
+import jobCardsEL from '../../locales/el/job_cards.json'
+import jobCardsEN from '../../locales/en/job_cards.json'
 
-const messages = merge.all([
-  core,
-  settings,
-  historyLog,
-  users,
-  contacts,
-  vehicles,
-  services,
-  jobcards
-])
+const translations = {
+  el: {
+    core: coreEL,
+    history_log: historyLogEL,
+    users: usersEL,
+    contacts: contactsEL,
+    vehicles: vehiclesEL,
+    job_cards: jobCardsEL
+  },
+  en: {
+    core: coreEN,
+    history_log: historyLogEN,
+    users: usersEN,
+    contacts: contactsEN,
+    vehicles: vehiclesEN,
+    job_cards: jobCardsEN
+  }
+}
 
-export default createI18n({
+const i18n = createI18n({
   locale: 'el',
   fallbackLocale: 'en',
   legacy: false,
-  messages
+  messages: translations
 })
+
+export default i18n

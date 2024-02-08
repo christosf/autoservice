@@ -18,6 +18,19 @@ a {
 	text-transform: none;
 }
 
+/* Chrome, Safari, Edge, Opera */
+.hide-arrows input::-webkit-outer-spin-button,
+.hide-arrows input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+.hide-arrows input[type=number] {
+  -moz-appearance: textfield;
+	appearance: textfield;
+}
+
 .fade-enter-active, .fade-leave-active {
     transition: opacity 0.1s;
 }
@@ -70,33 +83,50 @@ a {
 	padding-left: 32px;
 }
 
+.after-options-slot .q-item {
+  border-top: 1px solid rgba(0,0,0,0.1)
+}
+
 .q-banner {
 	border: 1px solid rgba(0,0,0,0.1)
 }
-
+/*
 .q-table th {
-    font-size: 13px;
+	font-size: 13px;
+}
+
+.q-table--dense .q-table th {
+	font-size: 12px;
 }
 
 .q-table tbody td {
-    font-size: 14px;
+  font-size: 14px;
+}
+
+.q-table--dense .q-table tbody td {
+	font-size: 13px;
+}
+*/
+
+.q-table tbody td, .q-table thead tr {
+	height: 40px;
 }
 
 .q-table tbody td.dense {
-    padding: 7px;
+  padding: 7px;
 }
 
 .q-table tbody td.operations {
 	padding-left: 6px;
-    padding-right: 10px;
+  padding-right: 10px;
 }
 
 .q-table thead th.operations,
 .q-table tbody td.operations {
-    background-color: #ffffff;
-    position: sticky;
-    right: -1px;
-    z-index: 1;
+	background-color: #ffffff;
+	position: sticky;
+	right: -1px;
+	z-index: 1;
 }
 
 .custom-dropdown-menu {
@@ -107,6 +137,7 @@ a {
 .custom-dropdown-menu .q-item {
 	min-height: 40px;
 	padding: 6px 12px;
+	font-size: 13px;
 }
 
 .custom-dropdown-menu .q-item--dense, .q-list--dense>.q-item {
@@ -118,10 +149,25 @@ a {
 	min-width: 30px;
 }
 
+
 .custom-dropdown-menu .q-item__section--side {
 	padding-right: 10px;
 }
 
+.custom-dropdown-menu .q-item__section--side:last-child {
+	padding-right: 0px;
+}
+
 .custom-dropdown-menu .q-item__section--side>.q-icon {
 	font-size: 20px;
+}
+
+div.q-card__section.border-bottom {
+	border-bottom: 1px solid rgba(0,0,0,.12);
+}
+
+.q-editor__content ol,
+.q-editor__content ul {
+	margin: 2px 0;
+	padding-left: 24px;
 }

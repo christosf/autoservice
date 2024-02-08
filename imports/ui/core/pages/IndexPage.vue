@@ -1,20 +1,17 @@
-<template>
-    <q-page padding>
-        
-    </q-page>
-</template>
-
-<script>
+<script setup>
 import { useI18n } from 'vue-i18n'
 import { useMeta } from '../../quasar'
 
-export default {
-    setup() {
-        const { t: $t } = useI18n()
+const { t: $t } = useI18n()
 
-        useMeta({
-            title: $t('core.homepage')
-        })
-    }
-}
+useMeta({
+  title: $t('core.dashboard')
+})
+
 </script>
+
+<template>
+  <q-page padding>
+    {{ $t('core.msg_welcome') }}
+  </q-page>
+</template>

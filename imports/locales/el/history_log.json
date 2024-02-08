@@ -1,0 +1,23 @@
+{
+  "contacts_method": "{index}η μέθοδος επικοινωνίας",
+  "contacts_method_description": "{index}η μέθοδος επικοινωνίας > Περιγραφή",
+  "contacts_method_type": "{index}η μέθοδος επικοινωνίας > Τύπος",
+  "contacts_method_value": "{index}η μέθοδος επικοινωνίας > Τιμή",
+  "deleted": "Διαγραμμένο αντικείμενο",
+  "msg_reorder": "Αναταξινομήθηκε από την {from}η στην {to}η θέση.",
+  "operation_add": "Προσθήκη",
+  "operation_remove": "Αφαίρεση",
+  "operation_reorder": "Αναταξινόμηση",
+  "operation_replace": "Ενημέρωση",
+  "type_activation": "Ενεργοποίηση",
+  "type_deactivation": "Απενεργοποίηση",
+  "type_insert": "Προσθήκη",
+  "type_link": "Συσχέτιση",
+  "type_notes_update": "Ενημέρωση σημειώσεων",
+  "type_unlink": "Αφαίρεση συσχέτισης",
+  "type_unlink_delete": "Αφαίρεση συσχέτισης λόγω διαγραφής",
+  "type_update": "Ενημέρωση",
+  "value_new": "Νέα τιμή",
+  "value_prev": "Προηγούμενη τιμή",
+  "view_change_list": "Προβολή λίστας αλλαγών"
+}

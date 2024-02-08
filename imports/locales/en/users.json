@@ -1,0 +1,9 @@
+{
+  "login": "Log in",
+  "msg_incorrect_credentials_short": "Incorrect credentials.",
+  "msg_incorrect_credentials": "Username or password is incorrect.",
+  "msg_login_successful": "You have logged in successfully!",
+  "msg_logout_successful": "You logged out successfully!",
+  "password": "Password",
+  "username": "Username"
+}

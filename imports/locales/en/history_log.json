@@ -1,0 +1,23 @@
+{
+  "contacts_method": "Contact method no. {index}",
+  "contacts_method_description": "Contact method No. {index} > Description",
+  "contacts_method_type": "Contact method No. {index} > Type",
+  "contacts_method_value": "Contact method No. {index} > Value",
+  "deleted": "Deleted object",
+  "msg_reorder": "Re-ordered from no. {from} to no. {to} position.",
+  "operation_add": "Insert",
+  "operation_remove": "Remove",
+  "operation_reorder": "Reorder",
+  "operation_replace": "Update",
+  "type_activation": "Activation",
+  "type_deactivation": "Deactivation",
+  "type_insert": "Insert",
+  "type_link": "Association",
+  "type_notes_update": "Notes update",
+  "type_unlink": "Association removal",
+  "type_unlink_delete": "Association removal due to deletion",
+  "type_update": "Update",
+  "value_new": "New value",
+  "value_prev": "Previous value",
+  "view_change_list": "View change list"
+}

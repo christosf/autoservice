@@ -1,0 +1,55 @@
+<script setup>
+import { defineModel, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { useVehicleAPI } from '../../composables'
+
+const model = defineModel({ required: true })
+
+const { t: $t } = useI18n()
+const { getDistinctFieldValues } = useVehicleAPI()
+
+const optionList = ref([])
+
+const filterOptionList = async(filter, update) => {
+  if (filter === '') {
+    update(() => {
+      optionList.value = []
+    })
+    return
+  }
+  const options = await getDistinctFieldValues({ filter, field: 'engine' })
+
+  update(() => {
+    optionList.value = options
+  })
+}
+</script>
+
+<template>
+  <q-select
+    v-model='model'
+    @filter='filterOptionList'
+    @input-value='(value) => model = value'
+    :label='$t("vehicles.engine")'
+    :options='optionList'
+    maxlength='50'
+    hide-dropdown-icon
+    use-input
+    fill-input
+    hide-selected
+    options-dense
+    bottom-slots
+    outlined
+  >
+    <template #prepend>
+      <q-icon name='sym_o_cyclone' />
+    </template>
+    <template v-slot:option='{ itemProps, opt }'>
+      <q-item v-bind='itemProps' class='add-relation-item'>
+        <q-item-section>
+          <q-item-label>{{ opt }}</q-item-label>
+        </q-item-section>
+      </q-item>
+    </template>
+  </q-select>
+</template>
